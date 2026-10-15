@@ -201,9 +201,14 @@ figma.ui.onmessage = async (msg) => {
     }
 
     if (msg.type === 'dump') {
-      const roots = msg.scope === 'all'
-        ? figma.root.children.flatMap((p) => p.children)
-        : figma.currentPage.selection;
+      let roots;
+      if (msg.scope === 'all') {
+        // مع documentAccess: dynamic-page لازم نحمّل الصفحات أولًا
+        await figma.loadAllPagesAsync();
+        roots = figma.root.children.flatMap((p) => p.children);
+      } else {
+        roots = figma.currentPage.selection.slice();
+      }
 
       if (!roots.length) {
         figma.ui.postMessage({ type: 'error', message: 'Nothing selected.' });
