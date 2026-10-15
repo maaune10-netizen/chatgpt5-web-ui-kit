@@ -9,6 +9,20 @@ HOW TO INSTALL (30 seconds)
 4. Pick the manifest.json inside the unzipped folder.
 5. Done — it now appears under Plugins -> Development -> Design Dump.
 
+UPDATING AN ALREADY-IMPORTED COPY
+Figma does not re-read a changed manifest. So:
+  Plugins -> Development -> Manage plugins in development -> "..." -> Remove
+then import the manifest again.
+
+VERSION 2 FIXES
+  - "flatMap is not a function" on whole-file export (older Figma engines have
+    no Array.prototype.flatMap). Replaced with plain loops.
+  - SVG export silently produced 0 files: it filtered on a flag that only exists
+    on the serialized objects, not on the real nodes.
+  - Every step now reports progress by name, so any failure says where.
+  - Guarded for older Figma: no loadAllPagesAsync, missing apiVersion, and an
+    undefined selection no longer break it.
+
 HOW TO USE
 1. Open the file you want to export (e.g. the ChatGPT 5 Web UI Kit).
 2. Select the frames you want (shift-click, or drag a marquee over the whole page).
