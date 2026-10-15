@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 16px; background: #1e1e1e; color: #ececec;
+    font: 12px/1.6 Inter, -apple-system, "Segoe UI", sans-serif;
+  }
+  h1 { font-size: 14px; margin: 0 0 4px; font-weight: 600; }
+  p.hint { color: #9a9a9a; margin: 0 0 14px; }
+  .row { display: flex; gap: 8px; margin-bottom: 10px; }
+  button {
+    font: inherit; padding: 9px 14px; border-radius: 8px; border: 1px solid #3d3d3d;
+    background: #2c2c2c; color: #ececec; cursor: pointer; flex: 1;
+  }
+  button:hover { background: #383838; }
+  button.primary { background: #fff; color: #000; border-color: #fff; font-weight: 600; }
+  button.primary:hover { background: #e6e6e6; }
+  button:disabled { opacity: .5; cursor: default; }
+  label.chk { display: flex; align-items: center; gap: 8px; color: #cfcfcf; margin-bottom: 12px; cursor: pointer; }
+  #status { font-size: 11px; color: #9a9a9a; min-height: 18px; margin-bottom: 10px; }
+  #status.ok { color: #6ee7a8; }
+  #status.err { color: #f87171; }
+  #out {
+    width: 100%; height: 150px; resize: none; background: #141414; color: #b9b9b9;
+    border: 1px solid #333; border-radius: 8px; padding: 8px; font: 10px/1.5 ui-monospace, Consolas, monospace;
+  }
+  a.dl { display: none; }
+</style>
+</head>
+<body>
+  <h1>Design Dump</h1>
+  <p class="hint">Select the frames in Figma, then export their full node tree as JSON.</p>
+
+  <div class="row">
+    <button id="scoped">Use selection</button>
+    <button id="all">Use whole file</button>
+  </div>
+
+  <label class="chk">
+    <input type="checkbox" id="svg" />
+    Also export SVG for every vector (icons) — slower
+  </label>
+
+  <div class="row">
+    <button class="primary" id="go" disabled>Export JSON</button>
+  </div>
+
+  <div id="status">Nothing selected yet.</div>
+  <textarea id="out" readonly placeholder="The exported JSON appears here…"></textarea>
+
+  <div class="row" style="margin-top:10px">
+    <button id="save" disabled>Download .json</button>
+  </div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  let scope = null;
+  let result = null;
+
+  const setStatus = (msg, cls) => { $('status').textContent = msg; $('status').className = cls || ''; };
+
+  const post = (msg) => parent.postMessage({ pluginMessage: msg }, '*');
+
+  function bytes(n) {
+    if (n < 1024) return n + ' B';
+    if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+    return (n / 1048576).toFixed(2) + ' MB';
+  }
+
+  $('scoped').onclick = () => { scope = 'selection'; post({ type: 'count' }); };
+  $('all').onclick = () => { scope = 'all'; setStatus('Whole file selected. Press Export.'); $('go').disabled = false; };
+
+  $('go').onclick = () => {
+    if (!scope) return;
+    result = null;
+    $('save').disabled = true;
+    $('out').value = '';
+    $('go').disabled = true;
+    setStatus('Working…');
+    post({ type: 'dump', scope, includeSvg: $('svg').checked });
+  };
+
+  $('save').onclick = () => {
+    if (!result) return;
+    const blob = new Blob([JSON.stringify(result)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    a.download = 'figma-dump-' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  onmessage = (event) => {
+    const msg = event.data.pluginMessage;
+    if (!msg) return;
+
+    if (msg.type === 'count') {
+      if (!msg.selected) {
+        setStatus('Nothing selected. Select frames in Figma, or use the whole file.');
+        $('go').disabled = true;
+        return;
+      }
+      setStatus('Selection: ' + msg.selected + ' frame(s), ' + msg.nodes + ' nodes. Ready.');
+      $('go').disabled = false;
+    }
+
+    if (msg.type === 'progress') setStatus(msg.message);
+
+    if (msg.type === 'error') {
+      setStatus('Error: ' + msg.message, 'err');
+      $('go').disabled = false;
+    }
+
+    if (msg.type === 'done') {
+      result = msg.payload;
+      const json = JSON.stringify(result);
+      $('out').value = JSON.stringify(result.meta, null, 2);
+      $('save').disabled = false;
+      $('go').disabled = false;
+      setStatus(
+        'Done — ' + result.meta.nodeCount + ' nodes' +
+        (result.meta.svgCount ? ', ' + result.meta.svgCount + ' SVGs' : '') +
+        ' · ' + bytes(json.length) + '. Press Download.',
+        'ok'
+      );
+    }
+  };
+</script>
+</body>
+</html>
