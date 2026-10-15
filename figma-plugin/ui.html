@@ -56,7 +56,7 @@
 <body>
   <header>
     <h1>Design Dump</h1>
-    <span class="badge">v3</span>
+    <span class="badge" id="ver">v3.2</span>
   </header>
 
   <div class="row">
@@ -71,6 +71,7 @@
 
   <div class="row">
     <button class="primary" id="go" disabled>Export JSON</button>
+    <button id="cancel" style="flex:0 0 84px;display:none">Cancel</button>
     <button id="diag" style="flex:0 0 96px">Copy log</button>
   </div>
 
@@ -84,7 +85,7 @@
   <div class="panel">
     <h2>
       <span>Issues</span>
-      <span><span id="cntErr">0</span> errors · <span id="cntWarn">0</span> warnings</span>
+      <span><span id="cntErr">0</span> errors · <span id="cntSkip">0</span> skipped</span>
     </h2>
     <div class="body"><ul id="errs"><li class="empty">None.</li></ul></div>
   </div>
@@ -103,6 +104,8 @@
   var scope = null;
   var result = null;
   var log = [];
+  var lastStages = [];
+  var lastSkip = 0;
   var tick = null;
   var t0 = 0;
 
@@ -157,7 +160,7 @@
     if (tick) clearInterval(tick);
     tick = setInterval(function () { $('timer').textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's'; }, 100);
   }
-  function stopTimer() { if (tick) { clearInterval(tick); tick = null; } }
+  function stopTimer() { if (tick) { clearInterval(tick); tick = null; } $('cancel').style.display = 'none'; }
 
   $('scoped').onclick = function () {
     scope = 'selection';
@@ -180,8 +183,14 @@
     $('go').disabled = true;
     renderIssues();
     setStatus('Working…');
+    $('cancel').style.display = '';
     startTimer();
     post({ type: 'dump', scope: scope, includeSvg: $('svg').checked });
+  };
+
+  $('cancel').onclick = function () {
+    post({ type: 'cancel' });
+    setStatus('Cancelling…');
   };
 
   $('diag').onclick = function () {
@@ -190,7 +199,8 @@
       when: new Date().toISOString(),
       userAgent: navigator.userAgent,
       scope: scope,
-      stages: (result && result.diagnostics && result.diagnostics.stages) || [],
+      stages: (result && result.diagnostics && result.diagnostics.stages) || lastStages,
+      skipped: (result && result.diagnostics && result.diagnostics.skipped) || [],
       errors: (result && result.diagnostics && result.diagnostics.errors) || log.filter(function (x) { return x.kind !== 'warn'; }),
       warnings: (result && result.diagnostics && result.diagnostics.warnings) || log.filter(function (x) { return x.kind === 'warn'; }),
     };
@@ -231,9 +241,11 @@
     if (raw.type === 'fatal') { setStatus('Fatal: ' + (msg.message || 'unknown'), 'err'); return; }
 
     if (raw.type === 'status') {
+      lastStages = msg.stages || [];
+      lastSkip = msg.skipped || 0;
       renderStages(msg.stages, msg.step);
       $('cntErr').textContent = msg.errors;
-      $('cntWarn').textContent = msg.warnings;
+      $('cntSkip').textContent = lastSkip;
       $('timer').textContent = (msg.elapsed / 1000).toFixed(1) + 's';
     }
 
@@ -286,7 +298,8 @@
         'vectors      ' + m.vectorCount + '\n' +
         'svgs         ' + m.svgCount + '\n' +
         'errors       ' + m.errorCount + '\n' +
-        'warnings     ' + m.warningCount + '\n' +
+        'skipped      ' + (m.skippedCount || 0) + '\n' +
+        'unique vecs  ' + (m.uniqueVectorCount || 0) + '\n' +
         'elapsed      ' + (m.elapsedMs / 1000).toFixed(2) + 's\n' +
         'json size    ' + bytes(json.length) + '\n' +
         'figma api    ' + m.api + ' (' + m.editor + ')';

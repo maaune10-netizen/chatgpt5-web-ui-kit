@@ -1,4 +1,4 @@
-Design Dump v3 — Figma plugin
+Design Dump v3.2 — Figma plugin
 ==========================
 
 HOW TO INSTALL (30 seconds)
@@ -13,6 +13,32 @@ UPDATING AN ALREADY-IMPORTED COPY
 Figma does not re-read a changed manifest. So:
   Plugins -> Development -> Manage plugins in development -> "..." -> Remove
 then import the manifest again.
+
+VERSION 3.2 — SVG export no longer explodes
+
+  A real run on the ChatGPT 5 kit reported 6 963 errors, all reading
+  "Failed to export node. This node may not have any visible layers."
+  Nothing was broken. Three separate problems:
+
+  1. Every icon inside every component instance was queued as its own vector,
+     so the same icon appeared hundreds of times. Instances give sub-nodes
+     composite ids like "I386:51166;126:9872;3:311"; the trailing "3:311" is
+     the master id. Vectors are now de-duplicated on that key, so each icon is
+     exported once.
+
+  2. Hidden nodes were attempted and then counted as errors. Visibility is now
+     resolved by walking the whole parent chain, and invisible nodes are
+     reported as SKIPPED, in their own counter, never as errors.
+
+  3. exportAsync still fails on some nodes with no visible layers. That message
+     is now treated as a skip rather than an error, and the export continues.
+
+  Also added: a Cancel button (keeps whatever was exported so far), progress
+  with an ETA, and a pre-flight "unique vectors" count so you can see the
+  de-duplication before it runs.
+
+  test/dedup.mjs covers it: 5 vectors (one master, three instance copies, one
+  hidden) must collapse to exactly 1 export, 4 skips and 0 errors.
 
 VERSION 3 — error tracking, live status, and the postMessage fix
 

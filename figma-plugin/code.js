@@ -11,6 +11,7 @@
  * ======================================================================== */
 
 var VERSION = 3;
+var REVISION = 2;
 
 figma.showUI(__html__, { width: 460, height: 620, title: 'Design Dump v3' });
 
@@ -21,6 +22,7 @@ var stages = [];     // { name, t }
 var errors = [];     // { t, step, nodeId, nodeName, message, stack }
 var warnings = [];   // { t, step, nodeId, nodeName, message }
 var currentStep = 'init';
+var cancelled = false;
 
 function elapsed() { return Date.now() - startedAt; }
 
@@ -59,6 +61,8 @@ function pushStatus() {
     stages: stages,
     errors: errors.length,
     warnings: warnings.length,
+    skipped: skipped.length,
+    revision: REVISION,
   });
 }
 
@@ -74,6 +78,43 @@ function recordError(e, node) {
   errors.push(entry);
   send('errlog', entry);
   return entry;
+}
+
+var skipped = [];   // ليست أخطاء: عقد مخفية أو بلا طبقات ظاهرة
+
+function recordSkip(reason, node) {
+  skipped.push({
+    t: elapsed(),
+    step: currentStep,
+    nodeId: node && node.id ? node.id : null,
+    nodeName: node && node.name ? node.name : null,
+    reason: reason,
+  });
+}
+
+/**
+ * هل العقدة ظاهرة فعلًا؟ نفحص سلسلة الآباء كاملة —
+ * لأن عقدة داخل حاوية مخفية تكون visible=true لكنها غير مرئية.
+ */
+function isVisible(node) {
+  var n = node;
+  var guard = 0;
+  while (n && n.type !== 'PAGE' && guard++ < 200) {
+    if (n.visible === false) return false;
+    n = n.parent;
+  }
+  return true;
+}
+
+/**
+ * مفتاح المصدر: نسخ المكوّنات تحمل معرّفًا مركّبًا مثل
+ * "I386:51166;126:9872;3:311" — الجزء الأخير "3:311" هو العقدة الأساسية.
+ * فكل نسخ نفس الأيقونة تتشارك المفتاح نفسه، ونصدّرها مرة واحدة.
+ */
+function sourceKey(node) {
+  var id = node && node.id ? String(node.id) : '';
+  var parts = id.split(';');
+  return parts[parts.length - 1];
 }
 
 function recordWarning(msg, node) {
@@ -294,41 +335,65 @@ function walk(node, depth, out, index) {
 
 /* ---------- SVG ---------- */
 
-function exportVectors(ids, index) {
-  return new Promise(function (resolve) {
-    var svgs = {};
-    var list = [];
-    for (var i = 0; i < ids.length; i++) {
-      var n = index[ids[i]];
-      if (n && typeof n.exportAsync === 'function') list.push(n);
-    }
-    if (!list.length) { resolve(svgs); return; }
+function exportVectors(ids, index, onDone) {
+  var svgs = {};
+  var list = [];
+  var seen = {};
 
-    var at = 0;
-    var lastPush = 0;
-    function next() {
-      if (at >= list.length) { resolve(svgs); return; }
-      var n = list[at++];
-      if (elapsed() - lastPush > 120 || at === list.length) {
-        lastPush = elapsed();
-        currentStep = 'Exporting SVG ' + at + '/' + list.length;
-        pushStatus();
-      }
-      n.exportAsync({ format: 'SVG', svgOutlineText: true })
-        .then(function (bytes) {
-          var s = '';
-          for (var k = 0; k < bytes.length; k++) s += String.fromCharCode(bytes[k]);
-          svgs[n.id] = s;
-          next();
-        })
-        .catch(function (e) {
-          svgs[n.id] = null;
-          recordError(e, n);
-          next();
-        });
+  for (var i = 0; i < ids.length; i++) {
+    var n = index[ids[i]];
+    if (!n) continue;
+    if (typeof n.exportAsync !== 'function') continue;
+
+    // تخطَّ غير المرئي — بدل ما يفشل ويُسجَّل كخطأ
+    if (!isVisible(n)) { recordSkip('hidden', n); continue; }
+
+    // أزل التكرار: نفس العقدة الأساسية عبر كل نسخ المكوّن
+    var key = sourceKey(n);
+    if (seen[key]) { recordSkip('duplicate of ' + key, n); continue; }
+    seen[key] = true;
+
+    list.push(n);
+  }
+
+  var startedAt = elapsed();
+  var at = 0;
+
+  function tick() {
+    if (cancelled) { recordWarning('SVG export cancelled — keeping ' + at + ' of ' + list.length); onDone(svgs, at); return; }
+    if (at >= list.length) { onDone(svgs, list.length); return; }
+    var n = list[at++];
+
+    if (elapsed() - lastPushAt > 150 || at === list.length) {
+      lastPushAt = elapsed();
+      var doneMs = elapsed() - startedAt;
+      var eta = at > 3 ? Math.round((doneMs / at) * (list.length - at) / 1000) : null;
+      currentStep = 'SVG ' + at + '/' + list.length + (eta !== null ? ' · ~' + eta + 's left' : '');
+      pushStatus();
     }
-    next();
-  });
+
+    n.exportAsync({ format: 'SVG', svgOutlineText: true })
+      .then(function (bytes) {
+        var out = '';
+        for (var k = 0; k < bytes.length; k++) out += String.fromCharCode(bytes[k]);
+        svgs[n.id] = out;
+        tick();
+      })
+      .catch(function (e) {
+        // "no visible layers" متوقّع → تخطٍّ، لا خطأ
+        var msg = String(e && e.message ? e.message : e);
+        if (msg.indexOf('visible') !== -1 || msg.indexOf('export') !== -1) {
+          recordSkip('not exportable: ' + msg, n);
+        } else {
+          recordError(e, n);
+        }
+        tick();
+      });
+  }
+
+  var lastPushAt = 0;
+  if (!list.length) { onDone(svgs, 0); return; }
+  tick();
 }
 
 /* ---------- الاستقبال ---------- */
@@ -336,6 +401,7 @@ function exportVectors(ids, index) {
 figma.ui.onmessage = function (msg) {
   if (!msg) return;
 
+  if (msg.type === 'cancel') { cancelled = true; pushStatus(); return; }
   if (msg.type === 'close') { figma.closePlugin(); return; }
   if (msg.type === 'resize') { figma.ui.resize(msg.w, msg.h); return; }
 
@@ -365,9 +431,11 @@ figma.ui.onmessage = function (msg) {
 
   if (msg.type === 'dump') {
     startedAt = Date.now();
+    cancelled = false;
     stages = [];
     errors = [];
     warnings = [];
+    skipped = [];
 
     (function () {
       var roots;
@@ -428,7 +496,17 @@ figma.ui.onmessage = function (msg) {
         }
 
         var vectorIds = [];
-        for (var v = 0; v < flat.length; v++) if (flat[v].vector) vectorIds.push(flat[v].id);
+        var uniqueKeys = {};
+        var uniqueCount = 0;
+        for (var v = 0; v < flat.length; v++) {
+          if (!flat[v].vector) continue;
+          vectorIds.push(flat[v].id);
+          var real = index[flat[v].id];
+          if (real && isVisible(real)) {
+            var kk = sourceKey(real);
+            if (!uniqueKeys[kk]) { uniqueKeys[kk] = 1; uniqueCount++; }
+          }
+        }
 
         function finish(svgs) {
           mark('Packaging');
@@ -445,20 +523,26 @@ figma.ui.onmessage = function (msg) {
               svgCount: svgs ? Object.keys(svgs).length : 0,
               errorCount: errors.length,
               warningCount: warnings.length,
+              skippedCount: skipped.length,
+              uniqueVectorCount: uniqueCount,
+              revision: REVISION,
               api: figma.apiVersion || 'unknown',
               editor: figma.editorType || 'unknown',
             },
             nodes: flat,
             svgs: svgs,
-            diagnostics: { stages: stages, errors: errors, warnings: warnings },
+            diagnostics: { stages: stages, errors: errors, warnings: warnings, skipped: skipped.slice(0, 200) },
           };
           mark('Done');
           send('done', payload);
         }
 
         if (msg.includeSvg && vectorIds.length) {
-          mark('Exporting ' + vectorIds.length + ' SVG');
-          return exportVectors(vectorIds, index).then(finish);
+          mark('Preparing ' + vectorIds.length + ' vectors (deduping)');
+          return exportVectors(vectorIds, index, function (svgs, exported) {
+            mark('Exported ' + exported + ' unique SVGs');
+            finish(svgs);
+          });
         }
         return finish(undefined);
       }
