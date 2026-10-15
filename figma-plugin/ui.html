@@ -5,34 +5,59 @@
 <style>
   * { box-sizing: border-box; }
   body {
-    margin: 0; padding: 16px; background: #1e1e1e; color: #ececec;
-    font: 12px/1.6 Inter, -apple-system, "Segoe UI", sans-serif;
+    margin: 0; padding: 14px; background: #1e1e1e; color: #ececec;
+    font: 12px/1.55 Inter, -apple-system, "Segoe UI", sans-serif;
   }
-  h1 { font-size: 14px; margin: 0 0 4px; font-weight: 600; }
-  p.hint { color: #9a9a9a; margin: 0 0 14px; }
-  .row { display: flex; gap: 8px; margin-bottom: 10px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+  h1 { font-size: 14px; margin: 0; font-weight: 600; }
+  .badge {
+    font-size: 10px; font-weight: 700; letter-spacing: .04em;
+    background: #2f6fd0; color: #fff; padding: 2px 7px; border-radius: 999px;
+  }
+  .row { display: flex; gap: 8px; margin-bottom: 9px; }
   button {
-    font: inherit; padding: 9px 14px; border-radius: 8px; border: 1px solid #3d3d3d;
-    background: #2c2c2c; color: #ececec; cursor: pointer; flex: 1;
+    font: inherit; padding: 8px 12px; border-radius: 8px; border: 1px solid #3d3d3d;
+    background: #2c2c2c; color: #ececec; cursor: pointer; flex: 1; transition: .12s;
   }
-  button:hover { background: #383838; }
+  button:hover:not(:disabled) { background: #383838; }
   button.primary { background: #fff; color: #000; border-color: #fff; font-weight: 600; }
-  button.primary:hover { background: #e6e6e6; }
-  button:disabled { opacity: .5; cursor: default; }
+  button.primary:hover:not(:disabled) { background: #e6e6e6; }
+  button:disabled { opacity: .45; cursor: default; }
+  button.sel { background: #2f6fd0; border-color: #2f6fd0; color: #fff; }
   label.chk { display: flex; align-items: center; gap: 8px; color: #cfcfcf; margin-bottom: 12px; cursor: pointer; }
-  #status { font-size: 11px; color: #9a9a9a; min-height: 18px; margin-bottom: 10px; }
+
+  .panel { border: 1px solid #303030; border-radius: 10px; background: #181818; margin-bottom: 10px; overflow: hidden; }
+  .panel h2 {
+    font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: #8e8e8e;
+    margin: 0; padding: 8px 10px; border-bottom: 1px solid #262626; font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .panel .body { padding: 8px 10px; max-height: 150px; overflow: auto; }
+
+  #stages { list-style: none; margin: 0; padding: 0; font: 11px/1.7 ui-monospace, Consolas, monospace; }
+  #stages li { display: flex; justify-content: space-between; gap: 8px; color: #b9b9b9; }
+  #stages li .t { color: #6f6f6f; }
+  #stages li.active { color: #7fb2ff; }
+  #stages li.active .t { color: #5b8dd6; }
+
+  #errs { list-style: none; margin: 0; padding: 0; font: 11px/1.6 ui-monospace, Consolas, monospace; }
+  #errs li { padding: 6px 0; border-bottom: 1px solid #242424; color: #f7a6a6; word-break: break-word; }
+  #errs li:last-child { border-bottom: 0; }
+  #errs li .meta { color: #8e8e8e; display: block; font-size: 10px; }
+  #errs li.warn { color: #e8c37a; }
+  .empty { color: #6f6f6f; font-size: 11px; }
+
+  #status { font-size: 11px; color: #9a9a9a; min-height: 16px; margin-bottom: 8px; }
   #status.ok { color: #6ee7a8; }
   #status.err { color: #f87171; }
-  #out {
-    width: 100%; height: 150px; resize: none; background: #141414; color: #b9b9b9;
-    border: 1px solid #333; border-radius: 8px; padding: 8px; font: 10px/1.5 ui-monospace, Consolas, monospace;
-  }
-  a.dl { display: none; }
+  #meta { font: 10px/1.6 ui-monospace, Consolas, monospace; color: #8e8e8e; white-space: pre-wrap; }
 </style>
 </head>
 <body>
-  <h1>Design Dump</h1>
-  <p class="hint">Select the frames in Figma, then export their full node tree as JSON.</p>
+  <header>
+    <h1>Design Dump</h1>
+    <span class="badge">v3</span>
+  </header>
 
   <div class="row">
     <button id="scoped">Use selection</button>
@@ -40,29 +65,49 @@
   </div>
 
   <label class="chk">
-    <input type="checkbox" id="svg" />
-    Also export SVG for every vector (icons) — slower
+    <input type="checkbox" id="svg" checked />
+    Also export SVG for every vector (icons)
   </label>
 
   <div class="row">
     <button class="primary" id="go" disabled>Export JSON</button>
+    <button id="diag" style="flex:0 0 96px">Copy log</button>
   </div>
 
   <div id="status">Nothing selected yet.</div>
-  <textarea id="out" readonly placeholder="The exported JSON appears here…"></textarea>
 
-  <div class="row" style="margin-top:10px">
+  <div class="panel">
+    <h2><span>Status</span><span id="timer">0.0s</span></h2>
+    <div class="body"><ul id="stages"><li class="empty">Waiting…</li></ul></div>
+  </div>
+
+  <div class="panel">
+    <h2>
+      <span>Issues</span>
+      <span><span id="cntErr">0</span> errors · <span id="cntWarn">0</span> warnings</span>
+    </h2>
+    <div class="body"><ul id="errs"><li class="empty">None.</li></ul></div>
+  </div>
+
+  <div class="panel">
+    <h2>Result</h2>
+    <div class="body"><div id="meta" class="empty">Nothing exported yet.</div></div>
+  </div>
+
+  <div class="row">
     <button id="save" disabled>Download .json</button>
   </div>
 
 <script>
-  const $ = (id) => document.getElementById(id);
-  let scope = null;
-  let result = null;
+  var $ = function (id) { return document.getElementById(id); };
+  var scope = null;
+  var result = null;
+  var log = [];
+  var tick = null;
+  var t0 = 0;
 
-  const setStatus = (msg, cls) => { $('status').textContent = msg; $('status').className = cls || ''; };
-
-  const post = (msg) => parent.postMessage({ pluginMessage: msg }, '*');
+  function setStatus(msg, cls) { $('status').textContent = msg; $('status').className = cls || ''; }
+  function post(msg) { parent.postMessage({ pluginMessage: msg }, '*'); }
 
   function bytes(n) {
     if (n < 1024) return n + ' B';
@@ -70,38 +115,136 @@
     return (n / 1048576).toFixed(2) + ' MB';
   }
 
-  $('scoped').onclick = () => { scope = 'selection'; post({ type: 'count' }); };
-  $('all').onclick = () => { scope = 'all'; setStatus('Whole file selected. Press Export.'); $('go').disabled = false; };
+  function renderStages(stages, current) {
+    var ul = $('stages');
+    if (!stages.length) { ul.innerHTML = '<li class="empty">Waiting…</li>'; return; }
+    var html = '';
+    for (var i = 0; i < stages.length; i++) {
+      var s = stages[i];
+      var isLast = i === stages.length - 1;
+      var active = isLast && current && current !== 'Done' && current !== 'Failed';
+      html += '<li class="' + (active ? 'active' : '') + '"><span>' +
+        (active ? '▸ ' : '✓ ') + escapeHtml(s.name) + '</span><span class="t">' +
+        (s.t / 1000).toFixed(2) + 's</span></li>';
+    }
+    ul.innerHTML = html;
+    ul.parentNode.scrollTop = ul.parentNode.scrollHeight;
+  }
 
-  $('go').onclick = () => {
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function renderIssues() {
+    var ul = $('errs');
+    if (!log.length) { ul.innerHTML = '<li class="empty">None.</li>'; return; }
+    var html = '';
+    for (var i = 0; i < log.length; i++) {
+      var e = log[i];
+      html += '<li class="' + (e.kind === 'warn' ? 'warn' : '') + '">' +
+        (e.kind === 'warn' ? '⚠ ' : '✕ ') + escapeHtml(e.message) +
+        '<span class="meta">[' + escapeHtml(e.step || '') + ']' +
+        (e.nodeName ? ' · ' + escapeHtml(e.nodeName) + ' (' + escapeHtml(e.nodeId) + ')' : '') +
+        ' · ' + (e.t / 1000).toFixed(2) + 's' +
+        (e.stack ? '\n' + escapeHtml(e.stack) : '') +
+        '</span></li>';
+    }
+    ul.innerHTML = html;
+  }
+
+  function startTimer() {
+    t0 = Date.now();
+    if (tick) clearInterval(tick);
+    tick = setInterval(function () { $('timer').textContent = ((Date.now() - t0) / 1000).toFixed(1) + 's'; }, 100);
+  }
+  function stopTimer() { if (tick) { clearInterval(tick); tick = null; } }
+
+  $('scoped').onclick = function () {
+    scope = 'selection';
+    $('scoped').className = 'sel'; $('all').className = '';
+    post({ type: 'count' });
+  };
+  $('all').onclick = function () {
+    scope = 'all';
+    $('all').className = 'sel'; $('scoped').className = '';
+    setStatus('Whole file selected. Press Export.');
+    $('go').disabled = false;
+  };
+
+  $('go').onclick = function () {
     if (!scope) return;
-    result = null;
+    result = null; log = [];
     $('save').disabled = true;
-    $('out').value = '';
+    $('meta').className = 'empty';
+    $('meta').textContent = 'Nothing exported yet.';
     $('go').disabled = true;
+    renderIssues();
     setStatus('Working…');
-    post({ type: 'dump', scope, includeSvg: $('svg').checked });
+    startTimer();
+    post({ type: 'dump', scope: scope, includeSvg: $('svg').checked });
   };
 
-  $('save').onclick = () => {
+  $('diag').onclick = function () {
+    var dump = {
+      version: 3,
+      when: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      scope: scope,
+      stages: (result && result.diagnostics && result.diagnostics.stages) || [],
+      errors: (result && result.diagnostics && result.diagnostics.errors) || log.filter(function (x) { return x.kind !== 'warn'; }),
+      warnings: (result && result.diagnostics && result.diagnostics.warnings) || log.filter(function (x) { return x.kind === 'warn'; }),
+    };
+    var text = JSON.stringify(dump, null, 2);
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); setStatus('Log copied to clipboard.', 'ok'); }
+    catch (e) { setStatus('Copy failed — see the console.', 'err'); console.log(text); }
+    ta.remove();
+  };
+
+  $('save').onclick = function () {
     if (!result) return;
-    const blob = new Blob([JSON.stringify(result)], { type: 'application/json' });
-    const a = document.createElement('a');
+    var blob = new Blob([JSON.stringify(result)], { type: 'application/json' });
+    var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-    a.download = 'figma-dump-' + stamp + '.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    var stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    a.download = 'figma-dump-v3-' + stamp + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setStatus('Saved.', 'ok');
   };
 
-  onmessage = (event) => {
-    const msg = event.data.pluginMessage;
-    if (!msg) return;
+  onmessage = function (event) {
+    var raw = event.data.pluginMessage;
+    if (!raw) return;
 
-    if (msg.type === 'count') {
+    /* الرسائل تصل كـ { type, json } — نفكّها بأمان */
+    var msg;
+    try {
+      msg = raw.json !== undefined ? JSON.parse(raw.json) : raw;
+    } catch (e) {
+      setStatus('Could not read a message from the plugin: ' + e.message, 'err');
+      return;
+    }
+    if (msg.type === undefined) msg.type = raw.type;
+    if (raw.type === 'fatal') { setStatus('Fatal: ' + (msg.message || 'unknown'), 'err'); return; }
+
+    if (raw.type === 'status') {
+      renderStages(msg.stages, msg.step);
+      $('cntErr').textContent = msg.errors;
+      $('cntWarn').textContent = msg.warnings;
+      $('timer').textContent = (msg.elapsed / 1000).toFixed(1) + 's';
+    }
+
+    if (raw.type === 'errlog') {
+      log.push({ kind: 'error', t: msg.t, step: msg.step, message: msg.message, nodeId: msg.nodeId, nodeName: msg.nodeName, stack: msg.stack });
+      renderIssues();
+    }
+
+    if (raw.type === 'count') {
       if (!msg.selected) {
-        setStatus('Nothing selected. Select frames in Figma, or use the whole file.');
+        setStatus('Nothing selected. Pick frames in Figma, or use the whole file.');
         $('go').disabled = true;
         return;
       }
@@ -109,25 +252,48 @@
       $('go').disabled = false;
     }
 
-    if (msg.type === 'progress') setStatus(msg.message);
-
-    if (msg.type === 'error') {
-      setStatus('Error: ' + msg.message, 'err');
+    if (raw.type === 'failed') {
+      stopTimer();
+      for (var i = 0; i < msg.errors.length; i++) {
+        var e = msg.errors[i];
+        if (!log.some(function (x) { return x.t === e.t && x.message === e.message; })) {
+          log.push({ kind: 'error', t: e.t, step: e.step, message: e.message, nodeId: e.nodeId, nodeName: e.nodeName, stack: e.stack });
+        }
+      }
+      renderIssues();
+      renderStages(msg.stages || [], 'Failed');
+      setStatus('Export failed. Press "Copy log" and send it over.', 'err');
       $('go').disabled = false;
     }
 
-    if (msg.type === 'done') {
-      result = msg.payload;
-      const json = JSON.stringify(result);
-      $('out').value = JSON.stringify(result.meta, null, 2);
+    if (raw.type === 'done') {
+      stopTimer();
+      result = msg;
+      var m = result.meta;
+
+      for (var w = 0; w < (result.diagnostics.warnings || []).length; w++) {
+        var wn = result.diagnostics.warnings[w];
+        log.push({ kind: 'warn', t: wn.t, step: wn.step, message: wn.message, nodeId: wn.nodeId, nodeName: wn.nodeName });
+      }
+      renderIssues();
+      renderStages(result.diagnostics.stages, 'Done');
+
+      var json = JSON.stringify(result);
+      $('meta').className = '';
+      $('meta').textContent =
+        'version      v' + m.version + '\n' +
+        'nodes        ' + m.nodeCount + '\n' +
+        'vectors      ' + m.vectorCount + '\n' +
+        'svgs         ' + m.svgCount + '\n' +
+        'errors       ' + m.errorCount + '\n' +
+        'warnings     ' + m.warningCount + '\n' +
+        'elapsed      ' + (m.elapsedMs / 1000).toFixed(2) + 's\n' +
+        'json size    ' + bytes(json.length) + '\n' +
+        'figma api    ' + m.api + ' (' + m.editor + ')';
+
       $('save').disabled = false;
       $('go').disabled = false;
-      setStatus(
-        'Done — ' + result.meta.nodeCount + ' nodes' +
-        (result.meta.svgCount ? ', ' + result.meta.svgCount + ' SVGs' : '') +
-        ' · ' + bytes(json.length) + '. Press Download.',
-        'ok'
-      );
+      setStatus('Done — ' + m.nodeCount + ' nodes' + (m.svgCount ? ', ' + m.svgCount + ' SVGs' : '') + '. Press Download.', m.errorCount ? 'err' : 'ok');
     }
   };
 </script>

@@ -1,4 +1,4 @@
-Design Dump — Figma plugin
+Design Dump v3 — Figma plugin
 ==========================
 
 HOW TO INSTALL (30 seconds)
@@ -13,6 +13,33 @@ UPDATING AN ALREADY-IMPORTED COPY
 Figma does not re-read a changed manifest. So:
   Plugins -> Development -> Manage plugins in development -> "..." -> Remove
 then import the manifest again.
+
+VERSION 3 — error tracking, live status, and the postMessage fix
+
+  ROOT CAUSE OF "cannot unwrap symbol":
+  Figma encodes postMessage payloads itself, and a single Symbol anywhere in the
+  object graph aborts the whole message. Plugin-API objects carry internal
+  symbols, so passing one by reference is enough to break it. Two changes:
+    - every message is now sent as a JSON *string* ({"type":..., "json":"..."}),
+      which cannot contain a Symbol by construction
+    - dashPattern, which was assigned by reference, is now copied into a plain array
+
+  ERROR TRACKING
+    - each failure records time, stage, node id, node name, message and stack
+    - a failing node no longer kills the export: it is logged as {"failed":true}
+      and the walk continues
+    - "Copy log" puts a full diagnostics JSON (stages, errors, warnings,
+      userAgent) on the clipboard to paste back
+
+  STATUS TRACKING
+    - a live panel lists every stage with its elapsed time
+    - the running stage is marked and the header shows a live timer
+    - counters for errors and warnings update as they happen
+    - the result panel reports nodes / vectors / SVGs / errors / warnings /
+      elapsed / JSON size / Figma API version
+
+  test/symbol.mjs walks every outgoing message and fails if it finds a Symbol key,
+  a Symbol value or a function anywhere in the payload.
 
 VERSION 2 FIXES
   - "flatMap is not a function" on whole-file export (older Figma engines have

@@ -103,12 +103,13 @@ async function run(msg, label) {
   for (let i = 0; i < 60 && !messages.some(m => m.type === 'done' || m.type === 'error'); i++) {
     await new Promise(r => setTimeout(r, 25));
   }
-  const err = messages.find((m) => m.type === 'error');
-  const done = messages.find((m) => m.type === 'done');
+  const decode = (m) => { if (!m) return null; if (m.json === undefined) return m; try { return Object.assign({ type: m.type }, JSON.parse(m.json)); } catch { return m; } };
+  const err = decode(messages.find((m) => m.type === 'failed'));
+  const done = decode(messages.find((m) => m.type === 'done'));
   if (err) {
-    console.log(`✗ ${label} -> error: ${err.message}`);
+    console.log(`✗ ${label} -> error: ${err.errors && err.errors[0] ? err.errors[0].message : err.message}`);
   } else if (done) {
-    console.log(`✓ ${label} -> ok: ${done.payload.meta.nodeCount} nodes, ${done.payload.meta.svgCount} svgs`);
+    console.log(`✓ ${label} -> ok: ${done.meta.nodeCount} nodes, ${done.meta.svgCount} svgs`);
   } else {
     console.log(`? ${label} -> no done/error. messages:`, JSON.stringify(messages).slice(0, 200));
   }

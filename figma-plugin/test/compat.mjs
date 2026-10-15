@@ -16,10 +16,11 @@ async function tryCase(label, mutate) {
   new Function('figma','__html__', code)(figma, '<html></html>');
   figma.ui.onmessage({type:'dump', scope:'all', includeSvg:true});
   for (let i=0;i<80 && !msgs.some(m=>m.type==='done'||m.type==='error');i++) await new Promise(r=>setTimeout(r,20));
-  const err = msgs.find(m=>m.type==='error');
-  const done = msgs.find(m=>m.type==='done');
-  if (err) console.log('✗', label, '->', err.message);
-  else if (done) console.log('✓', label, '->', done.payload.meta.nodeCount, 'nodes,', done.payload.meta.svgCount, 'svgs');
+  const dec = (m) => { if (!m) return null; if (m.json === undefined) return m; try { return Object.assign({ type: m.type }, JSON.parse(m.json)); } catch { return m; } };
+  const err = dec(msgs.find(m=>m.type==='failed'));
+  const done = dec(msgs.find(m=>m.type==='done'));
+  if (err) console.log('✗', label, '->', (err.errors && err.errors[0] ? err.errors[0].message : err.message));
+  else if (done) console.log('✓', label, '->', done.meta.nodeCount, 'nodes,', done.meta.svgCount, 'svgs');
   else console.log('?', label, '-> stuck:', JSON.stringify(msgs.map(m=>m.type)).slice(0,120));
 }
 
