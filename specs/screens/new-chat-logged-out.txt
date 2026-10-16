@@ -1,0 +1,75 @@
+# New Chat - Logged Out
+
+Figma: https://www.figma.com/design/J4mMUwLS0Mg1Ll5j6gH5wL?node-id=6-1288
+Size: 1440x1024   Visible nodes: 63
+
+Coordinates are relative to the screen origin.
+row/col = auto-layout direction · gap/pad · bg = fill · r = radius · fx = shadows
+TEXT lines end with: content, font, size/weight, line-height, letter-spacing, alignment
+INSTANCE lines end with {variant properties}
+
+```
+• New Chat - Logged Out (COMPONENT)  @1954,2325 1440x1024  bg=#212121  clip
+  • Body (FRAME)  @1954,2325 1440x1024  col  gap=16  pad=52/40/50/40  align=CENTER  clip
+    • Chat Footer (INSTANCE)  @1954,3211 1440x138  col  {Message#592:0=true, ✏️ Text#199:32=By messaging ChatGPT, you agree to our Terms and have read our Privacy Policy.}
+      • Gradient (FRAME)  @1954,3211 1440x102
+        • Gradient Mask (RECTANGLE)  @1954,3211 1440x102  bg=grad(#212121@29%>#212121@100%)
+        • Fill (RECTANGLE)  @1954,3211 1440x102  bg=#212121
+      • Fixed Footer Message (FRAME)  @1954,3313 1440x36  row  gap=10  pad=8/0/8/0  justify=CENTER  align=CENTER  bg=#212121
+        • By messaging ChatGPT, you agree to our Terms and have read our Privacy Policy. (TEXT)  @1954,3321 1440x20  bg=#ffffff  "By messaging ChatGPT, you agree to our Terms and have read our Privacy Policy."  ? /undefined
+    • Chat Thread (FRAME)  @1994,2377 1360x922  col  gap=8  pad=0/0/64/0  justify=CENTER  align=CENTER
+      • Title Wrapper (FRAME)  @2226,2714.5 896x64  row  gap=10  pad=0/0/28/0  justify=CENTER  align=CENTER
+        • ChatGPT (TEXT)  @2226,2714.5 896x36  bg=#ffffff  "ChatGPT"  ? /undefined
+      • Prompt Suggestions Wrapper (FRAME)  @2290,2786.5 768x1  col  gap=10  align=CENTER
+      • Prompt Input Field (INSTANCE)  @2290,2795.5 768x102  col  gap=10  pad=12/10/12/10  bg=#303030  r=28  fx=inner 0/0/1/1 #ffffff/a0.13 + shadow 0/6/8/0 #000000/a0.1 + shadow 0/0/1.5/0 #000000/a0.45  {Composer#199:51=true, Image Input#324:1=false, Signed In=No, State=Empty, Long Input=N/A}
+        • Text Wrapper (FRAME)  @2300,2807.5 748x32  col  gap=10  pad=4/8/4/8
+          • .Text Input Content (INSTANCE)  @2308,2811.5 732x24  row  align=CENTER  {✏️ Text#31:0=Text input, ✏️ Hint#84:2=Ask anything, State=Empty, Show Cursor=No}
+            • Hint text (TEXT)  @2308,2811.5 732x24  bg=#afafaf  "Ask anything"  ? /undefined
+        • Button Wrapper (FRAME)  @2300,2849.5 748x36  row  gap=10  justify=SPACE_BETWEEN
+          • Buttons Left (FRAME)  @2300,2849.5 274x36  row  gap=6
+            • Composer Button (INSTANCE)  @2300,2849.5 88x36  row  gap=4  pad=8/12/8/8  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {↳ Icon#199:48=2:14, Tooltip#199:65=true, ✏️ Text#199:58=Attach, Type=Radio, State=Default}
+              • General / Attach (INSTANCE)  @2308,2857.5 20x20  clip  {}
+                • Vector (VECTOR)  @2312.3,2859.3 11.3x16.3  bg=#ffffff
+              • Composer (TEXT)  @2332,2857.5 44x20  bg=#ffffff  "Attach"  ? /undefined
+              • Tooltip (INSTANCE)  @2328,2893.5 32x32  op=0  {✏️ Text#159:1=Add photos, Alignment=Center, Size=Regular}
+                • Tooltip Base (FRAME)  @2303,2893.5 82x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                  • Tooltip (TEXT)  @2311,2897.5 66x16  bg=#ffffff  "Add photos"  ? /undefined
+            • Composer Button (INSTANCE)  @2394,2849.5 91x36  row  gap=4  pad=8/12/8/8  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {✏️ Text#199:58=Search, Tooltip#199:65=true, ↳ Icon#199:48=3:34, Type=Radio, State=Default}
+              • General / Internet (INSTANCE)  @2402,2857.5 20x20  clip  {}
+                • Vector (VECTOR)  @2404.1,2859.6 15.8x15.8  bg=#ffffff
+              • Composer (TEXT)  @2426,2857.5 47x20  bg=#ffffff  "Search"  ? /undefined
+              • Tooltip (INSTANCE)  @2424,2893.5 32x32  op=0  {✏️ Text#159:1=Search the web, Alignment=Center, Size=Regular}
+                • Tooltip Base (FRAME)  @2387.5,2893.5 105x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                  • Tooltip (TEXT)  @2395.5,2897.5 89x16  bg=#ffffff  "Search the web"  ? /undefined
+            • Composer Button (INSTANCE)  @2491,2849.5 83x36  row  gap=4  pad=8/12/8/8  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {✏️ Text#199:58=Study, Tooltip#199:65=false, ↳ Icon#199:48=3:35, Type=Radio, State=Default}
+              • General / Study (INSTANCE)  @2499,2857.5 20x20  clip  {}
+                • Vector (VECTOR)  @2501.2,2858.5 15.5x17.2  bg=#ffffff
+              • Composer (TEXT)  @2523,2857.5 39x20  bg=#ffffff  "Study"  ? /undefined
+          • Buttons Right (FRAME)  @2974,2849.5 74x36  row  gap=8
+            • Button (INSTANCE)  @2974,2849.5 74x36  row  gap=4  pad=8/8/8/8  justify=CENTER  align=CENTER  bg=#212121, #ffffff/o0.10  r=999  {Tooltip#3:19=true, ↳ Icon#3:16=3:36, Icon#3:2=true, ✏️ Text#3:1=Voice, Type=Secondary, Size=Default, State=Default}
+              • General / Voice (INSTANCE)  @2982,2857.5 20x20  clip  {}
+                • Vector (VECTOR)  @2985,2861.3 14x12.3  bg=#ffffff
+              • Button (TEXT)  @3006,2858.5 34x18  bg=#ffffff  "Voice"  ? /undefined
+              • Tooltip (INSTANCE)  @2998,2893.5 24x24  op=0  {✏️ Text#159:1=Use voice mode, Alignment=Center, Size=Regular}
+                • Tooltip Base (FRAME)  @2956,2893.5 108x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                  • Tooltip (TEXT)  @2964,2897.5 92x16  bg=#ffffff  "Use voice mode"  ? /undefined
+    • App Header (INSTANCE)  @1954,2325 1440x52  row  gap=1044  pad=8/12/8/12  justify=SPACE_BETWEEN  align=CENTER  bg=#212121  stroke=#3e3e3e@  {Signed In=No, Type=Default}
+      • Title Group (FRAME)  @1966,2333 145x36  row  justify=CENTER  align=CENTER
+        • Icon Button (INSTANCE)  @1966,2335 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=3:140, Tooltip#317:12=false, Shape=Square, Size=Large, Type=Default, State=Default}
+          • General / ChatGPT (INSTANCE)  @1970,2339 24x24  clip  {}
+            • Vector (VECTOR)  @1972,2341.1 20x19.8  bg=#ffffff
+        • Model Selection Button (INSTANCE)  @1998,2333 113x36  row  gap=4  pad=0/10/0/10  justify=CENTER  align=CENTER  r=8  {State=Default, Logged In=No}
+          • ChatGPT (TEXT)  @2008,2337 73x28  bg=#ffffff  "ChatGPT"  ? /undefined
+          • General / Chevron Down (INSTANCE)  @2085,2343 16x16  clip  {}
+            • Vector (VECTOR)  @2087.8,2348.8 10.3x5.8  bg=#afafaf
+      • Buttons (FRAME)  @3141,2333 241x36  row  gap=8  align=CENTER
+        • Button (INSTANCE)  @3141,2333 65x36  row  gap=4  pad=8/12/8/12  justify=CENTER  align=CENTER  bg=#ffffff  r=999  {Tooltip#3:19=false, ↳ Icon#3:16=2:14, Icon#3:2=false, ✏️ Text#3:1=Log in, Type=Important, Size=Large, State=Default}
+          • Button (TEXT)  @3153,2341 41x20  bg=#000000  "Log in"  ? /undefined
+        • Button (INSTANCE)  @3214,2333 128x36  row  gap=4  pad=8/12/8/12  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {↳ Icon#3:16=2:14, Tooltip#3:19=false, Icon#3:2=false, ✏️ Text#3:1=Sign up for free, Type=Outline, Size=Large, State=Default}
+          • Button (TEXT)  @3226,2341 104x20  bg=#ffffff  "Sign up for free"  ? /undefined
+        • Icon Button (INSTANCE)  @3350,2335 32x32  row  gap=10  justify=CENTER  align=CENTER  r=999  {Icon#317:13=3:32, Tooltip#317:12=false, Shape=Round, Size=Large, Type=Default, State=Default}
+          • General / Help (INSTANCE)  @3354,2339 24x24  clip  {}
+            • Vector (BOOLEAN_OPERATION)  @3356.5,2341.5 19x19  bg=#ffffff
+              • Vector (VECTOR)  @3356.5,2341.5 19x19  bg=#000000
+              • Vector (VECTOR)  @3363,2346.2 6.1x9.6  bg=#000000
+```

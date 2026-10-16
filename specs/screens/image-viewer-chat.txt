@@ -1,0 +1,66 @@
+# Image Viewer - Chat
+
+Figma: https://www.figma.com/design/J4mMUwLS0Mg1Ll5j6gH5wL?node-id=84-6697
+Size: 1440x1024   Visible nodes: 54
+
+Coordinates are relative to the screen origin.
+row/col = auto-layout direction · gap/pad · bg = fill · r = radius · fx = shadows
+TEXT lines end with: content, font, size/weight, line-height, letter-spacing, alignment
+INSTANCE lines end with {variant properties}
+
+```
+• Image Viewer - Chat (COMPONENT)  @8514,8445 1440x1024  bg=#212121  clip
+  • Header Bar (FRAME)  @8514,8445 1440x52  row  gap=979  pad=8/8/8/8  justify=SPACE_BETWEEN  align=CENTER
+    • Left Button Wrapper (FRAME)  @8522,8453 36x36  row  gap=16  align=CENTER
+      • Icon Button (INSTANCE)  @8522,8453 36x36  row  gap=10  pad=0/8/0/8  justify=CENTER  align=CENTER  r=12  {Icon#317:13=7:576, Tooltip#317:12=false, Shape=Square, Size=Large, Type=Default, State=Default}
+        • General / Close (INSTANCE)  @8528,8459 24x24  clip  {}
+          • Vector (VECTOR)  @8533.5,8464.5 13.1x13.1  bg=#ffffff
+    • Right Button Wrapper (FRAME)  @9682,8453 264x36  row  gap=8  align=CENTER
+      • Icon Button (INSTANCE)  @9682,8453 36x36  row  gap=10  pad=0/8/0/8  justify=CENTER  align=CENTER  r=12  {Icon#317:13=7:751, Tooltip#317:12=false, Shape=Square, Size=Large, Type=Default, State=Default}
+        • General / Thumbs Up (INSTANCE)  @9688,8459 24x24  clip  {}
+          • Vector (VECTOR)  @9691.2,8461.2 17.7x19.6  bg=#ffffff
+      • Icon Button (INSTANCE)  @9726,8453 36x36  row  gap=10  pad=0/8/0/8  justify=CENTER  align=CENTER  r=12  {Icon#317:13=7:750, Tooltip#317:12=false, Shape=Square, Size=Large, Type=Default, State=Default}
+        • General / Thumbs Down (INSTANCE)  @9732,8459 24x24  clip  {}
+          • Vector (VECTOR)  @9735.2,8461.2 17.7x19.6  bg=#ffffff
+      • Icon Button (INSTANCE)  @9770,8453 36x36  row  gap=10  pad=0/8/0/8  justify=CENTER  align=CENTER  r=12  {Icon#317:13=84:5936, Tooltip#317:12=false, Shape=Square, Size=Large, Type=Default, State=Default}
+        • General / Edit Image (INSTANCE)  @9776,8459 24x24  clip  {}
+          • Vector (VECTOR)  @9778.4,8461.5 19.2x19.3  bg=#ffffff
+      • Icon Button (INSTANCE)  @9814,8453 36x36  row  gap=10  pad=0/8/0/8  justify=CENTER  align=CENTER  r=12  {Icon#317:13=84:3095, Tooltip#317:12=false, Shape=Square, Size=Large, Type=Default, State=Default}
+        • General / Download (INSTANCE)  @9820,8459 24x24  clip  {}
+          • Vector (VECTOR)  @9823.2,8462.2 17.6x17.6  bg=#ffffff
+      • Button (INSTANCE)  @9858,8453 88x36  row  gap=4  pad=8/12/8/12  justify=CENTER  align=CENTER  bg=#212121  stroke=#ffffff/o0.26@1  r=999  {↳ Icon#3:16=7:500, Tooltip#3:19=false, Icon#3:2=true, ✏️ Text#3:1=Share, Type=Default, Size=Large, State=Default}
+        • General / Share (INSTANCE)  @9870,8461 20x20  clip  {}
+          • Vector (VECTOR)  @9872.7,8463.7 14.7x14.7  bg=#ffffff
+        • Button (TEXT)  @9894,8461 40x20  bg=#ffffff  "Share"  ? /undefined
+  • Prompt Input Field (INSTANCE)  @8803,9377 768x56  col  gap=10  pad=10/10/10/10  justify=CENTER  bg=#303030  r=28  fx=inner 0/0/1/1 #ffffff/a0.13 + shadow 0/6/8/0 #000000/a0.1 + shadow 0/0/1.5/0 #000000/a0.45  {Composer#199:51=true, Image Input#324:1=false, Signed In=Yes, State=Empty, Long Input=No}
+    • Text Wrapper (FRAME)  @8813,9387 748x36  row  gap=6  align=CENTER
+      • Icon Button (INSTANCE)  @8813,9387 36x36  row  gap=10  justify=CENTER  align=CENTER  r=999  {Icon#317:13=7:505, Tooltip#317:12=true, Shape=Round, Size=Large, Type=Default, State=Default}
+        • General / Add (INSTANCE)  @8819,9393 24x24  clip  {}
+          • Vector (VECTOR)  @8822.4,9396.4 17.2x17.2  bg=#ffffff
+        • Tooltip (INSTANCE)  @8819,9427 24x24  op=0  {✏️ Text#159:1=Add files and more, Alignment=Center, Size=Regular}
+          • Tooltip Base (FRAME)  @8769.5,9427 123x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+            • Tooltip (TEXT)  @8777.5,9431 107x16  bg=#ffffff  "Add files and more"  ? /undefined
+      • .Text Input Content (INSTANCE)  @8855,9393 620x24  row  align=CENTER  {✏️ Text#31:0=Text input, ✏️ Hint#84:2=Describe what you want to add, remove or replace..., State=Empty, Show Cursor=No}
+        • Hint text (TEXT)  @8855,9393 620x24  bg=#afafaf  "Describe what you want to add, remove or replace..."  ? /undefined
+      • Buttons Right (FRAME)  @9481,9387 80x36  row  gap=8  align=CENTER
+        • Icon Button (INSTANCE)  @9481,9387 36x36  row  gap=10  justify=CENTER  align=CENTER  r=999  {Icon#317:13=7:508, Tooltip#317:12=true, Shape=Round, Size=Large, Type=Default, State=Default}
+          • General / Microphone (INSTANCE)  @9487,9393 24x24  clip  {}
+            • Vector (VECTOR)  @9491.5,9395.2 15x19.6  bg=#ffffff
+          • Tooltip (INSTANCE)  @9487,9427 24x24  op=0  {✏️ Text#159:1=Dictate, Alignment=Center, Size=Regular}
+            • Tooltip Base (FRAME)  @9470.5,9427 57x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+              • Tooltip (TEXT)  @9478.5,9431 41x16  bg=#ffffff  "Dictate"  ? /undefined
+        • Button (INSTANCE)  @9525,9387 36x36  row  gap=4  pad=8/8/8/8  justify=CENTER  align=CENTER  bg=#212121, #ffffff/o0.10  r=999  {Tooltip#3:19=true, ↳ Icon#3:16=3:36, Icon#3:2=true, ✏️ Text#3:1=Voice, Type=Secondary, Size=Default, State=Default}
+          • General / Voice (INSTANCE)  @9533,9395 20x20  clip  {}
+            • Vector (VECTOR)  @9536,9398.8 14x12.3  bg=#ffffff
+          • Tooltip (INSTANCE)  @9530,9431 24x24  op=0  {✏️ Text#159:1=Use voice mode, Alignment=Center, Size=Regular}
+            • Tooltip Base (FRAME)  @9488,9431 108x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+              • Tooltip (TEXT)  @9496,9435 92x16  bg=#ffffff  "Use voice mode"  ? /undefined
+  • Image (RECTANGLE)  @8658,8542 1057x789  bg=image  r=4
+  • Thumbnail Stack (FRAME)  @9876,8542 54x789  col  gap=8  pad=0/0/20/0  align=CENTER
+    • Prev Thumbnails (FRAME)  @9880.5,8542 45x349.5  col  gap=8  justify=MAX  op=0.5
+      • Thumbnail (RECTANGLE)  @9880.5,8793.5 45x45  bg=image  stroke=#ffffff@1  r=8
+      • Thumbnail (RECTANGLE)  @9880.5,8846.5 45x45  bg=image  stroke=#ffffff@1  r=8
+    • Current Thumbnail (RECTANGLE)  @9876,8899.5 54x54  bg=image  stroke=#ffffff@1  r=10
+    • Next Thumbnails (FRAME)  @9880.5,8961.5 45x349.5  col  gap=8  op=0.5
+      • Thumbnail (RECTANGLE)  @9880.5,8961.5 45x45  bg=image  stroke=#ffffff@1  r=8
+```

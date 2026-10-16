@@ -11,7 +11,7 @@
  * ======================================================================== */
 
 var VERSION = 3;
-var REVISION = 2;
+var REVISION = 3;
 
 figma.showUI(__html__, { width: 460, height: 620, title: 'Design Dump v3' });
 
@@ -271,19 +271,58 @@ function serialize(n) {
   if (typeof n.clipsContent === 'boolean') o.clips = n.clipsContent;
 
   if (n.type === 'TEXT') {
-    var s = n.style || {};
+    /*
+     * تنبيه: node.style مهجور في Figma الحديث ويعيد undefined.
+     * الخصائص الفردية (fontName / fontSize / lineHeight / letterSpacing)
+     * هي المصدر الصحيح. نقرأ الاثنين معًا للأمان.
+     */
+    var st = {};
+    try { st = n.style || {}; } catch (e) { st = {}; }
+
+    var fn = null; try { fn = n.fontName || null; } catch (e) { fn = null; }
+    var sz = null; try { sz = n.fontSize; } catch (e) { sz = null; }
+    var lh = null; try { lh = n.lineHeight; } catch (e) { lh = null; }
+    var ls = null; try { ls = n.letterSpacing; } catch (e) { ls = null; }
+
     o.characters = n.characters;
-    o.fontFamily = s.fontFamily;
-    o.fontStyle = s.fontStyle;
-    o.size = round(s.fontSize);
-    o.weight = s.fontWeight;
-    o.lineHeightPx = round(s.lineHeightPx);
-    o.lineHeightPercent = round(s.lineHeightPercentFontSize);
-    o.letterSpacing = round(s.letterSpacing);
-    o.alignH = s.textAlignHorizontal;
-    o.alignV = s.textAlignVertical;
+    o.fontFamily = st.fontFamily || (fn && fn.family) || null;
+    o.fontStyle = st.fontStyle || (fn && fn.style) || null;
+    o.size = round(st.fontSize !== undefined ? st.fontSize : sz);
+
+    // الوزن من اسم النمط لأن fontWeight مهجور أيضًا
+    var weight = st.fontWeight;
+    if (weight === undefined && o.fontStyle) {
+      var fs = String(o.fontStyle).toLowerCase();
+      if (fs.indexOf('black') !== -1 || fs.indexOf('heavy') !== -1) weight = 900;
+      else if (fs.indexOf('extra bold') !== -1 || fs.indexOf('extrabold') !== -1) weight = 800;
+      else if (fs.indexOf('semi bold') !== -1 || fs.indexOf('semibold') !== -1) weight = 600;
+      else if (fs.indexOf('bold') !== -1) weight = 700;
+      else if (fs.indexOf('medium') !== -1) weight = 500;
+      else if (fs.indexOf('light') !== -1) weight = 300;
+      else if (fs.indexOf('thin') !== -1) weight = 100;
+      else weight = 400;
+    }
+    o.weight = weight;
+
+    if (st.lineHeightPx !== undefined) o.lineHeightPx = round(st.lineHeightPx);
+    else if (lh && lh.unit === 'PIXELS') o.lineHeightPx = round(lh.value);
+    else if (lh && lh.unit === 'PERCENT' && o.size) o.lineHeightPx = round(o.size * lh.value / 100);
+    else if (lh && lh.unit === 'AUTO' && o.size) o.lineHeightPx = round(o.size * 1.2);
+
+    if (st.lineHeightPercentFontSize !== undefined) o.lineHeightPercent = round(st.lineHeightPercentFontSize);
+    else if (lh && lh.unit === 'PERCENT') o.lineHeightPercent = round(lh.value);
+
+    if (st.letterSpacing !== undefined) o.letterSpacing = round(st.letterSpacing);
+    else if (ls) o.letterSpacing = round(ls.value);
+
+    o.alignH = st.textAlignHorizontal || n.textAlignHorizontal;
+    o.alignV = st.textAlignVertical || n.textAlignVertical;
     o.autoResize = n.textAutoResize;
-    if (s.textDecoration) o.decoration = s.textDecoration;
+    if (st.textDecoration) o.decoration = st.textDecoration;
+
+    // مراجع الأنماط — تربط بمكتبة الطباعة المنشورة
+    try { if (n.textStyleId) o.textStyleId = n.textStyleId; } catch (e) {}
+    try { if (n.fillStyleId && typeof n.fillStyleId === 'string') o.fillStyleId = n.fillStyleId; } catch (e) {}
   }
 
   if (VECTOR_TYPES[n.type]) o.vector = true;
@@ -534,6 +573,18 @@ figma.ui.onmessage = function (msg) {
             diagnostics: { stages: stages, errors: errors, warnings: warnings, skipped: skipped.slice(0, 200) },
           };
           mark('Done');
+          // ملخّص الخطوط — للتأكد من قراءتها
+          var fontSummary = {};
+          for (var fi = 0; fi < flat.length; fi++) {
+            var fn2 = flat[fi].fontFamily;
+            if (!fn2) continue;
+            var k2 = fn2 + ' ' + flat[fi].size + '/' + flat[fi].weight + ' lh=' + flat[fi].lineHeightPx + ' ls=' + flat[fi].letterSpacing;
+            fontSummary[k2] = (fontSummary[k2] || 0) + 1;
+          }
+          payload.meta.fonts = Object.keys(fontSummary).sort(function (a, b) { return fontSummary[b] - fontSummary[a]; }).slice(0, 40);
+          payload.meta.fontsMissing = 0;
+          for (var mi = 0; mi < flat.length; mi++) if (flat[mi].type === 'TEXT' && !flat[mi].fontFamily) payload.meta.fontsMissing++;
+
           send('done', payload);
         }
 

@@ -1,0 +1,35 @@
+# Image Viewer - Web Images
+
+Figma: https://www.figma.com/design/J4mMUwLS0Mg1Ll5j6gH5wL?node-id=324-18961
+Size: 1440x1024   Visible nodes: 23
+
+Coordinates are relative to the screen origin.
+row/col = auto-layout direction · gap/pad · bg = fill · r = radius · fx = shadows
+TEXT lines end with: content, font, size/weight, line-height, letter-spacing, alignment
+INSTANCE lines end with {variant properties}
+
+```
+• Image Viewer - Web Images (COMPONENT)  @10154,8445 1440x1024  bg=#000000  clip
+  • Header Bar (FRAME)  @10154,8445 1440x52  row  gap=979  pad=8/8/8/8  justify=SPACE_BETWEEN  align=CENTER
+    • Left Button Wrapper (FRAME)  @10162,8453 87x36  row  gap=16  align=CENTER
+      • Icon Button (INSTANCE)  @10162,8453 36x36  row  gap=10  pad=0/8/0/8  justify=CENTER  align=CENTER  r=12  {Icon#317:13=7:576, Tooltip#317:12=false, Shape=Square, Size=Large, Type=Default, State=Default}
+        • General / Close (INSTANCE)  @10168,8459 24x24  clip  {}
+          • Vector (VECTOR)  @10173.5,8464.5 13.1x13.1  bg=#ffffff
+    • 2 / 4 (TEXT)  @10857,8459 35x24  bg=#afafaf  "2 / 4"  ? /undefined
+  • Image Row (FRAME)  @9256,8470.5 3236x974  row  gap=106  justify=CENTER  align=CENTER
+    • Image (RECTANGLE)  @9256,8470.5 1008x974  bg=image  r=4  op=0.4
+    • Image (RECTANGLE)  @10370,8470.5 1008x974  bg=image  r=4
+    • Image (RECTANGLE)  @11484,8470.5 1008x974  bg=image  r=4  op=0.4
+  • Icon Button (INSTANCE)  @10174,8939 38x38  row  gap=10  pad=0/8/0/8  justify=CENTER  align=CENTER  bg=#212121  stroke=#ffffff/o0.26@1  r=999  {Tooltip#317:12=false, Icon#317:13=118:6020, Shape=Round, Size=Large, Type=Outline, State=Default}
+    • General / Chevron Left (INSTANCE)  @10181,8946 24x24  clip  {}
+      • Vector (VECTOR)  @10187.5,8950.3 8.8x15.5  bg=#ffffff
+  • Icon Button (INSTANCE)  @11536,8939 38x38  row  gap=10  pad=0/8/0/8  justify=CENTER  align=CENTER  bg=#212121  stroke=#ffffff/o0.26@1  r=999  {Tooltip#317:12=false, Icon#317:13=118:6019, Shape=Round, Size=Large, Type=Outline, State=Default}
+    • General / Chevron Right (INSTANCE)  @11543,8946 24x24  clip  {}
+      • Vector (VECTOR)  @11551.8,8950.3 8.8x15.5  bg=#ffffff
+  • Source 6 (INSTANCE)  @10174,9389 700x56  col  gap=4  pad=8/16/8/16  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=false, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+    • Source Site (FRAME)  @10190,9397 668x16  row  gap=6  align=CENTER
+      • Source / Placeholder (INSTANCE)  @10190,9397 16x16  bg=#696969  r=999  clip  {}
+        • vector (VECTOR)  @10194,9401 8x8  bg=#ffffff
+      • Source Name (TEXT)  @10212,9397 646x16  bg=#ffffff  "Source Name"  ? /undefined
+    • Page Name (TEXT)  @10190,9417 668x20  bg=#ffffff  "Page Name"  ? /undefined
+```

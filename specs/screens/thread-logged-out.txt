@@ -1,0 +1,130 @@
+# Thread  - Logged Out
+
+Figma: https://www.figma.com/design/J4mMUwLS0Mg1Ll5j6gH5wL?node-id=149-17484
+Size: 1440x1024   Visible nodes: 118
+
+Coordinates are relative to the screen origin.
+row/col = auto-layout direction · gap/pad · bg = fill · r = radius · fx = shadows
+TEXT lines end with: content, font, size/weight, line-height, letter-spacing, alignment
+INSTANCE lines end with {variant properties}
+
+```
+• Thread  - Logged Out (COMPONENT)  @3594,2325 1440x1024  bg=#212121  clip
+  • Body (FRAME)  @3594,2325 1440x1024  col  gap=16  pad=52/40/50/40  align=CENTER  clip
+    • Chat Thread (FRAME)  @3930,2377 768x804  col  gap=8  pad=24/0/40/0
+      • User Message Section (INSTANCE)  @3930,2401 768x72  col  gap=4  pad=0/0/36/0  align=MAX  {Reference Image#84:7=false, State=Default}
+        • .User Message Bubble (INSTANCE)  @4506,2401 192x36  row  gap=10  pad=6/16/6/16  justify=CENTER  align=CENTER  bg=#ffffff/o0.10  r=999  {✏️ Text#1:0=ChatGPT edge cases}
+          • Text (TEXT)  @4522,2407 160x24  bg=#ffffff  "ChatGPT edge cases"  ? /undefined
+      • Response Section (FRAME)  @3930,2481 768x704  col  gap=16
+        • "Edge cases" for ChatGPT refer to situations where the model's behavior is unexpected, unreliable, or problematic—especially near the "boundaries" of its intended use. These cases often reveal the limits of the model's capabilities, safety mechanisms, or alignment with user intent. Here’s a categorized list of ChatGPT edge cases, with examples: (TEXT)  @3930,2481 768x128  bg=#ffffff  ""Edge cases" for ChatGPT refer to situations where the model's behavior is unexpected, unreliable, or problematic—especially near the "boundaries" of its intended use. These cases often reveal the limits of the model's capabilities, safety mechanisms, or alignment with user intent.⏎Here’s a categorized list of ChatGPT edge cases, with examples:"  ? /undefined
+        • Divider (INSTANCE)  @3930,2625 768x32  row  gap=10  pad=16/0/16/0  {✏️ Chat#188:11=Chat Name, Type=Default}
+          • Line 1 (LINE)  @3930,2641 768x0  stroke=#ffffff/o0.26@1
+        • 🔍 1. Ambiguity and Underspecification (TEXT)  @3930,2673 768x28  bg=#ffffff  "🔍 1. Ambiguity and Underspecification"  ? /undefined
+        • "Edge cases" for ChatGPT refer to situations where the model's behavior is unexpected, unreliable, or problematic—especially near the "boundaries" of its intended use. These cases often reveal the limits of the model's capabilities, safety mechanisms, or alignment with user intent. Here’s a categorized list of ChatGPT edge cases, with examples: When user input is vague or unclear, ChatGPT has to "guess" the intent, which can lead to incorrect or irrelevant responses. Examples: User: “What’s the best one?” Best what? A book? A laptop? A flavor of ice cream? User: “How do you do it?” No context = unpredictable response. Challenge: LLMs lack real-world context or memory of previous interactions unless explicitly given. (TEXT)  @3930,2717 768x416  bg=#ffffff  ""Edge cases" for ChatGPT refer to situations where the model's behavior is unexpected, unreliable, or problematic—especially near the "boundaries" of its intended use. These cases often reveal the limits of the model's capabilities, safety mechanisms, or alignment with user intent.⏎Here’s a categorized list of ChatGPT edge cases, with examples:⏎When user input is vague or unclear, ChatGPT has to "guess" the intent, which can lead to incorrect or irrelevant responses.⏎Examples:⏎User: “What’s the best one?”⏎Best what? A book? A laptop? A flavor of ice cream?⏎User: “How do you do it?”⏎No context = unpredictable response.⏎Challenge: LLMs lack real-world context or memory of previous interactions unless explicitly given."  ? /undefined
+        • Response Button Row (INSTANCE)  @3930,3149 328x36  row  gap=2  align=CENTER  {Evaluation#126:43=true, Share#126:46=true, Try Again#126:40=true, Sources#7:6=true, Signed In=Yes}
+          • Copy (INSTANCE)  @3930,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=3:33, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • General / Copy (INSTANCE)  @3934,3155 24x24  clip  {}
+              • Vector (VECTOR)  @3936.2,3157.2 19.6x19.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @3934,3191 24x24  op=0  {✏️ Text#159:1=Copy, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @3923,3191 46x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @3931,3195 30x16  bg=#ffffff  "Copy"  ? /undefined
+          • Good Response (INSTANCE)  @3964,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=7:751, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • General / Thumbs Up (INSTANCE)  @3968,3155 24x24  clip  {}
+              • Vector (VECTOR)  @3971.2,3157.2 17.7x19.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @3968,3191 24x24  op=0  {✏️ Text#159:1=Good response, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @3928.5,3191 103x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @3936.5,3195 87x16  bg=#ffffff  "Good response"  ? /undefined
+          • Bad Response (INSTANCE)  @3998,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=7:750, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • General / Thumbs Down (INSTANCE)  @4002,3155 24x24  clip  {}
+              • Vector (VECTOR)  @4005.2,3157.2 17.7x19.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @4002,3191 24x24  op=0  {✏️ Text#159:1=Bad response, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @3967,3191 94x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @3975,3195 78x16  bg=#ffffff  "Bad response"  ? /undefined
+          • Share (INSTANCE)  @4032,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=7:752, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • Upload (INSTANCE)  @4036,3155 24x24  clip  {}
+              • Vector (VECTOR)  @4039.2,3158.2 17.6x17.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @4036,3191 24x24  op=0  {✏️ Text#159:1=Share, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @4023.5,3191 49x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @4031.5,3195 33x16  bg=#ffffff  "Share"  ? /undefined
+          • Try Again (INSTANCE)  @4066,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=7:748, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • General / Retry (INSTANCE)  @4070,3155 24x24  clip  {}
+              • Vector (VECTOR)  @4073.3,3158.2 17.5x17.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @4070,3191 24x24  op=0  {✏️ Text#159:1=Try again, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @4047.5,3191 69x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @4055.5,3195 53x16  bg=#ffffff  "Try again"  ? /undefined
+          • More Actions (INSTANCE)  @4100,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=3:257, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • General / Overflow (INSTANCE)  @4104,3155 24x24  clip  {}
+              • Vector (VECTOR)  @4107.6,3165.2 16.8x3.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @4104,3191 24x24  op=0  {✏️ Text#159:1=More actions, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @4071,3191 90x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @4079,3195 74x16  bg=#ffffff  "More actions"  ? /undefined
+          • .Source Button (INSTANCE)  @4134,3151 124x32  row  gap=8  pad=6/12/6/12  align=CENTER  r=999  {State=Default}
+            • .Source Icon Stack (INSTANCE)  @4146,3157 36x20  row  gap=-4  align=CENTER  {↳ Icon#7:29=7:1615, Amount=2}
+              • Source 1 (FRAME)  @4146,3157 20x20  bg=#ffffff  stroke=#212121@1  r=999  clip
+                • Source / Placeholder (INSTANCE)  @4146,3157 20x20  bg=#696969  r=999  clip  {}
+                  • vector (VECTOR)  @4151,3162 10x10  bg=#ffffff
+              • Source 2 (FRAME)  @4162,3157 20x20  bg=#ffffff  stroke=#212121@1  r=999  clip
+                • Source / Placeholder (INSTANCE)  @4162,3157 20x20  bg=#696969  r=999  clip  {}
+                  • vector (VECTOR)  @4167,3162 10x10  bg=#ffffff
+            • Sources (TEXT)  @4190,3157 56x20  bg=#ffffff  "Sources"  ? /undefined
+      • Scroll to Bottom (INSTANCE)  @4299,3213 30x30  row  gap=4  pad=8/8/8/8  justify=CENTER  align=CENTER  bg=#212121  stroke=#ffffff/o0.26@1  r=999  {↳ Icon#3:16=3:122, Tooltip#3:19=false, Icon#3:2=true, ✏️ Text#3:1=Voice, Type=Default, Size=Default, State=Default}
+        • General / Arrow Down (INSTANCE)  @4304,3218 20x20  clip  {}
+          • Vector (VECTOR)  @4307.5,3220.7 13x14.7  bg=#ffffff
+    • Chat Footer (INSTANCE)  @3594,3211 1440x138  col  {Message#592:0=true, ✏️ Text#199:32=ChatGPT can make mistakes. Check important info.}
+      • Gradient (FRAME)  @3594,3211 1440x102
+        • Gradient Mask (RECTANGLE)  @3594,3211 1440x102  bg=grad(#212121@29%>#212121@100%)
+        • Fill (RECTANGLE)  @3594,3211 1440x102  bg=#212121
+      • Fixed Footer Message (FRAME)  @3594,3313 1440x36  row  gap=10  pad=8/0/8/0  justify=CENTER  align=CENTER  bg=#212121
+        • By messaging ChatGPT, you agree to our Terms and have read our Privacy Policy. (TEXT)  @3594,3321 1440x20  bg=#ffffff  "ChatGPT can make mistakes. Check important info."  ? /undefined
+    • Prompt Input Field (INSTANCE)  @3930,3197 768x102  col  gap=10  pad=12/10/12/10  bg=#303030  r=28  fx=inner 0/0/1/1 #ffffff/a0.13 + shadow 0/6/8/0 #000000/a0.1 + shadow 0/0/1.5/0 #000000/a0.45  {Composer#199:51=true, Image Input#324:1=false, Signed In=No, State=Empty, Long Input=N/A}
+      • Text Wrapper (FRAME)  @3940,3209 748x32  col  gap=10  pad=4/8/4/8
+        • .Text Input Content (INSTANCE)  @3948,3213 732x24  row  align=CENTER  {✏️ Text#31:0=Text input, ✏️ Hint#84:2=Ask anything, State=Empty, Show Cursor=No}
+          • Hint text (TEXT)  @3948,3213 732x24  bg=#afafaf  "Ask anything"  ? /undefined
+      • Button Wrapper (FRAME)  @3940,3251 748x36  row  gap=10  justify=SPACE_BETWEEN
+        • Buttons Left (FRAME)  @3940,3251 274x36  row  gap=6
+          • Composer Button (INSTANCE)  @3940,3251 88x36  row  gap=4  pad=8/12/8/8  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {↳ Icon#199:48=2:14, Tooltip#199:65=true, ✏️ Text#199:58=Attach, Type=Radio, State=Default}
+            • General / Attach (INSTANCE)  @3948,3259 20x20  clip  {}
+              • Vector (VECTOR)  @3952.3,3260.8 11.3x16.3  bg=#ffffff
+            • Composer (TEXT)  @3972,3259 44x20  bg=#ffffff  "Attach"  ? /undefined
+            • Tooltip (INSTANCE)  @3968,3295 32x32  op=0  {✏️ Text#159:1=Add photos, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @3943,3295 82x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @3951,3299 66x16  bg=#ffffff  "Add photos"  ? /undefined
+          • Composer Button (INSTANCE)  @4034,3251 91x36  row  gap=4  pad=8/12/8/8  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {✏️ Text#199:58=Search, Tooltip#199:65=true, ↳ Icon#199:48=3:34, Type=Radio, State=Default}
+            • General / Internet (INSTANCE)  @4042,3259 20x20  clip  {}
+              • Vector (VECTOR)  @4044.1,3261.1 15.8x15.8  bg=#ffffff
+            • Composer (TEXT)  @4066,3259 47x20  bg=#ffffff  "Search"  ? /undefined
+            • Tooltip (INSTANCE)  @4064,3295 32x32  op=0  {✏️ Text#159:1=Search the web, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @4027.5,3295 105x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @4035.5,3299 89x16  bg=#ffffff  "Search the web"  ? /undefined
+          • Composer Button (INSTANCE)  @4131,3251 83x36  row  gap=4  pad=8/12/8/8  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {✏️ Text#199:58=Study, Tooltip#199:65=false, ↳ Icon#199:48=3:35, Type=Radio, State=Default}
+            • General / Study (INSTANCE)  @4139,3259 20x20  clip  {}
+              • Vector (VECTOR)  @4141.2,3260 15.5x17.2  bg=#ffffff
+            • Composer (TEXT)  @4163,3259 39x20  bg=#ffffff  "Study"  ? /undefined
+        • Buttons Right (FRAME)  @4614,3251 74x36  row  gap=8
+          • Button (INSTANCE)  @4614,3251 74x36  row  gap=4  pad=8/8/8/8  justify=CENTER  align=CENTER  bg=#212121, #ffffff/o0.10  r=999  {Tooltip#3:19=true, ↳ Icon#3:16=3:36, Icon#3:2=true, ✏️ Text#3:1=Voice, Type=Secondary, Size=Default, State=Default}
+            • General / Voice (INSTANCE)  @4622,3259 20x20  clip  {}
+              • Vector (VECTOR)  @4625,3262.8 14x12.3  bg=#ffffff
+            • Button (TEXT)  @4646,3260 34x18  bg=#ffffff  "Voice"  ? /undefined
+            • Tooltip (INSTANCE)  @4638,3295 24x24  op=0  {✏️ Text#159:1=Use voice mode, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @4596,3295 108x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @4604,3299 92x16  bg=#ffffff  "Use voice mode"  ? /undefined
+    • App Header (INSTANCE)  @3594,2325 1440x52  row  gap=1044  pad=8/12/8/12  justify=SPACE_BETWEEN  align=CENTER  bg=#212121  stroke=#3e3e3e@  {Signed In=No, Type=Default}
+      • Title Group (FRAME)  @3606,2333 145x36  row  justify=CENTER  align=CENTER
+        • Icon Button (INSTANCE)  @3606,2335 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=3:140, Tooltip#317:12=false, Shape=Square, Size=Large, Type=Default, State=Default}
+          • General / ChatGPT (INSTANCE)  @3610,2339 24x24  clip  {}
+            • Vector (VECTOR)  @3612,2341.1 20x19.8  bg=#ffffff
+        • Model Selection Button (INSTANCE)  @3638,2333 113x36  row  gap=4  pad=0/10/0/10  justify=CENTER  align=CENTER  r=8  {State=Default, Logged In=No}
+          • ChatGPT (TEXT)  @3648,2337 73x28  bg=#ffffff  "ChatGPT"  ? /undefined
+          • General / Chevron Down (INSTANCE)  @3725,2343 16x16  clip  {}
+            • Vector (VECTOR)  @3727.8,2348.8 10.3x5.8  bg=#afafaf
+      • Buttons (FRAME)  @4781,2333 241x36  row  gap=8  align=CENTER
+        • Button (INSTANCE)  @4781,2333 65x36  row  gap=4  pad=8/12/8/12  justify=CENTER  align=CENTER  bg=#ffffff  r=999  {Tooltip#3:19=false, ↳ Icon#3:16=2:14, Icon#3:2=false, ✏️ Text#3:1=Log in, Type=Important, Size=Large, State=Default}
+          • Button (TEXT)  @4793,2341 41x20  bg=#000000  "Log in"  ? /undefined
+        • Button (INSTANCE)  @4854,2333 128x36  row  gap=4  pad=8/12/8/12  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {↳ Icon#3:16=2:14, Tooltip#3:19=false, Icon#3:2=false, ✏️ Text#3:1=Sign up for free, Type=Outline, Size=Large, State=Default}
+          • Button (TEXT)  @4866,2341 104x20  bg=#ffffff  "Sign up for free"  ? /undefined
+        • Icon Button (INSTANCE)  @4990,2335 32x32  row  gap=10  justify=CENTER  align=CENTER  r=999  {Icon#317:13=3:32, Tooltip#317:12=false, Shape=Round, Size=Large, Type=Default, State=Default}
+          • General / Help (INSTANCE)  @4994,2339 24x24  clip  {}
+            • Vector (BOOLEAN_OPERATION)  @4996.5,2341.5 19x19  bg=#ffffff
+              • Vector (VECTOR)  @4996.5,2341.5 19x19  bg=#000000
+              • Vector (VECTOR)  @5003,2346.2 6.1x9.6  bg=#000000
+```

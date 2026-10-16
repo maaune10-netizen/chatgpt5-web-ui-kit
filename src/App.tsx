@@ -1,169 +1,201 @@
-import { useCallback, useState } from 'react';
-import Sidebar from './components/Sidebar';
-import AppHeader from './components/AppHeader';
-import PromptInput from './components/PromptInput';
-import { SCREENS, PENDING, type ScreenId } from './screens';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { renderScreen, type ScreenData, type ScreenNode } from './lib/render';
 
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  text: string;
-}
+/* كل الشاشات المُستخرجة من ملف Figma */
+const modules = import.meta.glob('./screens-data/*.json', { eager: true, import: 'default' }) as Record<
+  string,
+  ScreenData | { slug: string; name: string; node: string; count: number }[]
+>;
 
-const reply = (q: string) =>
-  `This is a UI-kit build, so there is no model behind it yet.\n\nYou asked: “${q}”\n\n` +
-  'The layout, typography, colours and shadows here come straight from the ' +
-  '“ChatGPT 5 Web — Free UI Kit” Figma file.';
+const SCREENS: ScreenData[] = Object.entries(modules)
+  .filter(([path, v]) => !path.endsWith('index.json') && !Array.isArray(v))
+  .map(([, v]) => v as ScreenData)
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+/*
+ * التنقّل: عناصر الشريط الجانبي في التصميم تنتقل إلى الشاشة المقابلة.
+ * الربط بالاسم لأن التصميم مبني من مكوّنات قابلة لإعادة الاستخدام.
+ */
+const NAV_TARGETS: Record<string, string> = {
+  'New Chat': 'new-chat-logged-in',
+  'Search chats': 'library',
+  Library: 'library',
+  'Example Project 1': 'project-page',
+  'Project Chat 1': 'project-chat',
+  'Project Chat 2': 'project-chat',
+  'Example Chat 1': 'thread-logged-in',
+  'Response Types': 'thread-response-types',
+  'Loading Animations': 'thread-loading-animations',
+  'Example GPT 1': 'gpt-chat',
+  'Example GPT 2': 'gpt-chat',
+};
 
 export default function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [screen, setScreen] = useState<ScreenId>('new-chat');
-  const [activeNav, setActiveNav] = useState('');
-  const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [temporary, setTemporary] = useState(false);
-  const [upgrade, setUpgrade] = useState(false);
+  const [slug, setSlug] = useState(SCREENS[0]?.slug ?? '');
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [fit, setFit] = useState(true);
+  const stageRef = useRef<HTMLDivElement>(null);
 
-  const send = useCallback(() => {
-    const text = input.trim();
-    if (!text) return;
-    setMessages((m) => [
-      ...m,
-      { id: crypto.randomUUID(), role: 'user', text },
-      { id: crypto.randomUUID(), role: 'assistant', text: reply(text) },
-    ]);
-    setInput('');
-    setScreen('thread');
-    setActiveNav('thread');
-  }, [input]);
+  const screen = useMemo(() => SCREENS.find((s) => s.slug === slug) ?? SCREENS[0], [slug]);
 
-  const newChat = useCallback(() => {
-    setMessages([]);
-    setInput('');
-    setScreen('new-chat');
-    setActiveNav('new-chat');
+  /* ملاءمة العرض تلقائيًا */
+  useEffect(() => {
+    if (!fit) return;
+    const el = stageRef.current;
+    if (!el) return;
+    const update = () => {
+      const pad = 48;
+      const s = Math.min((el.clientWidth - pad) / 1440, (el.clientHeight - pad) / 1024);
+      setZoom(Math.max(0.15, Math.round(s * 1000) / 1000));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [fit]);
+
+  const clickable = (n: ScreenNode) => !!NAV_TARGETS[n.n];
+  const onNodeClick = (n: ScreenNode) => {
+    const target = NAV_TARGETS[n.n];
+    if (target && SCREENS.some((s) => s.slug === target)) {
+      setSlug(target);
+      setPickerOpen(false);
+    }
+  };
+
+  /* Ctrl/Cmd + عجلة = تكبير يدوي */
+  useEffect(() => {
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      setFit(false);
+      setZoom((z) => Math.min(3, Math.max(0.15, z - e.deltaY * 0.0015)));
+    };
+    window.addEventListener('wheel', onWheel, { passive: false });
+    return () => window.removeEventListener('wheel', onWheel);
   }, []);
 
-  const selectNav = useCallback((id: string) => {
-    setActiveNav(id);
-    const known: ScreenId[] = ['thread', 'library', 'explore', 'project-page'];
-    if (id === 'library') setScreen('library');
-    else if (id === 'explore') setScreen('explore');
-    else if (id.startsWith('project')) setScreen('project-page');
-    else if (id.startsWith('chat') || id.includes('chat')) setScreen('thread');
-    else setScreen(known.includes(id as ScreenId) ? (id as ScreenId) : 'thread');
-  }, []);
-
-  const isNewChat = screen === 'new-chat';
-  const hasThread = messages.length > 0;
+  if (!screen) {
+    return <div className="grid h-full place-items-center text-white/70">No screens found.</div>;
+  }
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-body text-white">
-      <Sidebar
-        open={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        activeId={activeNav}
-        onSelect={selectNav}
-        onNewChat={newChat}
-        onUpgrade={() => setUpgrade(true)}
-      />
+    <div className="flex h-full flex-col bg-[#0b0b0b] text-white">
+      {/* الشريط العلوي */}
+      <header className="flex h-12 shrink-0 items-center gap-3 border-b border-white/10 px-3">
+        <button
+          onClick={() => setPickerOpen((v) => !v)}
+          className="flex h-8 items-center gap-2 rounded-lg bg-white/10 px-3 text-[12px] font-medium transition hover:bg-white/15"
+        >
+          <span className="grid grid-cols-2 gap-[2px]">
+            {[0, 1, 2, 3].map((i) => (
+              <span key={i} className="h-[3px] w-[3px] rounded-full bg-white/80" />
+            ))}
+          </span>
+          Screens
+          <span className="text-white/50">{SCREENS.length}</span>
+        </button>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <AppHeader
-          temporary={temporary}
-          onToggleTemporary={() => setTemporary((v) => !v)}
-          onUpsell={() => setUpgrade(true)}
-        />
+        <div className="min-w-0 flex-1 truncate text-[13px]">
+          <span className="font-medium">{screen.name}</span>
+          <span className="ml-2 text-white/40">
+            {screen.w}×{screen.h} · {screen.nodes.length} nodes
+          </span>
+        </div>
 
-        {temporary && (
-          <div className="flex shrink-0 items-center justify-center gap-2 border-b border-line bg-sidebar py-2 text-[12px] leading-[15.6px] text-muted">
-            Temporary chat — it won&apos;t appear in your history or be used to train models.
-          </div>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => {
+              setFit(false);
+              setZoom((z) => Math.max(0.15, Math.round((z - 0.05) * 100) / 100));
+            }}
+            className="h-8 w-8 rounded-lg bg-white/5 transition hover:bg-white/15"
+            title="Zoom out"
+          >
+            −
+          </button>
+          <span className="w-12 text-center text-[11px] tabular-nums text-white/60">
+            {Math.round(zoom * 100)}%
+          </span>
+          <button
+            onClick={() => {
+              setFit(false);
+              setZoom((z) => Math.min(3, Math.round((z + 0.05) * 100) / 100));
+            }}
+            className="h-8 w-8 rounded-lg bg-white/5 transition hover:bg-white/15"
+            title="Zoom in"
+          >
+            +
+          </button>
+          <button
+            onClick={() => setFit((v) => !v)}
+            className={`ml-1 h-8 rounded-lg px-3 text-[12px] transition ${
+              fit ? 'bg-white text-black' : 'bg-white/10 hover:bg-white/15'
+            }`}
+          >
+            Fit
+          </button>
+        </div>
+      </header>
+
+      <div className="flex min-h-0 flex-1">
+        {/* قائمة الشاشات */}
+        {pickerOpen && (
+          <aside className="flex w-72 shrink-0 flex-col border-r border-white/10 bg-[#121212]">
+            <div className="border-b border-white/10 px-3 py-2 text-[11px] uppercase tracking-wider text-white/40">
+              Extracted screens
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto p-2">
+              {SCREENS.map((s) => (
+                <button
+                  key={s.slug}
+                  onClick={() => {
+                    setSlug(s.slug);
+                  }}
+                  className={`mb-1 block w-full rounded-lg px-3 py-2 text-left text-[12px] transition ${
+                    s.slug === slug ? 'bg-white text-black' : 'text-white/80 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="truncate font-medium">{s.name}</div>
+                  <div
+                    className={`text-[10px] ${s.slug === slug ? 'text-black/50' : 'text-white/40'}`}
+                  >
+                    {s.nodes.length} nodes
+                  </div>
+                </button>
+              ))}
+            </div>
+          </aside>
         )}
 
-        <main className="flex min-h-0 flex-1 flex-col items-center pb-[50px]">
-          {isNewChat || hasThread ? (
-            hasThread ? (
-              <>
-                {/* Thread */}
-                <div className="min-h-0 w-full flex-1 overflow-y-auto">
-                  <div className="mx-auto w-[768px] max-w-full px-4 py-8">
-                    {messages.map((m) =>
-                      m.role === 'user' ? (
-                        <div key={m.id} className="mb-6 flex justify-end">
-                          <div className="max-w-[80%] whitespace-pre-wrap rounded-3xl bg-input px-4 py-2.5 text-[15px] leading-6">
-                            {m.text}
-                          </div>
-                        </div>
-                      ) : (
-                        <div key={m.id} className="mb-6 whitespace-pre-wrap text-[15px] leading-7">
-                          {m.text}
-                        </div>
-                      ),
-                    )}
-                  </div>
-                </div>
-                <div className="w-full shrink-0 pb-6">
-                  <div className="mx-auto w-[768px] max-w-full px-4">
-                    <PromptInput value={input} onChange={setInput} onSubmit={send} />
-                  </div>
-                </div>
-              </>
-            ) : (
-              /* New chat */
-              <div className="flex min-h-0 flex-1 flex-col items-center justify-center pb-16 pt-4">
-                <div className="w-[768px] max-w-full px-4">
-                  <div className="mb-2 pb-7 text-center">
-                    <h1 className="text-[30px] font-semibold leading-9 tracking-tight text-white">
-                      Ready when you are.
-                    </h1>
-                  </div>
-                  <PromptInput
-                    value={input}
-                    onChange={setInput}
-                    onSubmit={send}
-                    autoFocus
-                  />
-                </div>
-              </div>
-            )
-          ) : (
-            /* Screens that still need their Figma data */
-            <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-6 text-center">
-              <h1 className="text-[30px] font-semibold leading-9 text-white">
-                {SCREENS[screen]?.title ?? 'Screen'}
-              </h1>
-              <p className="mt-3 max-w-md text-[14px] leading-[19.7px] text-muted">
-                {PENDING}
-              </p>
-            </div>
-          )}
-        </main>
-      </div>
-
-      {upgrade && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onClick={() => setUpgrade(false)}
-        >
+        {/* المسرح */}
+        <div ref={stageRef} className="relative min-h-0 flex-1 overflow-auto">
           <div
-            className="w-full max-w-sm rounded-2xl border border-line bg-sidebar p-6"
-            onClick={(e) => e.stopPropagation()}
+            className="absolute left-1/2 top-1/2"
+            style={{
+              width: 1440 * zoom,
+              height: 1024 * zoom,
+              transform: 'translate(-50%, -50%)',
+            }}
           >
-            <h2 className="text-[18px] font-semibold">Get Plus</h2>
-            <p className="mt-2 text-[14px] leading-[19.7px] text-muted">
-              Demo only — there is no checkout in this build.
-            </p>
-            <button
-              type="button"
-              onClick={() => setUpgrade(false)}
-              className="mt-5 h-9 w-full rounded-full bg-white text-[14px] font-medium text-black transition hover:bg-white/90"
+            <div
+              id="screen-frame"
+              style={{
+                width: 1440,
+                height: 1024,
+                transform: `scale(${zoom})`,
+                transformOrigin: 'top left',
+                position: 'relative',
+                background: '#212121',
+                boxShadow: '0 24px 80px rgba(0,0,0,0.6)',
+              }}
             >
-              Close
-            </button>
+              {renderScreen(screen, { clickable, onNodeClick })}
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

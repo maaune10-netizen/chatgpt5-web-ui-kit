@@ -1,0 +1,224 @@
+# Thread + Citations - Logged Out
+
+Figma: https://www.figma.com/design/J4mMUwLS0Mg1Ll5j6gH5wL?node-id=6-1101
+Size: 1440x1024   Visible nodes: 212
+
+Coordinates are relative to the screen origin.
+row/col = auto-layout direction · gap/pad · bg = fill · r = radius · fx = shadows
+TEXT lines end with: content, font, size/weight, line-height, letter-spacing, alignment
+INSTANCE lines end with {variant properties}
+
+```
+• Thread + Citations - Logged Out (COMPONENT)  @5234,2325 1440x1024  bg=#212121  clip
+  • Citations Panel (INSTANCE)  @6372,2325 302x1024  col  bg=#212121  stroke=#3e3e3e@  clip  {}
+    • Section Header (INSTANCE)  @6372,2325 302x53  row  gap=10  pad=16/12/16/24  align=CENTER  bg=#212121  stroke=#3e3e3e@  {Show Close#7:16=true, ✏️ Title#7:15=Citations}
+      • Section Header (TEXT)  @6396,2341.5 224x20  bg=#ffffff  "Citations"  ? /undefined
+      • Icon Button (INSTANCE)  @6630,2335.5 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=7:576, Tooltip#317:12=false, Shape=Square, Size=Med, Type=Default, State=Default}
+        • General / Close (INSTANCE)  @6636,2341.5 20x20  clip  {}
+          • Vector (VECTOR)  @6640.6,2346.1 10.9x10.9  bg=#ffffff
+    • Citation Group (FRAME)  @6372,2378 302x542  col  gap=2  pad=8/12/8/12
+      • Source 1 (INSTANCE)  @6384,2386 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,2398 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,2398 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,2402 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,2398 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,2418 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,2442 254x18  bg=#ffffff  "Description"  ? /undefined
+      • Source 2 (INSTANCE)  @6384,2474 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,2486 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,2486 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,2490 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,2486 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,2506 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,2530 254x18  bg=#ffffff  "Description"  ? /undefined
+      • Source 3 (INSTANCE)  @6384,2562 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,2574 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,2574 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,2578 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,2574 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,2594 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,2618 254x18  bg=#ffffff  "Description"  ? /undefined
+      • Source 4 (INSTANCE)  @6384,2650 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,2662 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,2662 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,2666 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,2662 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,2682 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,2706 254x18  bg=#ffffff  "Description"  ? /undefined
+      • Source 5 (INSTANCE)  @6384,2738 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,2750 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,2750 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,2754 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,2750 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,2770 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,2794 254x18  bg=#ffffff  "Description"  ? /undefined
+      • Source 6 (INSTANCE)  @6384,2826 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,2838 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,2838 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,2842 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,2838 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,2858 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,2882 254x18  bg=#ffffff  "Description"  ? /undefined
+    • Section Header (INSTANCE)  @6372,2920 302x53  row  gap=10  pad=16/12/16/24  align=CENTER  bg=#212121  stroke=#3e3e3e@  {Show Close#7:16=false, ✏️ Title#7:15=More}
+      • Section Header (TEXT)  @6396,2936.5 266x20  bg=#ffffff  "More"  ? /undefined
+    • Citation Group (FRAME)  @6372,2973 302x542  col  gap=2  pad=8/12/8/12
+      • Source 7 (INSTANCE)  @6384,2981 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,2993 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,2993 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,2997 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,2993 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,3013 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,3037 254x18  bg=#ffffff  "Description"  ? /undefined
+      • Source 8 (INSTANCE)  @6384,3069 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,3081 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,3081 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,3085 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,3081 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,3101 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,3125 254x18  bg=#ffffff  "Description"  ? /undefined
+      • Source 9 (INSTANCE)  @6384,3157 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,3169 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,3169 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,3173 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,3169 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,3189 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,3213 254x18  bg=#ffffff  "Description"  ? /undefined
+      • Source 10 (INSTANCE)  @6384,3245 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,3257 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,3257 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,3261 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,3257 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,3277 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,3301 254x18  bg=#ffffff  "Description"  ? /undefined
+      • Source 11 (INSTANCE)  @6384,3333 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,3345 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,3345 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,3349 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,3345 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,3365 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,3389 254x18  bg=#ffffff  "Description"  ? /undefined
+      • Source 12 (INSTANCE)  @6384,3421 278x86  col  gap=4  pad=12/12/12/12  bg=#212121  r=12  {Source Icon#7:14=7:1615, ✏️ Page#7:12=Page Name, ✏️ Description#7:13=Description, Description#28:10=true, Page#31:7=true, ✏️ Source#7:11=Source Name, State=Default}
+        • Source Site (FRAME)  @6396,3433 254x16  row  gap=6  align=CENTER
+          • Source / Placeholder (INSTANCE)  @6396,3433 16x16  bg=#696969  r=999  clip  {}
+            • vector (VECTOR)  @6400,3437 8x8  bg=#ffffff
+          • Source Name (TEXT)  @6418,3433 232x16  bg=#ffffff  "Source Name"  ? /undefined
+        • Page Name (TEXT)  @6396,3453 254x20  bg=#ffffff  "Page Name"  ? /undefined
+        • Description (TEXT)  @6396,3477 254x18  bg=#ffffff  "Description"  ? /undefined
+  • Body (FRAME)  @5234,2325 1138x1024  col  gap=16  pad=52/40/50/40  align=CENTER  clip
+    • Chat Thread (FRAME)  @5419,2377 768x804  col  gap=8  pad=24/0/40/0
+      • User Message Section (INSTANCE)  @5419,2401 768x72  col  gap=4  pad=0/0/36/0  align=MAX  {Reference Image#84:7=false, State=Default}
+        • .User Message Bubble (INSTANCE)  @5995,2401 192x36  row  gap=10  pad=6/16/6/16  justify=CENTER  align=CENTER  bg=#ffffff/o0.10  r=999  {✏️ Text#1:0=ChatGPT edge cases}
+          • Text (TEXT)  @6011,2407 160x24  bg=#ffffff  "ChatGPT edge cases"  ? /undefined
+      • Response Section (FRAME)  @5419,2481 768x704  col  gap=16
+        • "Edge cases" for ChatGPT refer to situations where the model's behavior is unexpected, unreliable, or problematic—especially near the "boundaries" of its intended use. These cases often reveal the limits of the model's capabilities, safety mechanisms, or alignment with user intent. Here’s a categorized list of ChatGPT edge cases, with examples: (TEXT)  @5419,2481 768x128  bg=#ffffff  ""Edge cases" for ChatGPT refer to situations where the model's behavior is unexpected, unreliable, or problematic—especially near the "boundaries" of its intended use. These cases often reveal the limits of the model's capabilities, safety mechanisms, or alignment with user intent.⏎Here’s a categorized list of ChatGPT edge cases, with examples:"  ? /undefined
+        • Divider (INSTANCE)  @5419,2625 768x32  row  gap=10  pad=16/0/16/0  {✏️ Chat#188:11=Chat Name, Type=Default}
+          • Line 1 (LINE)  @5419,2641 768x0  stroke=#ffffff/o0.26@1
+        • 🔍 1. Ambiguity and Underspecification (TEXT)  @5419,2673 768x28  bg=#ffffff  "🔍 1. Ambiguity and Underspecification"  ? /undefined
+        • "Edge cases" for ChatGPT refer to situations where the model's behavior is unexpected, unreliable, or problematic—especially near the "boundaries" of its intended use. These cases often reveal the limits of the model's capabilities, safety mechanisms, or alignment with user intent. Here’s a categorized list of ChatGPT edge cases, with examples: When user input is vague or unclear, ChatGPT has to "guess" the intent, which can lead to incorrect or irrelevant responses. Examples: User: “What’s the best one?” Best what? A book? A laptop? A flavor of ice cream? User: “How do you do it?” No context = unpredictable response. Challenge: LLMs lack real-world context or memory of previous interactions unless explicitly given. (TEXT)  @5419,2717 768x416  bg=#ffffff  ""Edge cases" for ChatGPT refer to situations where the model's behavior is unexpected, unreliable, or problematic—especially near the "boundaries" of its intended use. These cases often reveal the limits of the model's capabilities, safety mechanisms, or alignment with user intent.⏎Here’s a categorized list of ChatGPT edge cases, with examples:⏎When user input is vague or unclear, ChatGPT has to "guess" the intent, which can lead to incorrect or irrelevant responses.⏎Examples:⏎User: “What’s the best one?”⏎Best what? A book? A laptop? A flavor of ice cream?⏎User: “How do you do it?”⏎No context = unpredictable response.⏎Challenge: LLMs lack real-world context or memory of previous interactions unless explicitly given."  ? /undefined
+        • Response Button Row (INSTANCE)  @5419,3149 328x36  row  gap=2  align=CENTER  {Evaluation#126:43=true, Share#126:46=true, Try Again#126:40=true, Sources#7:6=true, Signed In=Yes}
+          • Copy (INSTANCE)  @5419,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=3:33, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • General / Copy (INSTANCE)  @5423,3155 24x24  clip  {}
+              • Vector (VECTOR)  @5425.2,3157.2 19.6x19.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @5423,3191 24x24  op=0  {✏️ Text#159:1=Copy, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @5412,3191 46x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @5420,3195 30x16  bg=#ffffff  "Copy"  ? /undefined
+          • Good Response (INSTANCE)  @5453,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=7:751, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • General / Thumbs Up (INSTANCE)  @5457,3155 24x24  clip  {}
+              • Vector (VECTOR)  @5460.2,3157.2 17.7x19.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @5457,3191 24x24  op=0  {✏️ Text#159:1=Good response, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @5417.5,3191 103x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @5425.5,3195 87x16  bg=#ffffff  "Good response"  ? /undefined
+          • Bad Response (INSTANCE)  @5487,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=7:750, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • General / Thumbs Down (INSTANCE)  @5491,3155 24x24  clip  {}
+              • Vector (VECTOR)  @5494.2,3157.2 17.7x19.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @5491,3191 24x24  op=0  {✏️ Text#159:1=Bad response, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @5456,3191 94x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @5464,3195 78x16  bg=#ffffff  "Bad response"  ? /undefined
+          • Share (INSTANCE)  @5521,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=7:752, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • Upload (INSTANCE)  @5525,3155 24x24  clip  {}
+              • Vector (VECTOR)  @5528.2,3158.2 17.6x17.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @5525,3191 24x24  op=0  {✏️ Text#159:1=Share, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @5512.5,3191 49x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @5520.5,3195 33x16  bg=#ffffff  "Share"  ? /undefined
+          • Try Again (INSTANCE)  @5555,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=7:748, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • General / Retry (INSTANCE)  @5559,3155 24x24  clip  {}
+              • Vector (VECTOR)  @5562.3,3158.2 17.5x17.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @5559,3191 24x24  op=0  {✏️ Text#159:1=Try again, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @5536.5,3191 69x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @5544.5,3195 53x16  bg=#ffffff  "Try again"  ? /undefined
+          • More Actions (INSTANCE)  @5589,3151 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=3:257, Tooltip#317:12=true, Shape=Square, Size=Large, Type=Default, State=Default}
+            • General / Overflow (INSTANCE)  @5593,3155 24x24  clip  {}
+              • Vector (VECTOR)  @5596.6,3165.2 16.8x3.6  bg=#ffffff
+            • Tooltip (INSTANCE)  @5593,3191 24x24  op=0  {✏️ Text#159:1=More actions, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @5560,3191 90x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @5568,3195 74x16  bg=#ffffff  "More actions"  ? /undefined
+          • .Source Button (INSTANCE)  @5623,3151 124x32  row  gap=8  pad=6/12/6/12  align=CENTER  r=999  {State=Default}
+            • .Source Icon Stack (INSTANCE)  @5635,3157 36x20  row  gap=-4  align=CENTER  {↳ Icon#7:29=7:1615, Amount=2}
+              • Source 1 (FRAME)  @5635,3157 20x20  bg=#ffffff  stroke=#212121@1  r=999  clip
+                • Source / Placeholder (INSTANCE)  @5635,3157 20x20  bg=#696969  r=999  clip  {}
+                  • vector (VECTOR)  @5640,3162 10x10  bg=#ffffff
+              • Source 2 (FRAME)  @5651,3157 20x20  bg=#ffffff  stroke=#212121@1  r=999  clip
+                • Source / Placeholder (INSTANCE)  @5651,3157 20x20  bg=#696969  r=999  clip  {}
+                  • vector (VECTOR)  @5656,3162 10x10  bg=#ffffff
+            • Sources (TEXT)  @5679,3157 56x20  bg=#ffffff  "Sources"  ? /undefined
+      • Scroll to Bottom (INSTANCE)  @5788,3213 30x30  row  gap=4  pad=8/8/8/8  justify=CENTER  align=CENTER  bg=#212121  stroke=#ffffff/o0.26@1  r=999  {↳ Icon#3:16=3:122, Tooltip#3:19=false, Icon#3:2=true, ✏️ Text#3:1=Voice, Type=Default, Size=Default, State=Default}
+        • General / Arrow Down (INSTANCE)  @5793,3218 20x20  clip  {}
+          • Vector (VECTOR)  @5796.5,3220.7 13x14.7  bg=#ffffff
+    • Chat Footer (INSTANCE)  @5234,3211 1138x138  col  {Message#592:0=true, ✏️ Text#199:32=ChatGPT can make mistakes. Check important info.}
+      • Gradient (FRAME)  @5234,3211 1138x102
+        • Gradient Mask (RECTANGLE)  @5234,3211 1138x102  bg=grad(#212121@29%>#212121@100%)
+        • Fill (RECTANGLE)  @5234,3211 1138x102  bg=#212121
+      • Fixed Footer Message (FRAME)  @5234,3313 1138x36  row  gap=10  pad=8/0/8/0  justify=CENTER  align=CENTER  bg=#212121
+        • By messaging ChatGPT, you agree to our Terms and have read our Privacy Policy. (TEXT)  @5234,3321 1138x20  bg=#ffffff  "ChatGPT can make mistakes. Check important info."  ? /undefined
+    • Prompt Input Field (INSTANCE)  @5419,3197 768x102  col  gap=10  pad=12/10/12/10  bg=#303030  r=28  fx=inner 0/0/1/1 #ffffff/a0.13 + shadow 0/6/8/0 #000000/a0.1 + shadow 0/0/1.5/0 #000000/a0.45  {Composer#199:51=true, Image Input#324:1=false, Signed In=No, State=Empty, Long Input=N/A}
+      • Text Wrapper (FRAME)  @5429,3209 748x32  col  gap=10  pad=4/8/4/8
+        • .Text Input Content (INSTANCE)  @5437,3213 732x24  row  align=CENTER  {✏️ Text#31:0=Text input, ✏️ Hint#84:2=Ask anything, State=Empty, Show Cursor=No}
+          • Hint text (TEXT)  @5437,3213 732x24  bg=#afafaf  "Ask anything"  ? /undefined
+      • Button Wrapper (FRAME)  @5429,3251 748x36  row  gap=10  justify=SPACE_BETWEEN
+        • Buttons Left (FRAME)  @5429,3251 274x36  row  gap=6
+          • Composer Button (INSTANCE)  @5429,3251 88x36  row  gap=4  pad=8/12/8/8  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {↳ Icon#199:48=2:14, Tooltip#199:65=true, ✏️ Text#199:58=Attach, Type=Radio, State=Default}
+            • General / Attach (INSTANCE)  @5437,3259 20x20  clip  {}
+              • Vector (VECTOR)  @5441.3,3260.8 11.3x16.3  bg=#ffffff
+            • Composer (TEXT)  @5461,3259 44x20  bg=#ffffff  "Attach"  ? /undefined
+            • Tooltip (INSTANCE)  @5457,3295 32x32  op=0  {✏️ Text#159:1=Add photos, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @5432,3295 82x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @5440,3299 66x16  bg=#ffffff  "Add photos"  ? /undefined
+          • Composer Button (INSTANCE)  @5523,3251 91x36  row  gap=4  pad=8/12/8/8  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {✏️ Text#199:58=Search, Tooltip#199:65=true, ↳ Icon#199:48=3:34, Type=Radio, State=Default}
+            • General / Internet (INSTANCE)  @5531,3259 20x20  clip  {}
+              • Vector (VECTOR)  @5533.1,3261.1 15.8x15.8  bg=#ffffff
+            • Composer (TEXT)  @5555,3259 47x20  bg=#ffffff  "Search"  ? /undefined
+            • Tooltip (INSTANCE)  @5553,3295 32x32  op=0  {✏️ Text#159:1=Search the web, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @5516.5,3295 105x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @5524.5,3299 89x16  bg=#ffffff  "Search the web"  ? /undefined
+          • Composer Button (INSTANCE)  @5620,3251 83x36  row  gap=4  pad=8/12/8/8  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {✏️ Text#199:58=Study, Tooltip#199:65=false, ↳ Icon#199:48=3:35, Type=Radio, State=Default}
+            • General / Study (INSTANCE)  @5628,3259 20x20  clip  {}
+              • Vector (VECTOR)  @5630.2,3260 15.5x17.2  bg=#ffffff
+            • Composer (TEXT)  @5652,3259 39x20  bg=#ffffff  "Study"  ? /undefined
+        • Buttons Right (FRAME)  @6103,3251 74x36  row  gap=8
+          • Button (INSTANCE)  @6103,3251 74x36  row  gap=4  pad=8/8/8/8  justify=CENTER  align=CENTER  bg=#212121, #ffffff/o0.10  r=999  {Tooltip#3:19=true, ↳ Icon#3:16=3:36, Icon#3:2=true, ✏️ Text#3:1=Voice, Type=Secondary, Size=Default, State=Default}
+            • General / Voice (INSTANCE)  @6111,3259 20x20  clip  {}
+              • Vector (VECTOR)  @6114,3262.8 14x12.3  bg=#ffffff
+            • Button (TEXT)  @6135,3260 34x18  bg=#ffffff  "Voice"  ? /undefined
+            • Tooltip (INSTANCE)  @6127,3295 24x24  op=0  {✏️ Text#159:1=Use voice mode, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @6085,3295 108x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @6093,3299 92x16  bg=#ffffff  "Use voice mode"  ? /undefined
+    • App Header (INSTANCE)  @5234,2325 1138x52  row  gap=1044  pad=8/12/8/12  justify=SPACE_BETWEEN  align=CENTER  bg=#212121  stroke=#3e3e3e@  {Signed In=No, Type=Default}
+      • Title Group (FRAME)  @5246,2333 145x36  row  justify=CENTER  align=CENTER
+        • Icon Button (INSTANCE)  @5246,2335 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=3:140, Tooltip#317:12=false, Shape=Square, Size=Large, Type=Default, State=Default}
+          • General / ChatGPT (INSTANCE)  @5250,2339 24x24  clip  {}
+            • Vector (VECTOR)  @5252,2341.1 20x19.8  bg=#ffffff
+        • Model Selection Button (INSTANCE)  @5278,2333 113x36  row  gap=4  pad=0/10/0/10  justify=CENTER  align=CENTER  r=8  {State=Default, Logged In=No}
+          • ChatGPT (TEXT)  @5288,2337 73x28  bg=#ffffff  "ChatGPT"  ? /undefined
+          • General / Chevron Down (INSTANCE)  @5365,2343 16x16  clip  {}
+            • Vector (VECTOR)  @5367.8,2348.8 10.3x5.8  bg=#afafaf
+      • Buttons (FRAME)  @6119,2333 241x36  row  gap=8  align=CENTER
+        • Button (INSTANCE)  @6119,2333 65x36  row  gap=4  pad=8/12/8/12  justify=CENTER  align=CENTER  bg=#ffffff  r=999  {Tooltip#3:19=false, ↳ Icon#3:16=2:14, Icon#3:2=false, ✏️ Text#3:1=Log in, Type=Important, Size=Large, State=Default}
+          • Button (TEXT)  @6131,2341 41x20  bg=#000000  "Log in"  ? /undefined
+        • Button (INSTANCE)  @6192,2333 128x36  row  gap=4  pad=8/12/8/12  justify=CENTER  align=CENTER  stroke=#ffffff/o0.26@1  r=999  {↳ Icon#3:16=2:14, Tooltip#3:19=false, Icon#3:2=false, ✏️ Text#3:1=Sign up for free, Type=Outline, Size=Large, State=Default}
+          • Button (TEXT)  @6204,2341 104x20  bg=#ffffff  "Sign up for free"  ? /undefined
+        • Icon Button (INSTANCE)  @6328,2335 32x32  row  gap=10  justify=CENTER  align=CENTER  r=999  {Icon#317:13=3:32, Tooltip#317:12=false, Shape=Round, Size=Large, Type=Default, State=Default}
+          • General / Help (INSTANCE)  @6332,2339 24x24  clip  {}
+            • Vector (BOOLEAN_OPERATION)  @6334.5,2341.5 19x19  bg=#ffffff
+              • Vector (VECTOR)  @6334.5,2341.5 19x19  bg=#000000
+              • Vector (VECTOR)  @6341,2346.2 6.1x9.6  bg=#000000
+```

@@ -1,0 +1,185 @@
+# Temporary Chat
+
+Figma: https://www.figma.com/design/J4mMUwLS0Mg1Ll5j6gH5wL?node-id=133-5657
+Size: 1440x1024   Visible nodes: 173
+
+Coordinates are relative to the screen origin.
+row/col = auto-layout direction · gap/pad · bg = fill · r = radius · fx = shadows
+TEXT lines end with: content, font, size/weight, line-height, letter-spacing, alignment
+INSTANCE lines end with {variant properties}
+
+```
+• Temporary Chat (COMPONENT)  @3594,3549 1440x1024  bg=#212121  clip
+  • Content Wrapper (FRAME)  @3594,3549 1440x1024  row  align=CENTER
+    • Sidebar (INSTANCE)  @3594,3549 260x1024  col  bg=#181818  stroke=#3e3e3e@  {GPTs#92:1=true, Projects=Yes, Expanded=Yes}
+      • .Sidebar Footer (INSTANCE)  @3602,4515 244x48  row  gap=10  pad=6/10/6/8  justify=SPACE_BETWEEN  align=CENTER  bg=#181818  {Plan Status=Free, State=Default}
+        • User Info (FRAME)  @3610,4522 100x34  row  gap=8  align=CENTER
+          • .User Profile Icon (INSTANCE)  @3610,4527 24x24  row  gap=10  justify=CENTER  align=CENTER  bg=#3c6ac3  r=999  {✏️ Letter#31:10=A}
+            • Union (BOOLEAN_OPERATION)  @3617.6,4533.9 8.8x10.2  bg=#ffffff
+              • A (TEXT)  @3617,4529.1 10x20  bg=#ffffff  "A"  ? /undefined
+          • Text Wrapper (FRAME)  @3642,4522 68x34  col  gap=-2  justify=CENTER
+            • Username (TEXT)  @3642,4522 68x20  bg=#ffffff  "Username"  ? /undefined
+            • Free (TEXT)  @3642,4540 26x16  bg=#afafaf  "Free"  ? /undefined
+        • Button (INSTANCE)  @3766,4525 70x28  row  gap=4  pad=8/8/8/8  justify=CENTER  align=CENTER  bg=#ffffff/o0.05  stroke=#ffffff/o0.26@1  r=999  {↳ Icon#3:16=2:14, Tooltip#3:19=false, Icon#3:2=false, ✏️ Text#3:1=Upgrade, Type=Default, Size=Default, State=Default}
+          • Button (TEXT)  @3774,4530 54x18  bg=#ffffff  "Upgrade"  ? /undefined
+      • Main Menu Section  (FRAME)  @3594,3549 260x180  col  gap=8  pad=0/0/12/0  bg=#181818  stroke=#3e3e3e@
+        • Section Header (FRAME)  @3594,3549 260x52  row  gap=10  pad=0/8/0/8  justify=SPACE_BETWEEN  align=CENTER
+          • Icon Button (INSTANCE)  @3602,3559 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=3:140, Tooltip#317:12=false, Shape=Square, Size=Large, Type=Default, State=Default}
+            • General / ChatGPT (INSTANCE)  @3606,3563 24x24  clip  {}
+              • Vector (VECTOR)  @3608,3565.1 20x19.8  bg=#ffffff
+          • Icon Button (INSTANCE)  @3814,3559 32x32  row  gap=10  justify=CENTER  align=CENTER  r=8  {Icon#317:13=7:496, Tooltip#317:12=true, Shape=Square, Size=Med, Type=Default, State=Default}
+            • General / Sidebar (INSTANCE)  @3820,3565 20x20  clip  {}
+              • Vector (VECTOR)  @3821.8,3567.7 16.3x14.7  bg=#afafaf
+            • Tooltip (INSTANCE)  @3818,3599 24x24  op=0  {✏️ Text#159:1=Close sidebar, Alignment=Center, Size=Regular}
+              • Tooltip Base (FRAME)  @3783,3599 94x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                • Tooltip (TEXT)  @3791,3603 78x16  bg=#ffffff  "Close sidebar"  ? /undefined
+        • List Item Wrapper (FRAME)  @3594,3609 260x108  col  pad=0/6/0/6
+          • New Chat (INSTANCE)  @3600,3609 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=true, ✏️ Secondary#265:22=Secondary text, Loading Indicator#199:25=false, Secondary Text#258:0=false, ↳ Icon#7:20=3:141, Icon#51:4=true, ✏️ Text#7:17=New Chat, State=Default, Show Trailing=On Hover}
+            • General / Create (INSTANCE)  @3610,3617 20x20  clip  {}
+              • Vector (VECTOR)  @3612.7,3619.6 14.8x14.8  bg=#ffffff
+            • Content Wrapper (FRAME)  @3638,3617 92x20  col  justify=CENTER  align=CENTER
+              • Menu Item (TEXT)  @3638,3617 92x20  bg=#ffffff  "New Chat"  ? /undefined
+            • .List Item Trailing Content (INSTANCE)  @3738,3615 100x24  row  gap=4  justify=MAX  align=CENTER  op=0  {Trailing Icon#258:10=3:257, ✏️ Trailing Text#258:16=Ctrl + Shift + O, Type=Text}
+              • Trailing (TEXT)  @3738,3617 100x20  bg=#afafaf  "Ctrl + Shift + O"  ? /undefined
+          • Search Chats (INSTANCE)  @3600,3645 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=true, ✏️ Secondary#265:22=Secondary text, Loading Indicator#199:25=false, Secondary Text#258:0=false, ↳ Icon#7:20=6:921, Icon#51:4=true, ✏️ Text#7:17=Search chats, State=Default, Show Trailing=On Hover}
+            • General / Search (INSTANCE)  @3610,3653 20x20  clip  {}
+              • Vector (VECTOR)  @3612.1,3655.1 15.8x15.8  bg=#ffffff
+            • Content Wrapper (FRAME)  @3638,3653 141x20  col  justify=CENTER  align=CENTER
+              • Menu Item (TEXT)  @3638,3653 141x20  bg=#ffffff  "Search chats"  ? /undefined
+            • .List Item Trailing Content (INSTANCE)  @3787,3651 51x24  row  gap=4  justify=MAX  align=CENTER  op=0  {Trailing Icon#258:10=3:257, ✏️ Trailing Text#258:16=Ctrl + K, Type=Text}
+              • Trailing (TEXT)  @3787,3653 51x20  bg=#afafaf  "Ctrl + K"  ? /undefined
+          • Library (INSTANCE)  @3600,3681 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=false, ✏️ Secondary#265:22=Secondary text, Loading Indicator#199:25=false, Secondary Text#258:0=false, ↳ Icon#7:20=7:504, Icon#51:4=true, ✏️ Text#7:17=Library, State=Default, Show Trailing=On Hover}
+            • General / Images (INSTANCE)  @3610,3689 20x20  clip  {}
+              • Vector (VECTOR)  @3611.7,3690.6 16.8x16.8  bg=#ffffff
+            • Content Wrapper (FRAME)  @3638,3689 200x20  col  justify=CENTER  align=CENTER
+              • Menu Item (TEXT)  @3638,3689 200x20  bg=#ffffff  "Library"  ? /undefined
+      • Body Wrapper (FRAME)  @3594,3729 260x844  col
+        • GPTs (FRAME)  @3594,3729 260x164  col  pad=0/6/20/6
+          • .Sidebar Title (INSTANCE)  @3600,3729 248x36  row  gap=4  pad=6/10/6/10  align=CENTER  {✏️ Text#42:1=GPTs, State=Default}
+            • Sidebar Title (TEXT)  @3610,3737 35x20  bg=#afafaf  "GPTs"  ? /undefined
+          • List Item Wrapper (FRAME)  @3600,3765 248x108  col
+            • Explore (INSTANCE)  @3600,3765 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=false, ✏️ Secondary#265:22=Secondary text, Loading Indicator#199:25=false, Secondary Text#258:0=false, ↳ Icon#7:20=42:2445, Icon#51:4=true, ✏️ Text#7:17=Explore, State=Default, Show Trailing=On Hover}
+              • General / Explore (INSTANCE)  @3610,3773 20x20  clip  {}
+                • Vector (VECTOR)  @3612.7,3775.7 14.7x14.7  bg=#ffffff
+              • Content Wrapper (FRAME)  @3638,3773 200x20  col  justify=CENTER  align=CENTER
+                • Menu Item (TEXT)  @3638,3773 200x20  bg=#ffffff  "Explore"  ? /undefined
+            • GPT 1 (INSTANCE)  @3600,3801 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=true, ✏️ Secondary#265:22=Secondary text, Loading Indicator#199:25=false, Secondary Text#258:0=false, ↳ Icon#7:20=49:2626, Icon#51:4=true, ✏️ Text#7:17=Example GPT 1, State=Default, Show Trailing=On Hover}
+              • GPT / Placeholder GPT (INSTANCE)  @3610,3809 20x20  bg=#424242, #ffffff/o0.10  r=999  clip  {}
+                • General / Placeholder (INSTANCE)  @3613,3812 14x14  clip  {}
+                  • Vector (VECTOR)  @3614.7,3813.1 10.6x11.8  bg=#ffffff
+              • Content Wrapper (FRAME)  @3638,3809 172x20  col  justify=CENTER  align=CENTER
+                • Menu Item (TEXT)  @3638,3809 172x20  bg=#ffffff  "Example GPT 1"  ? /undefined
+              • .List Item Trailing Content (INSTANCE)  @3818,3807 20x24  row  gap=4  justify=MAX  align=CENTER  op=0  {✏️ Trailing Text#258:16=Trailing, Trailing Icon#258:10=3:257, Type=Icon}
+                • General / Overflow (INSTANCE)  @3818,3809 20x20  clip  {}
+                  • Vector (VECTOR)  @3821,3817.5 14x3  bg=#ffffff
+            • GPT 2 (INSTANCE)  @3600,3837 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=true, ✏️ Secondary#265:22=Secondary text, Loading Indicator#199:25=false, Secondary Text#258:0=false, ↳ Icon#7:20=49:2626, Icon#51:4=true, ✏️ Text#7:17=Example GPT 2, State=Default, Show Trailing=On Hover}
+              • GPT / Placeholder GPT (INSTANCE)  @3610,3845 20x20  bg=#424242, #ffffff/o0.10  r=999  clip  {}
+                • General / Placeholder (INSTANCE)  @3613,3848 14x14  clip  {}
+                  • Vector (VECTOR)  @3614.7,3849.1 10.6x11.8  bg=#ffffff
+              • Content Wrapper (FRAME)  @3638,3845 172x20  col  justify=CENTER  align=CENTER
+                • Menu Item (TEXT)  @3638,3845 172x20  bg=#ffffff  "Example GPT 2"  ? /undefined
+              • .List Item Trailing Content (INSTANCE)  @3818,3843 20x24  row  gap=4  justify=MAX  align=CENTER  op=0  {✏️ Trailing Text#258:16=Trailing, Trailing Icon#258:10=3:257, Type=Icon}
+                • General / Overflow (INSTANCE)  @3818,3845 20x20  clip  {}
+                  • Vector (VECTOR)  @3821,3853.5 14x3  bg=#ffffff
+        • Projects (FRAME)  @3594,3893 260x236  col  pad=0/6/20/6
+          • .Sidebar Title (INSTANCE)  @3600,3893 248x36  row  gap=4  pad=6/10/6/10  align=CENTER  {✏️ Text#42:1=Projects, State=Default}
+            • Sidebar Title (TEXT)  @3610,3901 54x20  bg=#afafaf  "Projects"  ? /undefined
+          • List Item Wrapper (FRAME)  @3600,3929 248x180  col
+            • New Project (INSTANCE)  @3600,3929 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {↳ Icon#7:20=7:506, Icon#51:4=true, Secondary Text#258:0=false, ✏️ Text#7:17=New Project, ✏️ Secondary#265:22=Secondary text, Trailing Content#270:35=false, Loading Indicator#199:25=false, State=Default, Show Trailing=Persistent}
+              • General / Folder Add (INSTANCE)  @3610,3937 20x20  clip  {}
+                • Vector (VECTOR)  @3612.1,3939.8 16.9x15.3  bg=#ffffff
+              • Content Wrapper (FRAME)  @3638,3937 200x20  col  justify=CENTER  align=CENTER
+                • Menu Item (TEXT)  @3638,3937 200x20  bg=#ffffff  "New Project"  ? /undefined
+            • Project 1 (INSTANCE)  @3600,3965 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=true, ✏️ Secondary#265:22=Secondary text, Loading Indicator#199:25=false, Secondary Text#258:0=false, ↳ Icon#7:20=68:38893, Icon#51:4=true, ✏️ Text#7:17=Example Project 1, State=Default, Show Trailing=On Hover}
+              • General / Folder Open (INSTANCE)  @3610,3973 20x20  clip  {}
+                • Vector (VECTOR)  @3610.4,3976.2 19.5x14  bg=#ffffff
+              • Content Wrapper (FRAME)  @3638,3973 172x20  col  justify=CENTER  align=CENTER
+                • Menu Item (TEXT)  @3638,3973 172x20  bg=#ffffff  "Example Project 1"  ? /undefined
+              • .List Item Trailing Content (INSTANCE)  @3818,3971 20x24  row  gap=4  justify=MAX  align=CENTER  op=0  {✏️ Trailing Text#258:16=Trailing, Trailing Icon#258:10=3:257, Type=Icon}
+                • General / Overflow (INSTANCE)  @3818,3973 20x20  clip  {}
+                  • Vector (VECTOR)  @3821,3981.5 14x3  bg=#ffffff
+            • Project 1 Chats (FRAME)  @3600,4001 248x72  col  pad=0/0/0/25
+              • Chat 1 (INSTANCE)  @3625,4001 223x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=true, Secondary Text#258:0=false, Loading Indicator#199:25=false, ✏️ Secondary#265:22=Secondary text, ↳ Icon#7:20=7:506, Icon#51:4=false, ✏️ Text#7:17=Project Chat 1, State=Default, Show Trailing=On Hover}
+                • Content Wrapper (FRAME)  @3635,4009 175x20  col  justify=CENTER  align=CENTER
+                  • Menu Item (TEXT)  @3635,4009 175x20  bg=#ffffff  "Project Chat 1"  ? /undefined
+                • .List Item Trailing Content (INSTANCE)  @3818,4007 20x24  row  gap=4  justify=MAX  align=CENTER  op=0  {✏️ Trailing Text#258:16=Trailing, Trailing Icon#258:10=3:257, Type=Icon}
+                  • General / Overflow (INSTANCE)  @3818,4009 20x20  clip  {}
+                    • Vector (VECTOR)  @3821,4017.5 14x3  bg=#ffffff
+              • Chat 2 (INSTANCE)  @3625,4037 223x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=true, Secondary Text#258:0=false, Loading Indicator#199:25=false, ✏️ Secondary#265:22=Secondary text, ↳ Icon#7:20=7:506, Icon#51:4=false, ✏️ Text#7:17=Project Chat 2, State=Default, Show Trailing=On Hover}
+                • Content Wrapper (FRAME)  @3635,4045 175x20  col  justify=CENTER  align=CENTER
+                  • Menu Item (TEXT)  @3635,4045 175x20  bg=#ffffff  "Project Chat 2"  ? /undefined
+                • .List Item Trailing Content (INSTANCE)  @3818,4043 20x24  row  gap=4  justify=MAX  align=CENTER  op=0  {✏️ Trailing Text#258:16=Trailing, Trailing Icon#258:10=3:257, Type=Icon}
+                  • General / Overflow (INSTANCE)  @3818,4045 20x20  clip  {}
+                    • Vector (VECTOR)  @3821,4053.5 14x3  bg=#ffffff
+            • Project 2 (INSTANCE)  @3600,4073 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=true, ✏️ Secondary#265:22=Secondary text, Loading Indicator#199:25=false, Secondary Text#258:0=false, ↳ Icon#7:20=42:2441, Icon#51:4=true, ✏️ Text#7:17=Example Project 2, State=Default, Show Trailing=On Hover}
+              • General / Folder (INSTANCE)  @3610,4081 20x20  clip  {}
+                • Vector (VECTOR)  @3612.1,4083.9 15.8x14.3  bg=#ffffff
+              • Content Wrapper (FRAME)  @3638,4081 172x20  col  justify=CENTER  align=CENTER
+                • Menu Item (TEXT)  @3638,4081 172x20  bg=#ffffff  "Example Project 2"  ? /undefined
+              • .List Item Trailing Content (INSTANCE)  @3818,4079 20x24  row  gap=4  justify=MAX  align=CENTER  op=0  {✏️ Trailing Text#258:16=Trailing, Trailing Icon#258:10=3:257, Type=Icon}
+                • General / Overflow (INSTANCE)  @3818,4081 20x20  clip  {}
+                  • Vector (VECTOR)  @3821,4089.5 14x3  bg=#ffffff
+        • Chats (FRAME)  @3594,4129 260x164  col  pad=0/6/20/6
+          • .Sidebar Title (INSTANCE)  @3600,4129 248x36  row  gap=4  pad=6/10/6/10  align=CENTER  {✏️ Text#42:1=Chats, State=Default}
+            • Sidebar Title (TEXT)  @3610,4137 39x20  bg=#afafaf  "Chats"  ? /undefined
+          • List Item Wrapper (FRAME)  @3600,4165 248x108  col
+            • Chat 1 (INSTANCE)  @3600,4165 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=true, Secondary Text#258:0=false, Loading Indicator#199:25=false, ✏️ Secondary#265:22=Secondary text, ↳ Icon#7:20=7:506, Icon#51:4=false, ✏️ Text#7:17=Example Chat 1, State=Default, Show Trailing=On Hover}
+              • Content Wrapper (FRAME)  @3610,4173 200x20  col  justify=CENTER  align=CENTER
+                • Menu Item (TEXT)  @3610,4173 200x20  bg=#ffffff  "Example Chat 1"  ? /undefined
+              • .List Item Trailing Content (INSTANCE)  @3818,4171 20x24  row  gap=4  justify=MAX  align=CENTER  op=0  {✏️ Trailing Text#258:16=Trailing, Trailing Icon#258:10=3:257, Type=Icon}
+                • General / Overflow (INSTANCE)  @3818,4173 20x20  clip  {}
+                  • Vector (VECTOR)  @3821,4181.5 14x3  bg=#ffffff
+            • Chat 2 (INSTANCE)  @3600,4201 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=true, Secondary Text#258:0=false, Loading Indicator#199:25=false, ✏️ Secondary#265:22=Secondary text, ↳ Icon#7:20=7:506, Icon#51:4=false, ✏️ Text#7:17=Response Types, State=Default, Show Trailing=On Hover}
+              • Content Wrapper (FRAME)  @3610,4209 200x20  col  justify=CENTER  align=CENTER
+                • Menu Item (TEXT)  @3610,4209 200x20  bg=#ffffff  "Response Types"  ? /undefined
+              • .List Item Trailing Content (INSTANCE)  @3818,4207 20x24  row  gap=4  justify=MAX  align=CENTER  op=0  {✏️ Trailing Text#258:16=Trailing, Trailing Icon#258:10=3:257, Type=Icon}
+                • General / Overflow (INSTANCE)  @3818,4209 20x20  clip  {}
+                  • Vector (VECTOR)  @3821,4217.5 14x3  bg=#ffffff
+            • Chat 3 (INSTANCE)  @3600,4237 248x36  row  gap=8  pad=6/10/6/10  align=CENTER  r=10  {Trailing Content#270:35=true, Secondary Text#258:0=false, Loading Indicator#199:25=false, ✏️ Secondary#265:22=Secondary text, ↳ Icon#7:20=7:506, Icon#51:4=false, ✏️ Text#7:17=Loading Animations, State=Default, Show Trailing=On Hover}
+              • Content Wrapper (FRAME)  @3610,4245 200x20  col  justify=CENTER  align=CENTER
+                • Menu Item (TEXT)  @3610,4245 200x20  bg=#ffffff  "Loading Animations"  ? /undefined
+              • .List Item Trailing Content (INSTANCE)  @3818,4243 20x24  row  gap=4  justify=MAX  align=CENTER  op=0  {✏️ Trailing Text#258:16=Trailing, Trailing Icon#258:10=3:257, Type=Icon}
+                • General / Overflow (INSTANCE)  @3818,4245 20x20  clip  {}
+                  • Vector (VECTOR)  @3821,4253.5 14x3  bg=#ffffff
+    • Body (FRAME)  @3854,3549 1180x1024  col  gap=16  pad=52/40/50/40  align=CENTER  clip
+      • Chat Thread (FRAME)  @4060,3601 768x922  col  gap=8  pad=24/0/172/0  justify=CENTER  align=CENTER
+        • Title Wrapper (FRAME)  @4252,3865.5 384x172  col  gap=12  pad=0/0/28/0  justify=CENTER  align=CENTER
+          • Temporary Chat (TEXT)  @4252,3865.5 384x36  bg=#ffffff  "Temporary Chat"  ? /undefined
+          • This chat won’t appear in history, use or update ChatGPT’s memory, or be used to train our models. For safety purposes, we may keep a copy of this chat for up to 30 days. (TEXT)  @4252,3913.5 384x96  bg=#afafaf  "This chat won’t appear in history, use or update ChatGPT’s memory, or be used to train our models. For safety purposes, we may keep a copy of this chat for up to 30 days."  ? /undefined
+        • Prompt Input Field (INSTANCE)  @4060,4045.5 768x56  col  gap=10  pad=10/10/10/10  justify=CENTER  bg=#303030  r=28  fx=inner 0/0/1/1 #ffffff/a0.13 + shadow 0/6/8/0 #000000/a0.1 + shadow 0/0/1.5/0 #000000/a0.45  {Composer#199:51=true, Image Input#324:1=false, Signed In=Yes, State=Populated, Long Input=No}
+          • Text Wrapper (FRAME)  @4070,4055.5 748x36  row  gap=6  align=CENTER
+            • Icon Button (INSTANCE)  @4070,4055.5 36x36  row  gap=10  justify=CENTER  align=CENTER  r=999  {Icon#317:13=7:505, Tooltip#317:12=true, Shape=Round, Size=Large, Type=Default, State=Default}
+              • General / Add (INSTANCE)  @4076,4061.5 24x24  clip  {}
+                • Vector (VECTOR)  @4079.4,4064.9 17.2x17.2  bg=#ffffff
+              • Tooltip (INSTANCE)  @4076,4095.5 24x24  op=0  {✏️ Text#159:1=Add files and more, Alignment=Center, Size=Regular}
+                • Tooltip Base (FRAME)  @4026.5,4095.5 123x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                  • Tooltip (TEXT)  @4034.5,4099.5 107x16  bg=#ffffff  "Add files and more"  ? /undefined
+            • .Text Input Content (INSTANCE)  @4112,4061.5 620x24  row  align=CENTER  {✏️ Text#31:0=Text input, ✏️ Hint#84:2=Ask anything, State=Empty, Show Cursor=No}
+              • Hint text (TEXT)  @4112,4061.5 620x24  bg=#afafaf  "Ask anything"  ? /undefined
+            • Buttons Right (FRAME)  @4738,4055.5 80x36  row  gap=8  align=CENTER
+              • Icon Button (INSTANCE)  @4738,4055.5 36x36  row  gap=10  justify=CENTER  align=CENTER  r=999  {Icon#317:13=7:508, Tooltip#317:12=true, Shape=Round, Size=Large, Type=Default, State=Default}
+                • General / Microphone (INSTANCE)  @4744,4061.5 24x24  clip  {}
+                  • Vector (VECTOR)  @4748.5,4063.7 15x19.6  bg=#ffffff
+                • Tooltip (INSTANCE)  @4744,4095.5 24x24  op=0  {✏️ Text#159:1=Dictate, Alignment=Center, Size=Regular}
+                  • Tooltip Base (FRAME)  @4727.5,4095.5 57x24  row  gap=10  pad=4/8/4/8  justify=CENTER  align=CENTER  bg=#000000  r=8
+                    • Tooltip (TEXT)  @4735.5,4099.5 41x16  bg=#ffffff  "Dictate"  ? /undefined
+              • Button (INSTANCE)  @4782,4055.5 36x36  row  gap=4  pad=8/8/8/8  justify=CENTER  align=CENTER  bg=#ffffff  r=999  op=0.6  {Tooltip#3:19=false, ↳ Icon#3:16=51:2989, Icon#3:2=true, ✏️ Text#3:1=Voice, Type=Important, Size=Default, State=Default}
+                • General / Arrow Up (INSTANCE)  @4790,4063.5 20x20  clip  {}
+                  • Vector (VECTOR)  @4793.5,4066.2 13x14.7  bg=#000000
+        • Prompt Suggestions Wrapper (FRAME)  @4060,4109.5 768x1  col  gap=10  align=CENTER
+      • App Header (INSTANCE)  @3854,3549 1180x52  row  gap=1044  pad=8/12/8/12  justify=SPACE_BETWEEN  align=CENTER  bg=#212121  stroke=#3e3e3e@  {Signed In=Yes, Type=Temporary Chat}
+        • Model Selection Button (INSTANCE)  @3866,3557 113x36  row  gap=4  pad=0/10/0/10  align=CENTER  r=8  {State=Default, Logged In=Yes}
+          • ChatGPT (TEXT)  @3876,3561 73x28  bg=#ffffff  "ChatGPT"  ? /undefined
+          • General / Chevron Down (INSTANCE)  @3953,3567 16x16  clip  {}
+            • Vector (VECTOR)  @3955.8,3572.8 10.3x5.8  bg=#afafaf
+        • Buttons (FRAME)  @4986,3557 36x36  row  gap=8  align=CENTER
+          • Icon Button (INSTANCE)  @4986,3557 36x36  row  gap=10  justify=CENTER  align=CENTER  r=999  {Icon#317:13=133:4897, Tooltip#317:12=false, Shape=Round, Size=Large, Type=Default, State=Default}
+            • General / Temporary Chat Off (INSTANCE)  @4992,3563 24x24  clip  {}
+              • Vector (VECTOR)  @4994.2,3565.9 19.6x18.2  bg=#ffffff
+        • Upsell Button (INSTANCE)  @4382,3557 123x36  row  gap=4  pad=8/12/8/12  justify=CENTER  align=CENTER  bg=#373669  r=999  {Tooltip#324:15=false, ↳ Icon#324:14=7:577, Icon#324:13=true, ✏️ Text#324:12=Get Plus, State=Default}
+          • General / Upgrade Sparkle Solid (INSTANCE)  @4394,3565 20x20  op=0.8  clip  {}
+            • Vector (VECTOR)  @4396.3,3567.3 15.3x15.3  bg=#ffffff
+          • Get Plus (TEXT)  @4418,3565 57x20  bg=#ffffff  op=0.8  "Get Plus"  ? /undefined
+          • General / Close (INSTANCE)  @4479,3568 14x14  op=0.8  clip  {}
+            • Vector (VECTOR)  @4482.2,3571.2 7.6x7.6  bg=#ffffff
+```
