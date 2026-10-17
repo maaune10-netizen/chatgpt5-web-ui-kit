@@ -1,0 +1,26 @@
+# Login / upsell modal (logged-out)
+
+Figma node: 334:34542
+Size: 448x368
+
+```
+• Modal (INSTANCE)  @0,0 448x368
+  • Image (RECTANGLE)  @0,0 448x197
+  • Content Wrapper (FRAME)  @0,197 448x171
+    • Text Body (FRAME)  @24,221 400x71
+      • Modal Title (TEXT)  @24,221 400x28  "Try advanced features for free"  Inter 18/600 lh=27.9
+      • Modal body text (TEXT)  @24,252 400x40  "Get smarter responses, upload files, create images, and more by logging in."  Inter 14/400 lh=19.74
+    • Footer (FRAME)  @24,308 400x36
+      • Button Group (FRAME)  @24,308 203x36
+        • Button (INSTANCE)  @24,308 66x36
+          • Button (TEXT)  @36,316 42x20  "Log In"  Inter 14/600 lh=19.74
+        • Button (INSTANCE)  @99,308 128x36
+          • Button (TEXT)  @111,316 104x20  "Sign up for free"  Inter 14/600 lh=19.74
+```
+
+## "Log in" entry points
+
+The Logged Out screens put a Log in button in the app header:
+
+- Example Prototype - Dark Mode → Thread + Citations - Logged Out → Body → App Header → Buttons → Button → Button
+- General → App Header → Signed In=No, Type=Default → Buttons → Button → Button
