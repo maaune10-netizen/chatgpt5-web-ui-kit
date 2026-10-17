@@ -192,6 +192,8 @@ function buildIcons(svgs, index, ids) {
       vectorsInScope: order.length,
       resolved: Object.keys(icons).length,
       distinct: Object.keys(byHash).length,
+      /* العدد الحقيقي منفصل عن القائمة: القائمة تُقتطع للعرض، والعدد لا يُقتطع */
+      unresolvedCount: unresolved.length,
       unresolved: unresolved.slice(0, 80),
     },
   };

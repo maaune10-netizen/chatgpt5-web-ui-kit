@@ -181,17 +181,17 @@ if (ap) {
   const svgKeys = Object.keys(ap.svgs || {});
   const failed = (ap.meta.svgFailures || []).map((f) => f.name);
 
-  check('flip icon exported via its 2nd candidate', svgKeys.indexOf('I1:3;3:901') !== -1, svgKeys.filter((k) => k.indexOf('3:901') !== -1).join(',') || 'none');
-  check('the failing first candidate is not what got stored', svgKeys.indexOf('I1:2;3:901') === -1);
+  check('flip icon exported via its 2nd candidate', svgKeys.indexOf('3:901') !== -1, svgKeys.join(','));
+  check('svgs is keyed by source key, not by full node id', svgKeys.every((k) => !k.includes(';')));
   check('always-failing icon is reported in svgFailures', failed.indexOf('Bad Icon') !== -1, failed.join(',') || 'none');
-  check('failing icon WITH vectorPaths is built instead of lost', svgKeys.indexOf('I1:6;3:903') !== -1);
-  check('the path fallback contains real geometry', String(ap.svgs['I1:6;3:903'] || '').indexOf('M8 0a8 8') !== -1);
+  check('failing icon WITH vectorPaths is built instead of lost', svgKeys.indexOf('3:903') !== -1);
+  check('the path fallback contains real geometry', String(ap.svgs['3:903'] || '').indexOf('M8 0a8 8') !== -1);
   check('path fallback is counted', ap.meta.svgFallbacks >= 1, ap.meta.svgFallbacks);
   check('fallback icon is NOT also listed as a failure', failed.indexOf('Path Fallback Icon') === -1);
   check('hidden icon is not in svgFailures', failed.indexOf('Hidden Icon') === -1);
-  check('hidden icon produced no svg', svgKeys.indexOf('I1:5;3:902') === -1);
+  check('hidden icon produced no svg', svgKeys.indexOf('3:902') === -1);
   check('svgFailures is a separate uncapped list', Array.isArray(ap.meta.svgFailures));
-  check('revision is 6', ap.meta.revision === 6, ap.meta.revision);
+  check('revision is 7', ap.meta.revision === 7, ap.meta.revision);
   check('fonts summary present', Array.isArray(ap.meta.fonts) && ap.meta.fonts.length > 0, (ap.meta.fonts || [])[0]);
   check('no inferred-font flag on text nodes', !ap.nodes.some((n) => n._inferred));
   check('vector nodes are tagged', ap.nodes.filter((n) => n.vector).length >= 5);
@@ -209,6 +209,29 @@ check('icons-only returns an svg map', !!iconsMsg && Object.keys(iconsMsg.payloa
 check('icons-only omits the nodes array', !!iconsMsg && iconsMsg.payload.nodes === undefined);
 check('icons-only flags itself', !!iconsMsg && iconsMsg.payload.iconsOnly === true);
 check('icons-only still reports failures', !!iconsMsg && Array.isArray(iconsMsg.payload.meta.svgFailures));
+
+/* الأداة تتولّى التسمية والبصمة — فلا يبقى على المستهلك ما يمكن أن يخطئ فيه */
+function incoherentCount(ic) { return new Set(Object.values(ic).map((r) => r.file)).size; }
+const ic = iconsMsg && iconsMsg.payload.icons;
+const ia = iconsMsg && iconsMsg.payload.meta.iconAudit;
+check('icons map exists and is keyed by source key', !!ic && Object.keys(ic).length > 0 && Object.keys(ic).every((k) => !k.includes(';')), Object.keys(ic || {}).join(','));
+check('every icon file name carries a content hash', !!ic && Object.values(ic).every((r) => /-[0-9a-f]{12}$/.test(r.file)), Object.values(ic || {}).map((r) => r.file).join(', '));
+check('identical content shares one file name', !!ic && ic['3:500'].file === ic['3:501'].file && ic['3:501'].file === ic['3:901'].file, ic['3:500'].file + ' | ' + ic['3:501'].file + ' | ' + ic['3:901'].file);
+check('only the first of identical icons carries the svg payload', !!ic && Object.values(ic).filter((r) => r.svg).length === incoherentCount(ic), Object.values(ic).filter((r) => r.svg).length + ' payloads / ' + incoherentCount(ic) + ' files');
+function resolves(rec, all) {
+  if (rec.svg) return rec.svg.indexOf('<svg') === 0;
+  return all.some((o) => o.file === rec.file && o.svg);
+}
+check('each file name group resolves to a real svg', !!ic && Object.values(ic).every((r) => resolves(r, Object.values(ic))));
+check('audit counts every visible vector', !!ia && ia.resolved + ia.unresolvedCount === ia.vectorsInScope, JSON.stringify(ia && { r: ia.resolved, u: ia.unresolvedCount, t: ia.vectorsInScope }));
+check('unresolved list is capped but the count is not', !!ia && ia.unresolved.length <= 80 && ia.unresolvedCount >= ia.unresolved.length);
+check('unresolved icon is named in the audit', !!ia && ia.unresolved.some((u) => u.name === 'Bad Icon'), JSON.stringify(ia && ia.unresolved));
+check('hidden icon is not in the audit', !!ia && !ia.unresolved.some((u) => u.name === 'Hidden Icon'));
+
+/* البصمة تحقّق الغرض: محتوى مختلف بنفس اسم الطبقة → ملف مختلف */
+const sameName = Object.values(ic || {});
+const distinctSvg = new Set(sameName.filter((r) => r.svg).map((r) => r.svg));
+check('each distinct svg has exactly one file name', distinctSvg.size === incoherentCount(ic), distinctSvg.size + ' svgs / ' + incoherentCount(ic) + ' files');
 
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILED`);
 process.exit(failures === 0 ? 0 : 1);
