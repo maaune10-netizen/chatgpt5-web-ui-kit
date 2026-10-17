@@ -56,7 +56,7 @@
 <body>
   <header>
     <h1>Design Dump</h1>
-    <span class="badge" id="ver">v3.2</span>
+    <span class="badge" id="ver">v3.6</span>
   </header>
 
   <div class="row">
@@ -71,6 +71,7 @@
 
   <div class="row">
     <button class="primary" id="go" disabled>Export JSON</button>
+    <button id="icononly" title="Only the icon SVGs — seconds instead of minutes. Merge it into an existing dump.">Icons only</button>
     <button id="cancel" style="flex:0 0 84px;display:none">Cancel</button>
     <button id="diag" style="flex:0 0 96px">Copy log</button>
   </div>
@@ -172,6 +173,23 @@
     $('all').className = 'sel'; $('scoped').className = '';
     setStatus('Whole file selected. Press Export.');
     $('go').disabled = false;
+    $('icononly').disabled = false;
+  };
+
+  /* تصدير الأيقونات وحدها — ثوانٍ لا دقائق، وتُدمج في تصدير سابق */
+  $('icononly').disabled = true;
+  $('icononly').onclick = function () {
+    result = null; log = [];
+    $('save').disabled = true;
+    $('meta').className = 'empty';
+    $('meta').textContent = 'Nothing exported yet.';
+    $('go').disabled = true;
+    $('icononly').disabled = true;
+    renderIssues();
+    setStatus('Exporting icons only…');
+    $('cancel').style.display = '';
+    startTimer();
+    post({ type: 'icons', scope: 'all' });
   };
 
   $('go').onclick = function () {
@@ -216,11 +234,13 @@
 
   $('save').onclick = function () {
     if (!result) return;
+    $('go').disabled = false;
+    $('icononly').disabled = false;
     var blob = new Blob([JSON.stringify(result)], { type: 'application/json' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     var stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-    a.download = 'figma-dump-v3-' + stamp + '.json';
+    a.download = (result.iconsOnly ? 'figma-icons-' : 'figma-dump-v3-') + stamp + '.json';
     document.body.appendChild(a); a.click(); a.remove();
     setStatus('Saved.', 'ok');
   };
@@ -276,6 +296,35 @@
       renderStages(msg.stages || [], 'Failed');
       setStatus('Export failed. Press "Copy log" and send it over.', 'err');
       $('go').disabled = false;
+    }
+
+    if (raw.type === 'icons') {
+      stopTimer();
+      result = msg;
+      var im = result.meta;
+      renderIssues();
+      renderStages(lastStages, 'Done');
+
+      $('meta').className = '';
+      $('meta').textContent =
+        'icons only   yes\n' +
+        'vectors      ' + im.vectorCount + '\n' +
+        'svgs         ' + im.svgCount + '\n' +
+        'from paths   ' + (im.svgFallbacks || 0) + '\n' +
+        'still failed ' + ((im.svgFailures || []).length) + '\n' +
+        'elapsed      ' + (im.elapsedMs / 1000).toFixed(2) + 's\n' +
+        'json size    ' + bytes(JSON.stringify(result).length);
+
+      if ((im.svgFailures || []).length) {
+        for (var f2 = 0; f2 < im.svgFailures.length; f2++) {
+          var ff = im.svgFailures[f2];
+          log.push({ kind: 'err', t: 0, step: 'SVG', message: ff.name + ' (' + ff.key + ') — ' + ff.reason, nodeId: ff.key, nodeName: ff.parent });
+        }
+        renderIssues();
+      }
+
+      $('save').disabled = false;
+      setStatus('Icons done — ' + im.svgCount + ' SVGs. Press Download, then upload it.', 'ok');
     }
 
     if (raw.type === 'done') {

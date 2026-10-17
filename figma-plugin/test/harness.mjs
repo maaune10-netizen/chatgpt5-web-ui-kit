@@ -199,5 +199,16 @@ if (ap) {
   check('dump/all + svg produced a payload', false);
 }
 
+/* وضع الأيقونات وحدها: بلا عقد، بخريطة svgs فقط */
+messages.length = 0;
+figma.ui.onmessage({ type: 'icons' });
+for (let i = 0; i < 120 && !messages.some((m) => m.type === 'icons'); i++) await new Promise((r) => setTimeout(r, 25));
+const iconsMsg = messages.map(parse).find((m) => m.type === 'icons');
+console.log('\n--- icons-only mode ---');
+check('icons-only returns an svg map', !!iconsMsg && Object.keys(iconsMsg.payload.svgs).length > 0);
+check('icons-only omits the nodes array', !!iconsMsg && iconsMsg.payload.nodes === undefined);
+check('icons-only flags itself', !!iconsMsg && iconsMsg.payload.iconsOnly === true);
+check('icons-only still reports failures', !!iconsMsg && Array.isArray(iconsMsg.payload.meta.svgFailures));
+
 console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILED`);
 process.exit(failures === 0 ? 0 : 1);

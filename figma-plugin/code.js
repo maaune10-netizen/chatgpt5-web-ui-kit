@@ -609,6 +609,60 @@ figma.ui.onmessage = function (msg) {
     return;
   }
 
+  /*
+   * تصدير الأيقونات وحدها.
+   *
+   * تسلسل ٤٠ ألف عقدة ليس ما يبطئ — تصدير SVG هو ١٦٤ من ٣٠٠ ثانية.
+   * فهذا الوضع يتخطّاه مباشرة ويعيد خريطة الأيقونات فقط، لتُدمج في تصدير
+   * سابق بلا إعادة تصدير الملف كله.
+   */
+  if (msg.type === 'icons') {
+    startedAt = Date.now();
+    cancelled = false;
+    stages = [];
+    errors = [];
+    warnings = [];
+    skipped = [];
+
+    mark('Preparing');
+
+    var doIcons = function () {
+      var flat = [];
+      var index = {};
+      var roots = safe(function () { return figma.root.children; }, null, []) || [];
+      for (var r = 0; r < roots.length; r++) walk(roots[r], 0, flat, index);
+
+      var vectorIds = [];
+      for (var v = 0; v < flat.length; v++) if (flat[v].vector) vectorIds.push(flat[v].id);
+
+      mark('Preparing ' + vectorIds.length + ' vectors');
+      exportVectors(vectorIds, index, function (svgs, exported, fails, fallbacks) {
+        mark('Exported ' + exported + ' icons' + (fallbacks ? ' (' + fallbacks + ' from paths)' : ''));
+        send('icons', {
+          iconsOnly: true,
+          meta: {
+            version: VERSION,
+            revision: REVISION,
+            exportedAt: new Date().toISOString(),
+            elapsedMs: elapsed(),
+            vectorCount: vectorIds.length,
+            svgCount: Object.keys(svgs).length,
+            svgFailures: fails || [],
+            svgFallbacks: fallbacks || 0,
+          },
+          svgs: svgs,
+        });
+      });
+    };
+
+    if (typeof figma.loadAllPagesAsync === 'function') {
+      figma.loadAllPagesAsync().then(doIcons, function (e) { recordError(e, null); doIcons(); });
+    } else {
+      doIcons();
+    }
+    return;
+  }
+
   if (msg.type === 'dump') {
     startedAt = Date.now();
     cancelled = false;
