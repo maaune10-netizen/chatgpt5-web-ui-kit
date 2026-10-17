@@ -11,7 +11,7 @@
  * ======================================================================== */
 
 var VERSION = 3;
-var REVISION = 4;
+var REVISION = 5;
 
 figma.showUI(__html__, { width: 460, height: 620, title: 'Design Dump v3' });
 
@@ -386,10 +386,24 @@ function walk(node, depth, out, index) {
 
 /* ---------- SVG ---------- */
 
+/**
+ * تصدير الأيقونات مرّة واحدة لكل شكل أساسي.
+ *
+ * الفخّ الذي كلّفنا Copy و Try Again و More Actions: كان مفتاح المصدر
+ * يُحجز قبل نجاح التصدير. فإذا فشلت العقدة الأولى حملًا للمفتاح، استُهلكت
+ * الأيقونة لكل نسخها في الملف — ١٢٢٣ نسخة من Overflow بلا أيقونة واحدة.
+ *
+ * فالآن نجمع لكل مفتاح عدّة مرشّحين، ونجرّبهم بالترتيب حتى ينجح أحدهم،
+ * ثم نرجع إلى المكوّن الأساسي إن فشل الجميع. والفشل يُسجَّل صراحةً بلا سقف
+ * كي لا يختفي في قائمة التخطّي المحدودة بـ٢٠٠.
+ */
 function exportVectors(ids, index, onDone) {
   var svgs = {};
-  var list = [];
-  var seen = {};
+  var byKey = {};
+  var order = [];
+  var fails = [];
+  var triedMaster = {};
+  var MAX_CANDIDATES = 8;
 
   for (var i = 0; i < ids.length; i++) {
     var n = index[ids[i]];
@@ -399,52 +413,90 @@ function exportVectors(ids, index, onDone) {
     // تخطَّ غير المرئي — بدل ما يفشل ويُسجَّل كخطأ
     if (!isVisible(n)) { recordSkip('hidden', n); continue; }
 
-    // أزل التكرار: نفس العقدة الأساسية عبر كل نسخ المكوّن
     var key = sourceKey(n);
-    if (seen[key]) { recordSkip('duplicate of ' + key, n); continue; }
-    seen[key] = true;
-
-    list.push(n);
+    if (!byKey[key]) { byKey[key] = []; order.push(key); }
+    if (byKey[key].length < MAX_CANDIDATES) byKey[key].push(n);
   }
 
+  var total = order.length;
+  var keyAt = 0;
+  var candAt = 0;
+  var exported = 0;
+  var lastReason = '';
   var startedAt = elapsed();
-  var at = 0;
+  var lastPushAt = 0;
 
-  function tick() {
-    if (cancelled) { recordWarning('SVG export cancelled — keeping ' + at + ' of ' + list.length); onDone(svgs, at); return; }
-    if (at >= list.length) { onDone(svgs, list.length); return; }
-    var n = list[at++];
+  function report(force) {
+    if (!force && elapsed() - lastPushAt < 150) return;
+    lastPushAt = elapsed();
+    var doneMs = elapsed() - startedAt;
+    var eta = keyAt > 3 ? Math.round((doneMs / keyAt) * (total - keyAt) / 1000) : null;
+    currentStep = 'SVG ' + keyAt + '/' + total + (eta !== null ? ' · ~' + eta + 's left' : '');
+    pushStatus();
+  }
 
-    if (elapsed() - lastPushAt > 150 || at === list.length) {
-      lastPushAt = elapsed();
-      var doneMs = elapsed() - startedAt;
-      var eta = at > 3 ? Math.round((doneMs / at) * (list.length - at) / 1000) : null;
-      currentStep = 'SVG ' + at + '/' + list.length + (eta !== null ? ' · ~' + eta + 's left' : '');
-      pushStatus();
+  function step() {
+    if (cancelled) {
+      recordWarning('SVG export cancelled — kept ' + exported + ' of ' + total);
+      onDone(svgs, exported, fails);
+      return;
+    }
+    if (keyAt >= total) { onDone(svgs, exported, fails); return; }
+    report(false);
+
+    var key = order[keyAt];
+    var pool = byKey[key];
+
+    /* استُنفد المرشّحون — جرّب المكوّن الأساسي مرّة، ثم اعترف بالفشل */
+    if (candAt >= pool.length && !triedMaster[key]) {
+      triedMaster[key] = true;
+      var master = null;
+      try {
+        var mc = pool[0] && pool[0].mainComponent;
+        if (mc) master = mc;
+      } catch (e) { master = null; }
+      if (master) pool.push(master);
     }
 
-    n.exportAsync({ format: 'SVG', svgOutlineText: true })
+    if (candAt >= pool.length) {
+      var first = pool[0];
+      fails.push({
+        key: key,
+        name: first ? first.name : '?',
+        parent: first && first.parent ? first.parent.name : null,
+        candidates: pool.length,
+        reason: String(lastReason).slice(0, 140),
+      });
+      keyAt++;
+      candAt = 0;
+      return step();
+    }
+
+    var node = pool[candAt++];
+    var nodeId = node.id;
+
+    node.exportAsync({ format: 'SVG', svgOutlineText: true })
       .then(function (bytes) {
         var out = '';
         for (var k = 0; k < bytes.length; k++) out += String.fromCharCode(bytes[k]);
-        svgs[n.id] = out;
-        tick();
+        if (!out || out.indexOf('<svg') === -1) { lastReason = 'empty svg'; return step(); }
+        svgs[nodeId] = out;
+        exported++;
+        keyAt++;
+        candAt = 0;
+        step();
       })
       .catch(function (e) {
-        // "no visible layers" متوقّع → تخطٍّ، لا خطأ
-        var msg = String(e && e.message ? e.message : e);
-        if (msg.indexOf('visible') !== -1 || msg.indexOf('export') !== -1) {
-          recordSkip('not exportable: ' + msg, n);
-        } else {
-          recordError(e, n);
+        lastReason = String(e && e.message ? e.message : e);
+        if (lastReason.indexOf('visible') === -1 && lastReason.indexOf('export') === -1) {
+          recordError(e, node);
         }
-        tick();
+        step();
       });
   }
 
-  var lastPushAt = 0;
-  if (!list.length) { onDone(svgs, 0); return; }
-  tick();
+  if (!total) { onDone(svgs, 0, fails); return; }
+  step();
 }
 
 /* ---------- الاستقبال ---------- */
@@ -559,7 +611,7 @@ figma.ui.onmessage = function (msg) {
           }
         }
 
-        function finish(svgs) {
+        function finish(svgs, svgFails) {
           mark('Packaging');
           var payload = {
             meta: {
@@ -576,6 +628,7 @@ figma.ui.onmessage = function (msg) {
               warningCount: warnings.length,
               skippedCount: skipped.length,
               uniqueVectorCount: uniqueCount,
+              svgFailures: svgFails || [],
               revision: REVISION,
               api: figma.apiVersion || 'unknown',
               editor: figma.editorType || 'unknown',
@@ -602,9 +655,9 @@ figma.ui.onmessage = function (msg) {
 
         if (msg.includeSvg && vectorIds.length) {
           mark('Preparing ' + vectorIds.length + ' vectors (deduping)');
-          return exportVectors(vectorIds, index, function (svgs, exported) {
+          return exportVectors(vectorIds, index, function (svgs, exported, svgFails) {
             mark('Exported ' + exported + ' unique SVGs');
-            finish(svgs);
+            finish(svgs, svgFails);
           });
         }
         return finish(undefined);

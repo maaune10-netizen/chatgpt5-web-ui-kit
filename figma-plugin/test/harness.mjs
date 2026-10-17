@@ -1,9 +1,12 @@
 /**
  * محاكي Figma Plugin API — يشغّل code.js محليًا لاكتشاف الأخطاء.
+ *
+ * يختبر تحديدًا منطق تصدير الأيقونات: الفشل الجزئي، وإعادة المحاولة على
+ * نسخة أخرى من نفس الشكل الأساسي، وتسجيل ما فشل فعلًا.
  */
 import { readFileSync } from 'node:fs';
 
-const code = readFileSync(new URL('../code.js', import.meta.url), 'utf8');
+const code = readFileSync('/home/deploy/gpt5-kit/figma-plugin/code.js', 'utf8');
 
 const messages = [];
 
@@ -24,7 +27,7 @@ function node(type, name, extra = {}) {
     ...extra,
   };
   if (!('children' in n) && (type === 'FRAME' || type === 'COMPONENT' || type === 'PAGE')) n.children = [];
-  if (type === 'VECTOR' || type === 'BOOLEAN_OPERATION') {
+  if ((type === 'VECTOR' || type === 'BOOLEAN_OPERATION') && !n.exportAsync) {
     n.exportAsync = async () => {
       await new Promise((r) => setTimeout(r, 1));
       return new TextEncoder().encode('<svg viewBox="0 0 24 24"><path d="M0 0h24v24H0z"/></svg>');
@@ -54,15 +57,36 @@ function textNode(chars) {
 /* شجرة تشبه الملف الحقيقي: إطار فيه نصوص ومتجهات وحالات */
 const leaf1 = node('FRAME', 'Prompt Input', { layoutMode: 'HORIZONTAL', itemSpacing: 6, paddingTop: 10, paddingRight: 10, paddingBottom: 10, paddingLeft: 10, cornerRadius: 28, clipsContent: false });
 leaf1.children = [
-  node('VECTOR', 'Add icon'),
+  node('VECTOR', 'Add icon', { id: 'I1:0;3:500' }),
   textNode('Ask anything'),
   node('INSTANCE', 'Button', {
     mainComponent: { id: 'c1', name: 'Button' },
     componentProperties: { Variant: { value: 'Primary', type: 'VARIANT' } },
   }),
   node('ELLIPSE', 'Working Indicator', { fills: [{ type: 'GRADIENT_LINEAR', gradientStops: [{ position: 0, color: { r: 1, g: 1, b: 1, a: 1 } }], gradientHandlePositions: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }], visible: true }] }),
-  node('BOOLEAN_OPERATION', 'Union'),
+  node('BOOLEAN_OPERATION', 'Union', { id: 'I1:0;3:501' }),
+
+  /*
+   * الحالة التي كلّفتنا Copy و Retry و Overflow:
+   * نسختان تشتركان في المفتاح الأساسي 3:901، الأولى تفشل والثانية تنجح.
+   * قبل الإصلاح كان المفتاح يُحجز عند أول مرشّح، فتفشل الأيقونة كاملة.
+   */
+  node('VECTOR', 'Flip A', {
+    id: 'I1:2;3:901',
+    exportAsync: async () => { throw new Error('Failed to export node. This node may not have any visible layers.'); },
+  }),
+  node('VECTOR', 'Flip B', { id: 'I1:3;3:901' }),
+
+  /* فاشل دائمًا — يجب أن يظهر في meta.svgFailures */
+  node('VECTOR', 'Bad Icon', {
+    id: 'I1:4;3:900',
+    exportAsync: async () => { throw new Error('Failed to export node. This node may not have any visible layers.'); },
+  }),
+
+  /* مخفي — يجب أن يُتخطّى بلا خطأ */
+  node('VECTOR', 'Hidden Icon', { id: 'I1:5;3:902', visible: false }),
 ];
+
 const screen = node('COMPONENT', 'New Chat - Logged In', { children: [leaf1] });
 const page = node('PAGE', 'Screen Components', { children: [screen], selection: [] });
 
@@ -90,6 +114,12 @@ if (typeof figma.ui.onmessage !== 'function') {
 
 console.log('✓ plugin loaded, handlers registered');
 
+/** افصل الحمولة عن النص — الإضافة ترسل JSON نصًا لأن Figma تُسقط الـSymbols */
+function parse(m) {
+  if (!m || typeof m.json !== 'string') return m;
+  try { return Object.assign({}, m, { payload: JSON.parse(m.json) }); } catch (e) { return m; }
+}
+
 async function run(msg, label) {
   messages.length = 0;
   try {
@@ -97,28 +127,64 @@ async function run(msg, label) {
     if (r && typeof r.then === 'function') await r;
   } catch (e) {
     console.log(`✗ ${label} THREW: ${e.message}`);
-    return;
+    return null;
   }
-  // انتظر انتهاء أي وعود غير مُعادة
-  for (let i = 0; i < 60 && !messages.some(m => m.type === 'done' || m.type === 'error'); i++) {
-    await new Promise(r => setTimeout(r, 25));
+  for (let i = 0; i < 120 && !messages.some((m) => ['done', 'failed', 'error'].includes(m.type)); i++) {
+    await new Promise((r) => setTimeout(r, 25));
   }
-  const decode = (m) => { if (!m) return null; if (m.json === undefined) return m; try { return Object.assign({ type: m.type }, JSON.parse(m.json)); } catch { return m; } };
-  const err = decode(messages.find((m) => m.type === 'failed'));
-  const done = decode(messages.find((m) => m.type === 'done'));
-  if (err) {
-    console.log(`✗ ${label} -> error: ${err.errors && err.errors[0] ? err.errors[0].message : err.message}`);
+  const parsed = messages.map(parse);
+  const fail = parsed.find((m) => m.type === 'failed' || m.type === 'error');
+  const done = parsed.find((m) => m.type === 'done');
+  if (fail) {
+    const why = (fail.payload && fail.payload.errors && fail.payload.errors[0] && fail.payload.errors[0].message) || fail.message;
+    console.log(`✗ ${label} -> failed: ${why}`);
   } else if (done) {
-    console.log(`✓ ${label} -> ok: ${done.meta.nodeCount} nodes, ${done.meta.svgCount} svgs`);
+    console.log(`✓ ${label} -> ok: ${done.payload.meta.nodeCount} nodes, ${done.payload.meta.svgCount} svgs, ${done.payload.meta.skippedCount} skipped`);
   } else {
-    console.log(`? ${label} -> no done/error. messages:`, JSON.stringify(messages).slice(0, 200));
+    console.log(`? ${label} -> no done/failed`);
   }
-  const thrown = messages.filter((m) => m.type === 'threw');
+  const thrown = parsed.filter((m) => m.type === 'threw');
   if (thrown.length) console.log('   thrown:', JSON.stringify(thrown));
+  return parsed;
+}
+
+let failures = 0;
+function check(label, ok, extra) {
+  console.log(`${ok ? '  ✓' : '  ✗'} ${label}${extra !== undefined ? ' — ' + extra : ''}`);
+  if (!ok) failures++;
 }
 
 await run({ type: 'count' }, 'count');
-await run({ type: 'dump', scope: 'selection' }, 'dump/selection (empty)');
+
+const empty = await run({ type: 'dump', scope: 'selection' }, 'dump/selection (empty)');
+check('empty selection is reported as failed, not done', !!empty && !empty.some((m) => m.type === 'done'));
+
 figma.currentPage.selection = [screen];
-await run({ type: 'dump', scope: 'selection' }, 'dump/selection');
-await run({ type: 'dump', scope: 'all', includeSvg: true }, 'dump/all + svg');
+const sel = await run({ type: 'dump', scope: 'selection' }, 'dump/selection');
+const meta = sel && sel.find((m) => m.type === 'done') && sel.find((m) => m.type === 'done').payload.meta;
+
+const all = await run({ type: 'dump', scope: 'all', includeSvg: true }, 'dump/all + svg');
+const am = all && all.find((m) => m.type === 'done');
+const ap = am && am.payload;
+
+console.log('\n--- assertions ---');
+if (ap) {
+  const svgKeys = Object.keys(ap.svgs || {});
+  const failed = (ap.meta.svgFailures || []).map((f) => f.name);
+
+  check('flip icon exported via its 2nd candidate', svgKeys.indexOf('I1:3;3:901') !== -1, svgKeys.filter((k) => k.indexOf('3:901') !== -1).join(',') || 'none');
+  check('the failing first candidate is not what got stored', svgKeys.indexOf('I1:2;3:901') === -1);
+  check('always-failing icon is reported in svgFailures', failed.indexOf('Bad Icon') !== -1, failed.join(',') || 'none');
+  check('hidden icon is not in svgFailures', failed.indexOf('Hidden Icon') === -1);
+  check('hidden icon produced no svg', svgKeys.indexOf('I1:5;3:902') === -1);
+  check('svgFailures is a separate uncapped list', Array.isArray(ap.meta.svgFailures));
+  check('revision is 5', ap.meta.revision === 5, ap.meta.revision);
+  check('fonts summary present', Array.isArray(ap.meta.fonts) && ap.meta.fonts.length > 0, (ap.meta.fonts || [])[0]);
+  check('no inferred-font flag on text nodes', !ap.nodes.some((n) => n._inferred));
+  check('vector nodes are tagged', ap.nodes.filter((n) => n.vector).length >= 5);
+} else {
+  check('dump/all + svg produced a payload', false);
+}
+
+console.log(failures === 0 ? '\nALL PASS' : `\n${failures} FAILED`);
+process.exit(failures === 0 ? 0 : 1);
