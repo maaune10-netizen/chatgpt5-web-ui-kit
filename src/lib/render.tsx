@@ -34,6 +34,7 @@ export interface ScreenNode {
   lh?: number;
   ls?: number;
   ta?: 'c' | 'r';
+  ar?: string;            // autoResize من Figma: WIDTH_AND_HEIGHT | HEIGHT | NONE
   color?: string;
   ic?: string;            // icon file name
   _inferred?: number;
@@ -44,6 +45,7 @@ export interface ScreenData {
   name: string;
   w: number;
   h: number;
+  bg?: string | null;
   nodes: ScreenNode[];
 }
 
@@ -136,8 +138,14 @@ export function renderScreen(screen: ScreenData, opts: RenderOptions = {}): Reac
               lineHeight: n.lh ? n.lh + 'px' : undefined,
               letterSpacing: n.ls,
               color: n.color,
+              /*
+               * الافتراضي (normal) يطوي الأسطر الجديدة إلى فراغ — و52 عقدة نص
+               * في الملف تعتمد عليها (كتل الكود والاقتباسات).
+               * و WIDTH_AND_HEIGHT تعني أن الصندوق امتداد النص، فلا يلتفّ.
+               */
+              whiteSpace: n.ar === 'WIDTH_AND_HEIGHT' ? 'pre' : 'pre-wrap',
+              overflowWrap: n.ar === 'WIDTH_AND_HEIGHT' ? undefined : 'break-word',
               textAlign: n.ta === 'c' ? 'center' : n.ta === 'r' ? 'right' : 'left',
-              whiteSpace: 'pre-wrap',
               width: '100%',
               display: 'block',
             }}

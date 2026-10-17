@@ -3,15 +3,54 @@ import { renderScreen, type ScreenData, type ScreenNode } from './lib/render';
 import { preloadIcons, onIconsLoaded } from './lib/icons';
 
 /* كل الشاشات المُستخرجة من ملف Figma */
-const modules = import.meta.glob('./screens-data/*.json', { eager: true, import: 'default' }) as Record<
-  string,
-  ScreenData | { slug: string; name: string; node: string; count: number }[]
->;
+const BASE = import.meta.env.BASE_URL || '/';
 
-const SCREENS: ScreenData[] = Object.entries(modules)
-  .filter(([path, v]) => !path.endsWith('index.json') && !Array.isArray(v))
-  .map(([, v]) => v as ScreenData)
-  .sort((a, b) => a.name.localeCompare(b.name));
+type IndexEntry = { slug: string; name: string; node: string; count: number };
+
+/**
+ * بيانات الشاشات تُجلب وقت التشغيل لا وقت البناء.
+ *
+ * كانت تُجمَع بـ`import.meta.glob`، وهي طريقة Vite السليمة عمومًا. لكن كل
+ * إعادة توليد تعيد كتابة ٢٣ ملفًا، ويبقى خادم التطوير على الوحدات المخزّنة.
+ * وقد حدث ثلاث مرات، وفي كل مرة بدا الخلل في العارض لا في التخزين.
+ */
+let SCREENS: ScreenData[] = [];
+const screenListeners = new Set<() => void>();
+
+function notifyScreens() {
+  for (const fn of screenListeners) fn();
+}
+
+export function onScreensLoaded(fn: () => void): () => void {
+  screenListeners.add(fn);
+  return () => screenListeners.delete(fn);
+}
+
+/** هل وصلت الشاشات؟ */
+export function screensLoaded(): boolean {
+  return SCREENS.length > 0;
+}
+
+let screensPending: Promise<void> | null = null;
+export function loadScreens(): Promise<void> {
+  if (screensPending) return screensPending;
+  screensPending = fetch(BASE + 'screens/index.json', { cache: 'no-cache' })
+    .then((r) => (r.ok ? r.json() : Promise.reject(new Error('index ' + r.status))))
+    .then(async (index: IndexEntry[]) => {
+      const loaded = await Promise.all(
+        index.map((e) =>
+          fetch(BASE + 'screens/' + e.slug + '.json', { cache: 'no-cache' }).then((r) => r.json() as Promise<ScreenData>),
+        ),
+      );
+      SCREENS = loaded;
+      notifyScreens();
+    })
+    .catch((e) => {
+      console.error('[screens] could not load:', e);
+      screensPending = null;
+    });
+  return screensPending;
+}
 
 /*
  * التنقّل: عناصر الشريط الجانبي في التصميم تنتقل إلى الشاشة المقابلة.
@@ -36,28 +75,38 @@ export default function App() {
    * الأيقونات تُحمَّل بعد الإقلاع. الواجهة تُعيد الرسم عند وصولها،
    * فلا حاجة إلى إعادة تشغيل الخادم بعد كل إعادة توليد.
    */
-  const [, setIconsReady] = useState(0);
+  const [ready, setReady] = useState(0);
   useEffect(() => {
     preloadIcons();
-    return onIconsLoaded(() => setIconsReady((n) => n + 1));
+    loadScreens();
+    const offIcons = onIconsLoaded(() => setReady((n) => n + 1));
+    const offScreens = onScreensLoaded(() => setReady((n) => n + 1));
+    return () => { offIcons(); offScreens(); };
   }, []);
 
-  const [slug, setSlug] = useState(SCREENS[0]?.slug ?? '');
+  const [slug, setSlug] = useState('');
+  useEffect(() => {
+    if (!slug && SCREENS.length) setSlug(SCREENS[0].slug);
+  }, [ready, slug]);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [fit, setFit] = useState(true);
   const stageRef = useRef<HTMLDivElement>(null);
 
-  const screen = useMemo(() => SCREENS.find((s) => s.slug === slug) ?? SCREENS[0], [slug]);
+  const screen = useMemo(
+    () => SCREENS.find((s) => s.slug === slug) ?? SCREENS[0],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [slug, ready],
+  );
 
   /* ملاءمة العرض تلقائيًا */
   useEffect(() => {
-    if (!fit) return;
+    if (!fit || !screen) return;
     const el = stageRef.current;
     if (!el) return;
     const update = () => {
       const pad = 48;
-      const s = Math.min((el.clientWidth - pad) / 1440, (el.clientHeight - pad) / 1024);
+      const s = Math.min((el.clientWidth - pad) / screen.w, (el.clientHeight - pad) / screen.h);
       setZoom(Math.max(0.15, Math.round(s * 1000) / 1000));
     };
     update();
@@ -180,25 +229,31 @@ export default function App() {
           </aside>
         )}
 
-        {/* المسرح */}
+        {!screen ? (
+          <div className="flex flex-1 items-center justify-center text-sm text-white/40">
+            Loading screens…
+          </div>
+        ) : (
+        <>
+                {/* المسرح */}
         <div ref={stageRef} className="relative min-h-0 flex-1 overflow-auto">
           <div
             className="absolute left-1/2 top-1/2"
             style={{
-              width: 1440 * zoom,
-              height: 1024 * zoom,
+              width: screen.w * zoom,
+              height: screen.h * zoom,
               transform: 'translate(-50%, -50%)',
             }}
           >
             <div
               id="screen-frame"
               style={{
-                width: 1440,
-                height: 1024,
+                width: screen.w,
+                height: screen.h,
                 transform: `scale(${zoom})`,
                 transformOrigin: 'top left',
                 position: 'relative',
-                background: '#212121',
+                background: screen.bg || '#212121',
                 boxShadow: '0 24px 80px rgba(0,0,0,0.6)',
               }}
             >
@@ -206,6 +261,8 @@ export default function App() {
             </div>
           </div>
         </div>
+        </>
+        )}
       </div>
     </div>
   );

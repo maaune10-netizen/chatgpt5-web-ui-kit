@@ -168,10 +168,23 @@ function lineHeightFor(size, h) {
 }
 
 /* ============ 4) بيانات الشاشات ============ */
-const OUT = join(ROOT, 'src/screens-data');
+/*
+ * تُكتب في public/ لأنها تُقرأ وقت التشغيل.
+ * وحين كانت في src/ كان خادم التطوير يخزّن وحدات JSON، فيبقى على نسخة
+ * قديمة بعد كل إعادة توليد — وقد حدث ثلاث مرات، وفي كل مرة بدا الخلل
+ * في العارض أو في المولّد.
+ */
+const OUT = join(ROOT, 'public/screens');
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
+/*
+ * كل شاشة في قسم «Example Prototype - Dark Mode».
+ *
+ * ثلاثة معرّفات كانت خاطئة (126:9142 و136:8892 و386:46967 لا وجود لها)،
+ * فكانت تُطبع «missing» وتُتخطّى بصمت — ولهذا ظننت الشاشات غائبة عن الملف.
+ * والأسماء هنا هي أسماء الطبقات نفسها، فيسهل التحقق منها.
+ */
 const SCREENS = [
   ['133:6239', 'new-chat-logged-in'],
   ['6:1288', 'new-chat-logged-out'],
@@ -183,15 +196,34 @@ const SCREENS = [
   ['133:4503', 'project-page'],
   ['146:14919', 'project-chat'],
   ['100:5759', 'library'],
-  ['136:8892', 'explore-gpts'],
-  ['126:9142', 'gpt-chat'],
-  ['386:46967', 'explore-gpt-details'],
+  ['334:17500', 'gpt-chat'],
+  ['334:17503', 'explore-gpts'],
+  ['386:48216', 'explore-gpt-details'],
   ['84:6697', 'image-viewer-chat'],
   ['84:6681', 'image-viewer-library'],
   ['324:18961', 'image-viewer-web'],
   ['328:17456', 'thread-response-types'],
   ['328:18370', 'thread-loading-animations'],
+
+  /* النوافذ والقوائم — حالات تفاعلية لا شاشات كاملة */
+  ['386:51165', 'search-chats-modal'],
+  ['386:51166', 'share-modal'],
+  ['386:51167', 'share-modal-compact'],
+  ['334:34539', 'overflow-menu'],
+  ['334:34542', 'login-modal'],
 ];
+
+/*
+ * الأسماء المساعدة: كل ما عداها اسم طبقة من Figma، والاسم يصل من الملف.
+ * وعند التعارض (نافذتان اسمهما Share Modal) يُلحق التمييز في القائمة أعلاه.
+ */
+const SCREEN_TITLES = {
+  'search-chats-modal': 'Search Chats Modal',
+  'share-modal': 'Share Modal',
+  'share-modal-compact': 'Share Modal — Compact',
+  'overflow-menu': 'Overflow Menu',
+  'login-modal': 'Login / Upsell Modal',
+};
 
 const solid = (fills) => {
   if (!fills || !fills.length) return undefined;
@@ -305,6 +337,13 @@ for (const [id, slug] of SCREENS) {
         o.ls = isPercent ? Math.round((size * ls / 100) * 100) / 100 : ls;
       }
       if (n.alignH && n.alignH !== 'LEFT') o.ta = n.alignH === 'CENTER' ? 'c' : 'r';
+      /*
+       * سلوك الالتفاف من التصميم نفسه.
+       * WIDTH_AND_HEIGHT تعني أن الصندوق هو امتداد النص — فلا يلتفّ أبدًا.
+       * وإغفالها كان يجعل «Log In» سطرين حين يزيد النص بكسلًا واحدًا
+       * عن مقاس Figma (وهو فرق متوقع بين نسخ الخط).
+       */
+      if (n.autoResize) o.ar = n.autoResize;
       const tc = solid(n.fills);
       if (tc && tc.c) o.color = rgba(tc.c, tc.o);
       o._inferred = !n.size ? 1 : 0;
@@ -322,12 +361,18 @@ for (const [id, slug] of SCREENS) {
   emit(screen, R.x, R.y, 0);
 
   writeFileSync(join(OUT, slug + '.json'), JSON.stringify({
-    slug, name: screen.name, w: Math.round(R.w), h: Math.round(R.h), nodes,
+    slug,
+    name: SCREEN_TITLES[slug] || screen.name,
+    w: Math.round(R.w),
+    h: Math.round(R.h),
+    /* لون خلفية الشاشة من التصميم — لا مثبّتًا في الكود */
+    bg: (solid(screen.fills) || {}).c || null,
+    nodes,
   }));
 
   const inferred = nodes.filter((n) => n._inferred).length;
   const missing = nodes.filter((n) => n.missingIcon).length;
-  written.push({ id, slug, name: screen.name, nodes: nodes.length, inferred, missing });
+  written.push({ id, slug, name: SCREEN_TITLES[slug] || screen.name, nodes: nodes.length, inferred, missing });
 }
 
 writeFileSync(join(OUT, 'index.json'), JSON.stringify(
