@@ -262,6 +262,37 @@ const shadowCss = (fx) => {
 
 const rgba = hexToRgba;
 
+/*
+ * الصور تُكتب ملفات ويُشار إليها بمسار.
+ * وحقنها كـdata URL كان سيضخّم بيانات الشاشة بميغابايتات.
+ */
+const IMG_DIR = join(ROOT, 'public/generated-images');
+rmSync(IMG_DIR, { recursive: true, force: true });
+mkdirSync(IMG_DIR, { recursive: true });
+
+const extOf = (url) => {
+  const m = /^data:(image\/[a-z+]+);base64,/.exec(url);
+  if (!m) return 'png';
+  return m[1] === 'image/jpeg' ? 'jpg' : m[1].split('/')[1];
+};
+const imageUrl = {};
+let imageBytes = 0;
+for (const [hash, url] of Object.entries(j.images || {})) {
+  if (!url) continue;
+  const ext = extOf(url);
+  const file = String(hash).replace(/[^A-Za-z0-9_-]/g, '') + '.' + ext;
+  const b64 = url.slice(url.indexOf(',') + 1);
+  writeFileSync(join(IMG_DIR, file), Buffer.from(b64, 'base64'));
+  imageUrl[hash] = 'generated-images/' + file;
+  imageBytes += Math.floor(b64.length * 0.75);
+}
+if (Object.keys(imageUrl).length) {
+  console.log('images: ' + Object.keys(imageUrl).length + ' written, ' +
+    Math.round(imageBytes / 1024) + ' KB');
+}
+
+const FILL_OF = { FILL: 'cover', FIT: 'contain', CROP: 'cover', TILE: 'auto' };
+
 const written = [];
 for (const [id, slug] of SCREENS) {
   const screen = byId[id];
@@ -297,6 +328,11 @@ for (const [id, slug] of SCREENS) {
       if (s && s.c) o.bg = rgba(s.c, s.o);
       const g = grad(n.fills);
       if (g) o.bgi = g;
+      const im = (n.fills || []).find((f) => f.t === 'image' && f.imageHash && imageUrl[f.imageHash]);
+      if (im && !g) {
+        o.bgi = `url(${JSON.stringify(imageUrl[im.imageHash])})`;
+        o.bgs = FILL_OF[im.scaleMode] || 'cover';
+      }
     }
 
     if (n.strokes && n.strokes.length) {

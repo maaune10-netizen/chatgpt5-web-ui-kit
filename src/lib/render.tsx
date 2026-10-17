@@ -16,6 +16,7 @@ export interface ScreenNode {
   h: number;
   bg?: string;            // solid fill
   bgi?: string;           // gradient fill (css)
+  bgs?: string;           // background-size for an image fill
   bd?: string;            // border colour
   bw?: number;            // border width
   r?: number | string;    // corner radius
@@ -85,7 +86,14 @@ function boxStyle(n: ScreenNode): CSSProperties {
     height: n.h,
   };
   if (n.bg) base.background = n.bg;
-  else if (n.bgi) base.backgroundImage = n.bgi;
+  else if (n.bgi) {
+    base.backgroundImage = n.bgi;
+    if (n.bgs) {
+      base.backgroundSize = n.bgs;
+      base.backgroundPosition = 'center';
+      base.backgroundRepeat = 'no-repeat';
+    }
+  }
   /*
    * الحدود عبر ظل داخلي بدل border: الحدود العادية تُزيح «صندوق الحشو»
    * بمقدارها، وهو نقطة أصل الأبناء المطلقين — فتظهر إزاحة 1px لكل مستوى.

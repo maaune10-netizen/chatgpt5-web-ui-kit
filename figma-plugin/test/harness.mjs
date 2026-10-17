@@ -94,12 +94,24 @@ leaf1.children = [
 
   /* مخفي — يجب أن يُتخطّى بلا خطأ */
   node('VECTOR', 'Hidden Icon', { id: 'I1:5;3:902', visible: false }),
+
+  /* صورة معبّأة — يجب أن تُصدَّر بايتاتها */
+  node('RECTANGLE', 'Hero Image', {
+    fills: [{ type: 'IMAGE', imageHash: 'img1', scaleMode: 'FILL', opacity: 1, visible: true }],
+  }),
+  node('RECTANGLE', 'Broken Image', {
+    fills: [{ type: 'IMAGE', imageHash: 'img-missing', scaleMode: 'FILL', opacity: 1, visible: true }],
+  }),
 ];
 
 const screen = node('COMPONENT', 'New Chat - Logged In', { children: [leaf1] });
 const page = node('PAGE', 'Screen Components', { children: [screen], selection: [] });
 
+/* بايتات PNG صغيرة (التوقيع يكفي لاختبار استنتاج النوع) */
+const PNG_BYTES = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]);
+
 const figma = {
+  getImageByHash: (h) => (h === 'img1' ? { getBytesAsync: async () => PNG_BYTES } : null),
   root: { name: 'Test File', children: [page] },
   currentPage: page,
   showUI() {},
@@ -191,10 +203,18 @@ if (ap) {
   check('hidden icon is not in svgFailures', failed.indexOf('Hidden Icon') === -1);
   check('hidden icon produced no svg', svgKeys.indexOf('3:902') === -1);
   check('svgFailures is a separate uncapped list', Array.isArray(ap.meta.svgFailures));
-  check('revision is 7', ap.meta.revision === 7, ap.meta.revision);
+  check('revision is 8', ap.meta.revision === 8, ap.meta.revision);
   check('fonts summary present', Array.isArray(ap.meta.fonts) && ap.meta.fonts.length > 0, (ap.meta.fonts || [])[0]);
   check('no inferred-font flag on text nodes', !ap.nodes.some((n) => n._inferred));
   check('vector nodes are tagged', ap.nodes.filter((n) => n.vector).length >= 5);
+
+  /* الصور: النوع كان يُحفظ ويُسقط imageHash، فتُرسم فارغة */
+  const imgFills = ap.nodes.flatMap((n) => n.fills || []).filter((f) => f.t === 'image');
+  check('image fills carry their hash', imgFills.length === 2 && imgFills.every((f) => f.imageHash), JSON.stringify(imgFills));
+  check('image bytes are exported as a data url', !!ap.images && String(ap.images.img1 || '').indexOf('data:image/png;base64,') === 0, (ap.images && ap.images.img1 || '').slice(0, 40));
+  check('meta reports the image count', ap.meta.imageCount === 1, ap.meta.imageCount);
+  check('an unresolvable image is reported, not fatal', (ap.meta.imageSkipped || []).length === 1, JSON.stringify(ap.meta.imageSkipped));
+  check('image bytes are counted', ap.meta.imageBytes === PNG_BYTES.length, ap.meta.imageBytes);
 } else {
   check('dump/all + svg produced a payload', false);
 }
@@ -209,6 +229,7 @@ check('icons-only returns an svg map', !!iconsMsg && Object.keys(iconsMsg.payloa
 check('icons-only omits the nodes array', !!iconsMsg && iconsMsg.payload.nodes === undefined);
 check('icons-only flags itself', !!iconsMsg && iconsMsg.payload.iconsOnly === true);
 check('icons-only still reports failures', !!iconsMsg && Array.isArray(iconsMsg.payload.meta.svgFailures));
+check('icons-only also carries images', !!iconsMsg && String((iconsMsg.payload.images || {}).img1 || '').indexOf('data:image/png') === 0, Object.keys((iconsMsg && iconsMsg.payload.images) || {}).join(','));
 
 /* الأداة تتولّى التسمية والبصمة — فلا يبقى على المستهلك ما يمكن أن يخطئ فيه */
 function incoherentCount(ic) { return new Set(Object.values(ic).map((r) => r.file)).size; }

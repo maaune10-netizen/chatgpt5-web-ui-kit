@@ -54,6 +54,16 @@ for (const [id, svg] of Object.entries(icons.svgs)) {
 
 const after = Object.keys(dump.svgs).length;
 
+/* الصور تُدمج بالطريقة نفسها */
+let imgAdded = 0;
+for (const [hash, url] of Object.entries(icons.images || {})) {
+  if (!url) continue;
+  if (!dump.images) dump.images = {};
+  if (dump.images[hash] === undefined) imgAdded++;
+  dump.images[hash] = url;
+}
+if (imgAdded) console.log('images added ' + imgAdded);
+
 /* سجّل ما بقي فاشلًا في التشخيص كي لا يضيع */
 if (icons.meta && icons.meta.svgFailures) {
   dump.diagnostics = dump.diagnostics || {};
