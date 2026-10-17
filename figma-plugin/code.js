@@ -11,7 +11,7 @@
  * ======================================================================== */
 
 var VERSION = 3;
-var REVISION = 3;
+var REVISION = 4;
 
 figma.showUI(__html__, { width: 460, height: 620, title: 'Design Dump v3' });
 
@@ -312,8 +312,20 @@ function serialize(n) {
     if (st.lineHeightPercentFontSize !== undefined) o.lineHeightPercent = round(st.lineHeightPercentFontSize);
     else if (lh && lh.unit === 'PERCENT') o.lineHeightPercent = round(lh.value);
 
-    if (st.letterSpacing !== undefined) o.letterSpacing = round(st.letterSpacing);
-    else if (ls) o.letterSpacing = round(ls.value);
+    /*
+     * letterSpacing رقم + وحدة (PIXELS أو PERCENT).
+     * تصدير الرقم وحده يجعل -4% تُقرأ -4px — فرق ستة أضعاف.
+     * نحوّلها دائمًا إلى بكسل.
+     */
+    if (st.letterSpacing !== undefined) {
+      o.letterSpacing = round(st.letterSpacing);
+    } else if (ls) {
+      var lsUnit = ls.unit || 'PIXELS';
+      o.letterSpacing = lsUnit === 'PERCENT' && o.size
+        ? round(o.size * ls.value / 100)
+        : round(ls.value);
+      o.letterSpacingUnit = lsUnit;
+    }
 
     o.alignH = st.textAlignHorizontal || n.textAlignHorizontal;
     o.alignV = st.textAlignVertical || n.textAlignVertical;

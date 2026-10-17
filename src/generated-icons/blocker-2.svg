@@ -1,4 +1,7 @@
-<svg width="10" height="11" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M0 0L10 11H0V0Z" fill="#303030"/>
-<path d="M0 0L10 11H0V0Z" fill="white" fill-opacity="0.1"/>
+<svg width="10" height="11" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<use xlink:href="#stroke0_378_40189" fill="#303030"/>
+<use xlink:href="#stroke0_378_40189" fill="white" fill-opacity="0.1"/>
+<defs>
+<path id="stroke0_378_40189" d="M0 0L10 11H0V0Z"/>
+</defs>
 </svg>
