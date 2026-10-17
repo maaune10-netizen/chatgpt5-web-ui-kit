@@ -11,7 +11,7 @@
  * ======================================================================== */
 
 var VERSION = 3;
-var REVISION = 5;
+var REVISION = 6;
 
 figma.showUI(__html__, { width: 460, height: 620, title: 'Design Dump v3' });
 
@@ -397,6 +397,70 @@ function walk(node, depth, out, index) {
  * ثم نرجع إلى المكوّن الأساسي إن فشل الجميع. والفشل يُسجَّل صراحةً بلا سقف
  * كي لا يختفي في قائمة التخطّي المحدودة بـ٢٠٠.
  */
+/**
+ * احتياط أخير: ابنِ الأيقونة من مسار المتجه نفسه.
+ *
+ * `exportAsync` قد يفشل لأسباب لا علاقة لها بالشكل — عقدة داخل نسخة مكوّن،
+ * أو طبقة يراها Figma فارغة. لكن `vectorPaths` يظل متاحًا، ويحمل مسار SVG
+ * جاهزًا. فهذه الطريق تكفل ظهور الأيقونة بدل أن تختفي.
+ */
+function svgFromGeometry(node) {
+  try {
+    var paths = null;
+    if (node.vectorPaths && node.vectorPaths.length) paths = node.vectorPaths;
+    else if (node.fillGeometry && node.fillGeometry.length) paths = node.fillGeometry;
+    if (!paths || !paths.length) return null;
+
+    var d = '';
+    var rule = 'nonzero';
+    for (var i = 0; i < paths.length; i++) {
+      if (!paths[i] || !paths[i].data) continue;
+      d += paths[i].data + ' ';
+      if (paths[i].windingRule === 'EVENODD') rule = 'evenodd';
+    }
+    if (!d.replace(/\s/g, '')) return null;
+
+    var w = Math.max(1, round(node.width) || 1);
+    var h = Math.max(1, round(node.height) || 1);
+
+    var fill = 'none';
+    var op = 1;
+    var f = node.fills;
+    if (f && f.length) {
+      for (var j = 0; j < f.length; j++) {
+        if (f[j].visible === false) continue;
+        if (f[j].type === 'SOLID' && f[j].color) {
+          fill = hex(f[j].color);
+          op = typeof f[j].opacity === 'number' ? f[j].opacity : 1;
+        }
+        break;
+      }
+    }
+
+    var stroke = '';
+    var s = node.strokes;
+    if (s && s.length) {
+      for (var k = 0; k < s.length; k++) {
+        if (s[k].visible === false) continue;
+        if (s[k].type === 'SOLID' && s[k].color) {
+          stroke = ' stroke="' + hex(s[k].color) + '" stroke-width="' + (num(node.strokeWeight, 1)) +
+            '" stroke-linecap="round" stroke-linejoin="round"';
+        }
+        break;
+      }
+    }
+
+    if (fill === 'none' && !stroke) return null;
+
+    return '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h +
+      '" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="' + d.trim() + '" fill="' + fill + '" fill-opacity="' + op +
+      '" fill-rule="' + rule + '"' + stroke + '/></svg>';
+  } catch (e) {
+    return null;
+  }
+}
+
 function exportVectors(ids, index, onDone) {
   var svgs = {};
   var byKey = {};
@@ -422,6 +486,7 @@ function exportVectors(ids, index, onDone) {
   var keyAt = 0;
   var candAt = 0;
   var exported = 0;
+  var fallbacks = 0;
   var lastReason = '';
   var startedAt = elapsed();
   var lastPushAt = 0;
@@ -438,10 +503,10 @@ function exportVectors(ids, index, onDone) {
   function step() {
     if (cancelled) {
       recordWarning('SVG export cancelled — kept ' + exported + ' of ' + total);
-      onDone(svgs, exported, fails);
+      onDone(svgs, exported, fails, fallbacks);
       return;
     }
-    if (keyAt >= total) { onDone(svgs, exported, fails); return; }
+    if (keyAt >= total) { onDone(svgs, exported, fails, fallbacks); return; }
     report(false);
 
     var key = order[keyAt];
@@ -491,11 +556,23 @@ function exportVectors(ids, index, onDone) {
         if (lastReason.indexOf('visible') === -1 && lastReason.indexOf('export') === -1) {
           recordError(e, node);
         }
+
+        /* التصدير فشل — لكن المسار موجود. ابنِ الأيقونة بنفسك. */
+        var fb = svgFromGeometry(node);
+        if (fb) {
+          svgs[nodeId] = fb;
+          fallbacks++;
+          exported++;
+          keyAt++;
+          candAt = 0;
+          return step();
+        }
+
         step();
       });
   }
 
-  if (!total) { onDone(svgs, 0, fails); return; }
+  if (!total) { onDone(svgs, 0, fails, 0); return; }
   step();
 }
 
@@ -611,7 +688,7 @@ figma.ui.onmessage = function (msg) {
           }
         }
 
-        function finish(svgs, svgFails) {
+        function finish(svgs, svgFails, fallbacks) {
           mark('Packaging');
           var payload = {
             meta: {
@@ -629,6 +706,7 @@ figma.ui.onmessage = function (msg) {
               skippedCount: skipped.length,
               uniqueVectorCount: uniqueCount,
               svgFailures: svgFails || [],
+              svgFallbacks: fallbacks || 0,
               revision: REVISION,
               api: figma.apiVersion || 'unknown',
               editor: figma.editorType || 'unknown',
@@ -655,9 +733,9 @@ figma.ui.onmessage = function (msg) {
 
         if (msg.includeSvg && vectorIds.length) {
           mark('Preparing ' + vectorIds.length + ' vectors (deduping)');
-          return exportVectors(vectorIds, index, function (svgs, exported, svgFails) {
-            mark('Exported ' + exported + ' unique SVGs');
-            finish(svgs, svgFails);
+          return exportVectors(vectorIds, index, function (svgs, exported, svgFails, fallbacks) {
+            mark('Exported ' + exported + ' unique SVGs' + (fallbacks ? ' (' + fallbacks + ' from paths)' : ''));
+            finish(svgs, svgFails, fallbacks);
           });
         }
         return finish(undefined);

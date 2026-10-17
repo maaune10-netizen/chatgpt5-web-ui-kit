@@ -77,7 +77,16 @@ leaf1.children = [
   }),
   node('VECTOR', 'Flip B', { id: 'I1:3;3:901' }),
 
-  /* فاشل دائمًا — يجب أن يظهر في meta.svgFailures */
+  /* فاشل دائمًا لكن له مسار — يجب أن يُبنى من vectorPaths لا أن يُفقَد */
+  node('VECTOR', 'Path Fallback Icon', {
+    id: 'I1:6;3:903',
+    width: 16, height: 16,
+    fills: [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 }, opacity: 1, visible: true }],
+    vectorPaths: [{ windingRule: 'NONZERO', data: 'M8 0a8 8 0 100 16A8 8 0 008 0z' }],
+    exportAsync: async () => { throw new Error('Failed to export node. This node may not have any visible layers.'); },
+  }),
+
+  /* فاشل دائمًا وبلا مسار — يجب أن يظهر في meta.svgFailures */
   node('VECTOR', 'Bad Icon', {
     id: 'I1:4;3:900',
     exportAsync: async () => { throw new Error('Failed to export node. This node may not have any visible layers.'); },
@@ -175,10 +184,14 @@ if (ap) {
   check('flip icon exported via its 2nd candidate', svgKeys.indexOf('I1:3;3:901') !== -1, svgKeys.filter((k) => k.indexOf('3:901') !== -1).join(',') || 'none');
   check('the failing first candidate is not what got stored', svgKeys.indexOf('I1:2;3:901') === -1);
   check('always-failing icon is reported in svgFailures', failed.indexOf('Bad Icon') !== -1, failed.join(',') || 'none');
+  check('failing icon WITH vectorPaths is built instead of lost', svgKeys.indexOf('I1:6;3:903') !== -1);
+  check('the path fallback contains real geometry', String(ap.svgs['I1:6;3:903'] || '').indexOf('M8 0a8 8') !== -1);
+  check('path fallback is counted', ap.meta.svgFallbacks >= 1, ap.meta.svgFallbacks);
+  check('fallback icon is NOT also listed as a failure', failed.indexOf('Path Fallback Icon') === -1);
   check('hidden icon is not in svgFailures', failed.indexOf('Hidden Icon') === -1);
   check('hidden icon produced no svg', svgKeys.indexOf('I1:5;3:902') === -1);
   check('svgFailures is a separate uncapped list', Array.isArray(ap.meta.svgFailures));
-  check('revision is 5', ap.meta.revision === 5, ap.meta.revision);
+  check('revision is 6', ap.meta.revision === 6, ap.meta.revision);
   check('fonts summary present', Array.isArray(ap.meta.fonts) && ap.meta.fonts.length > 0, (ap.meta.fonts || [])[0]);
   check('no inferred-font flag on text nodes', !ap.nodes.some((n) => n._inferred));
   check('vector nodes are tagged', ap.nodes.filter((n) => n.vector).length >= 5);
