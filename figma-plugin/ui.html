@@ -56,7 +56,7 @@
 <body>
   <header>
     <h1>Design Dump</h1>
-    <span class="badge" id="ver">v3.6</span>
+    <span class="badge" id="ver">v3.7</span>
   </header>
 
   <div class="row">
@@ -311,9 +311,18 @@
         'vectors      ' + im.vectorCount + '\n' +
         'svgs         ' + im.svgCount + '\n' +
         'from paths   ' + (im.svgFallbacks || 0) + '\n' +
-        'still failed ' + ((im.svgFailures || []).length) + '\n' +
+        'named files  ' + ((im.iconAudit && im.iconAudit.distinct) || 0) + ' distinct\n' +
+        (im.iconAudit ? 'icons named  ' + im.iconAudit.resolved + ' of ' + im.iconAudit.vectorsInScope +
+          (im.iconAudit.unresolved.length ? '  ⚠ ' + im.iconAudit.unresolved.length + ' unresolved' : '  ✓ none unresolved') + '\n' : '') +
         'elapsed      ' + (im.elapsedMs / 1000).toFixed(2) + 's\n' +
         'json size    ' + bytes(JSON.stringify(result).length);
+
+      if (im.iconAudit && im.iconAudit.unresolved.length) {
+        for (var u = 0; u < im.iconAudit.unresolved.length; u++) {
+          var un = im.iconAudit.unresolved[u];
+          log.push({ kind: 'err', t: 0, step: 'SVG', message: 'no icon: ' + un.name + ' (' + un.key + ')', nodeId: un.key, nodeName: un.parent || '' });
+        }
+      }
 
       if ((im.svgFailures || []).length) {
         for (var f2 = 0; f2 < im.svgFailures.length; f2++) {
@@ -349,12 +358,24 @@
         'errors       ' + m.errorCount + '\n' +
         'skipped      ' + (m.skippedCount || 0) + '\n' +
         'unique vecs  ' + (m.uniqueVectorCount || 0) + '\n' +
+        (m.iconAudit ? 'icons named  ' + m.iconCount + ' of ' + m.iconAudit.vectorsInScope +
+          (m.iconAudit.unresolved.length ? '  ⚠ ' + m.iconAudit.unresolved.length + ' unresolved' : '  ✓ none unresolved') + '\n' : '') +
         'elapsed      ' + (m.elapsedMs / 1000).toFixed(2) + 's\n' +
         'json size    ' + bytes(json.length) + '\n' +
         'figma api    ' + m.api + ' (' + m.editor + ')';
 
+      /* ما لم تُحلّ أيقونته يُعرض كخطأ صريح، لا يُطمر */
+      if (m.iconAudit && m.iconAudit.unresolved.length) {
+        for (var u = 0; u < m.iconAudit.unresolved.length; u++) {
+          var un = m.iconAudit.unresolved[u];
+          log.push({ kind: 'err', t: 0, step: 'SVG', message: 'no icon: ' + un.name + ' (' + un.key + ')', nodeId: un.key, nodeName: un.parent || '' });
+        }
+        renderIssues();
+      }
+
       $('save').disabled = false;
       $('go').disabled = false;
+      $('icononly').disabled = false;
       setStatus('Done — ' + m.nodeCount + ' nodes' + (m.svgCount ? ', ' + m.svgCount + ' SVGs' : '') + '. Press Download.', m.errorCount ? 'err' : 'ok');
     }
   };

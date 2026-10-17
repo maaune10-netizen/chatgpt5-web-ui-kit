@@ -11,7 +11,7 @@
  * ======================================================================== */
 
 var VERSION = 3;
-var REVISION = 6;
+var REVISION = 7;
 
 figma.showUI(__html__, { width: 460, height: 620, title: 'Design Dump v3' });
 
@@ -115,6 +115,86 @@ function sourceKey(node) {
   var id = node && node.id ? String(node.id) : '';
   var parts = id.split(';');
   return parts[parts.length - 1];
+}
+
+/**
+ * بصمة محتوى — بلا مكتبات تشفير، فمحرّم الإضافة لا يوفّرها.
+ * FNV-1a مزدوجة: ٤٨ بت تكفي ٢٥٨ أيقونة بهامش لا يُقاس.
+ */
+function hashString(s) {
+  var h1 = 0x811c9dc5;
+  var h2 = 0x01000193;
+  for (var i = 0; i < s.length; i++) {
+    var c = s.charCodeAt(i);
+    h1 = Math.imul(h1 ^ c, 16777619) >>> 0;
+    h2 = Math.imul(h2 ^ (c + i), 2246822519) >>> 0;
+  }
+  return (h1.toString(16) + h2.toString(16)).slice(0, 12);
+}
+
+function slugify(s) {
+  return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+}
+
+/* أسماء طبقات لا تدلّ على شيء — الأفضل تسمية عامة */
+var GENERIC_ICON = /^(vector(-\d+)?|shape|union|path|line|group|rectangle|ellipse|icon|subtract|intersect|exclude|mask|fill|frame|image)$/;
+
+/**
+ * أسماء ملفات الأيقونات — تحت مسؤولية الأداة لا المستهلك.
+ *
+ * كان الاسم رقمًا تسلسليًا، فتغيّر المحتوى تحت الاسم نفسه وبقي المتصفح
+ * يعرض القديم. والاسم الآن يحمل بصمة محتواه، فلا يمكن أن يقدّم أحد نسخة
+ * قديمة. ولا يبقى على المستهلك إلا الكتابة.
+ */
+function buildIcons(svgs, index, ids) {
+  var icons = {};
+  var keyOf = {};
+  var order = [];
+
+  for (var i = 0; i < ids.length; i++) {
+    var n = index[ids[i]];
+    if (!n || typeof n.exportAsync !== 'function') continue;
+    if (!isVisible(n)) continue;
+    var k = sourceKey(n);
+    if (!keyOf[k]) { keyOf[k] = n; order.push(k); }
+  }
+
+  var unresolved = [];
+  var byHash = {};
+
+  for (var j = 0; j < order.length; j++) {
+    var key = order[j];
+    var node = keyOf[key];
+    var svg = svgs[key];
+    if (!svg) { unresolved.push({ key: key, name: node.name, parent: node.parent ? node.parent.name : null }); continue; }
+
+    var hash = hashString(svg);
+
+    /* محتوى واحد ← ملف واحد، وإن اختلفت أسماء الطبقات */
+    if (byHash[hash]) { icons[key] = { file: byHash[hash], w: round(node.width) || null, h: round(node.height) || null, dup: true }; continue; }
+
+    var base = slugify(node.name);
+    if (!base || GENERIC_ICON.test(base)) base = 'icon';
+    var file = base + '-' + hash;
+    byHash[hash] = file;
+
+    icons[key] = {
+      file: file,
+      w: round(node.width) || null,
+      h: round(node.height) || null,
+      svg: svg,
+    };
+  }
+
+  return {
+    icons: icons,
+    audit: {
+      vectorsInScope: order.length,
+      resolved: Object.keys(icons).length,
+      distinct: Object.keys(byHash).length,
+      unresolved: unresolved.slice(0, 80),
+    },
+  };
 }
 
 function recordWarning(msg, node) {
@@ -545,7 +625,7 @@ function exportVectors(ids, index, onDone) {
         var out = '';
         for (var k = 0; k < bytes.length; k++) out += String.fromCharCode(bytes[k]);
         if (!out || out.indexOf('<svg') === -1) { lastReason = 'empty svg'; return step(); }
-        svgs[nodeId] = out;
+        svgs[key] = out;
         exported++;
         keyAt++;
         candAt = 0;
@@ -560,7 +640,7 @@ function exportVectors(ids, index, onDone) {
         /* التصدير فشل — لكن المسار موجود. ابنِ الأيقونة بنفسك. */
         var fb = svgFromGeometry(node);
         if (fb) {
-          svgs[nodeId] = fb;
+          svgs[key] = fb;
           fallbacks++;
           exported++;
           keyAt++;
@@ -637,7 +717,8 @@ figma.ui.onmessage = function (msg) {
 
       mark('Preparing ' + vectorIds.length + ' vectors');
       exportVectors(vectorIds, index, function (svgs, exported, fails, fallbacks) {
-        mark('Exported ' + exported + ' icons' + (fallbacks ? ' (' + fallbacks + ' from paths)' : ''));
+        var built = buildIcons(svgs, index, vectorIds);
+        mark('Exported ' + exported + ' icons · ' + Object.keys(built.icons).length + ' named' + (fallbacks ? ' (' + fallbacks + ' from paths)' : ''));
         send('icons', {
           iconsOnly: true,
           meta: {
@@ -649,7 +730,9 @@ figma.ui.onmessage = function (msg) {
             svgCount: Object.keys(svgs).length,
             svgFailures: fails || [],
             svgFallbacks: fallbacks || 0,
+            iconAudit: built.audit,
           },
+          icons: built.icons,
           svgs: svgs,
         });
       });
@@ -744,6 +827,7 @@ figma.ui.onmessage = function (msg) {
 
         function finish(svgs, svgFails, fallbacks) {
           mark('Packaging');
+          var built = svgs ? buildIcons(svgs, index, vectorIds) : { icons: {}, audit: null };
           var payload = {
             meta: {
               version: VERSION,
@@ -761,11 +845,14 @@ figma.ui.onmessage = function (msg) {
               uniqueVectorCount: uniqueCount,
               svgFailures: svgFails || [],
               svgFallbacks: fallbacks || 0,
+              iconCount: Object.keys(built.icons).length,
+              iconAudit: built.audit,
               revision: REVISION,
               api: figma.apiVersion || 'unknown',
               editor: figma.editorType || 'unknown',
             },
             nodes: flat,
+            icons: built.icons,
             svgs: svgs,
             diagnostics: { stages: stages, errors: errors, warnings: warnings, skipped: skipped.slice(0, 200) },
           };

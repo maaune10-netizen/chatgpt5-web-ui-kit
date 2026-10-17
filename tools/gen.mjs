@@ -62,33 +62,56 @@ const iconOf = {};        // nodeId -> filename (بدون svg)
 const seenHash = new Map();
 let dupes = 0;
 
-for (const [nodeId, svg] of Object.entries(j.svgs || {})) {
-  if (!svg) continue;
-  const hash = createHash('sha1').update(svg.replace(/\s+/g, ' ').trim()).digest('hex').slice(0, 12);
-  if (seenHash.has(hash)) { iconOf[nodeId] = seenHash.get(hash); dupes++; continue; }
+/* خريطة واحدة بمفتاح المصدر: تُملأ من الأداة، أو تُشتقّ من svgs في تصدير قديم */
+const iconBySource = {};
 
-  const node = byId[nodeId];
-  let base = slugify(node && node.name);
-  if (!base || GENERIC.test(base)) base = 'icon';
+/*
+ * أداة التصدير هي التي تسمّي الملفات وتبصم محتواها.
+ *
+ * كان المولّد يشتقّ الأسماء بنفسه، فمرّ الخطأ مرّتين: مرة حين كانت الأسماء
+ * رقمية فتجاوزها التخزين، ومرة حين فشلت أيقونة من غير أن يعلم أحد.
+ * والأداة تملك الطبقات والأحجام، فهي أولى بالاسم وبالبصمة. ونحن نكتب فقط.
+ */
+if (j.icons && Object.keys(j.icons).length) {
+  for (const [key, rec] of Object.entries(j.icons)) {
+    if (!rec || !rec.file) continue;
+    /*
+     * سجّل كل مفتاح — حتى الذي يشير إلى ملف أيقونة أخرى.
+     * المحتوى المتطابق يُكتب مرة واحدة، فيأتي المكرّر بلا svg لكن بملف صالح.
+     * وتجاهله كان يُسقط ١٥ أيقونة لمجرد أن شكلها مكرّر.
+     */
+    if (rec.svg) writeFileSync(join(ICON_DIR, rec.file + '.svg'), cleanSvg(rec.svg));
+    iconBySource[key] = rec.file;
+    seenHash.set(key, rec.file);
+  }
+  if (j.meta && j.meta.iconAudit) {
+    const a = j.meta.iconAudit;
+    console.log('icons: ' + a.resolved + ' of ' + a.vectorsInScope + ' named by the plugin' +
+      (a.unresolved.length ? ' | ' + a.unresolved.length + ' UNRESOLVED: ' +
+        a.unresolved.map((u) => u.name + '(' + u.key + ')').join(', ') : ' | none unresolved'));
+  }
+} else {
+  /* مسار قديم: تصدير لا يحمل خريطة icons */
+  for (const [nodeId, svg] of Object.entries(j.svgs || {})) {
+    if (!svg) continue;
+    const hash = createHash('sha1').update(svg.replace(/\s+/g, ' ').trim()).digest('hex').slice(0, 12);
+    if (seenHash.has(hash)) { iconOf[nodeId] = seenHash.get(hash); dupes++; continue; }
 
-  /*
-   * الاسم يحمل بصمة المحتوى.
-   * الأسماء الثابتة كانت تُخزَّن في المتصفح: أعيد التوليد فبقي الخادم يقدّم
-   * الأيقونة القديمة تحت الاسم نفسه، فظهرت «نسخ» شخصًا و«إعادة» نجمة.
-   * وبصمة في الاسم تجعل ذلك مستحيلًا، وتزيد فاعلية التخزين أيضًا.
-   */
-  const name = base + '-' + hash.slice(0, 8);
+    const node = byId[nodeId];
+    let base = slugify(node && node.name);
+    if (!base || GENERIC.test(base)) base = 'icon';
 
-  writeFileSync(join(ICON_DIR, name + '.svg'), cleanSvg(svg));
-  seenHash.set(hash, name);
-  iconOf[nodeId] = name;
+    /* الاسم يحمل بصمة المحتوى — فلا يمكن أن يخدّم أحد نسخة قديمة */
+    const name = base + '-' + hash.slice(0, 8);
+    writeFileSync(join(ICON_DIR, name + '.svg'), cleanSvg(svg));
+    seenHash.set(hash, name);
+    iconOf[nodeId] = name;
+  }
 }
 
 /*
- * إزالة التكرار تعني أن الأيقونة تُصدَّر لأول نسخة تُصادفها فقط.
- * فنبني خريطة بمفتاح المصدر (آخر جزء من المعرّف المركّب) لتجدها كل الشاشات.
+ * إكمال ما نقص: أي مفتاح مُشتق لم تُسمّه الأداة.
  */
-const iconBySource = {};
 for (const [nodeId, name] of Object.entries(iconOf)) {
   if (!name) continue;
   const key = String(nodeId).split(';').pop();
@@ -106,13 +129,13 @@ for (const n of j.nodes) {
 
 /* خريطة بسيطة: اسم → ملف، لاستخدامها في الكود */
 const catalog = {};
-for (const [, name] of Object.entries(iconOf)) {
+for (const [, name] of Object.entries(iconBySource)) {
   if (name) catalog[name] = 'generated-icons/' + name + '.svg';
 }
 writeFileSync(join(ROOT, 'src/generated-icons/catalog.json'), JSON.stringify(catalog, null, 2));
 writeFileSync('/tmp/icon-map.json', JSON.stringify(iconOf));
 
-console.log('icons:', seenHash.size, '| dupes:', dupes, '| vectors without svg:', iconFallback);
+console.log('icons:', Object.keys(iconBySource).length, '| files:', Object.keys(catalog).length, '| dupes:', dupes, '| vectors without svg:', iconFallback);
 
 /* ============ 3) سلّم الطباعة (من قسم Typography في نفس الملف) ============ */
 /* قِيَم معروفة من التحليل: lh → size */
@@ -299,7 +322,8 @@ for (const [id, slug] of SCREENS) {
   }));
 
   const inferred = nodes.filter((n) => n._inferred).length;
-  written.push({ id, slug, name: screen.name, nodes: nodes.length, inferred });
+  const missing = nodes.filter((n) => n.missingIcon).length;
+  written.push({ id, slug, name: screen.name, nodes: nodes.length, inferred, missing });
 }
 
 writeFileSync(join(OUT, 'index.json'), JSON.stringify(
@@ -308,3 +332,17 @@ writeFileSync(join(OUT, 'index.json'), JSON.stringify(
 
 console.log('\nscreens:', written.length);
 for (const w of written) console.log('  ' + w.slug.padEnd(30) + String(w.nodes).padStart(5) + ' nodes, ' + String(w.inferred).padStart(4) + ' fonts inferred');
+
+/*
+ * حارس: أي متجه مرئي بلا أيقونة خلل، لا تفصيل.
+ * كان يمرّ صامتًا فيظهر صفّ الأزرار ناقصًا بلا أن يعلم أحد.
+ */
+const missing = written.reduce((a, w) => a + (w.missing || 0), 0);
+if (missing) {
+  console.log('\n⚠  ' + missing + ' visible vector(s) have no icon:');
+  for (const w of written) if (w.missing) console.log('     ' + w.slug + '  ' + w.missing);
+  console.log('   Re-export with plugin v3.7 or newer.');
+  process.exitCode = 1;
+} else {
+  console.log('\nno visible vector is missing an icon');
+}
