@@ -47,20 +47,9 @@ export interface ScreenData {
   nodes: ScreenNode[];
 }
 
-/** خرائط الأيقونات: الاسم → الرابط */
-export const iconUrls: Record<string, string> = (() => {
-  const mods = import.meta.glob('../generated-icons/*.svg', {
-    eager: true,
-    query: '?url',
-    import: 'default',
-  }) as Record<string, string>;
-  const out: Record<string, string> = {};
-  for (const [path, url] of Object.entries(mods)) {
-    const name = path.split('/').pop()!.replace('.svg', '');
-    out[name] = url;
-  }
-  return out;
-})();
+/** خرائط الأيقونات: الاسم → الرابط — تُقرأ وقت التشغيل من src/lib/icons.ts */
+import { iconUrls } from './icons';
+export { iconUrls };
 
 const JUSTIFY: Record<string, CSSProperties['justifyContent']> = {
   MIN: 'flex-start',
@@ -141,7 +130,7 @@ export function renderScreen(screen: ScreenData, opts: RenderOptions = {}): Reac
         {n.t === 'TEXT' ? (
           <span
             style={{
-              fontFamily: n.ff,
+              fontFamily: n.ff ? '"' + n.ff.replace(/"/g, '') + '", var(--font-emoji)' : 'var(--font-emoji)',
               fontSize: n.fs,
               fontWeight: n.fw,
               lineHeight: n.lh ? n.lh + 'px' : undefined,

@@ -37,7 +37,11 @@ const byId = {};
 for (const n of j.nodes) byId[n.id] = n;
 
 /* ============ 2) الأيقونات: nodeId → ملف ============ */
-const ICON_DIR = join(ROOT, 'src/generated-icons');
+/*
+ * تُكتب في public/ لأنها تُقدَّم ساكنة وتُقرأ وقت التشغيل.
+ * ولو كُتبت في src/ لاحتاجت قائمة Vite إلى إعادة بناء بعد كل تسمية جديدة.
+ */
+const ICON_DIR = join(ROOT, 'public/generated-icons');
 rmSync(ICON_DIR, { recursive: true, force: true });
 mkdirSync(ICON_DIR, { recursive: true });
 
@@ -132,7 +136,7 @@ const catalog = {};
 for (const [, name] of Object.entries(iconBySource)) {
   if (name) catalog[name] = 'generated-icons/' + name + '.svg';
 }
-writeFileSync(join(ROOT, 'src/generated-icons/catalog.json'), JSON.stringify(catalog, null, 2));
+writeFileSync(join(ICON_DIR, 'catalog.json'), JSON.stringify(catalog, null, 2));
 writeFileSync('/tmp/icon-map.json', JSON.stringify(iconOf));
 
 console.log('icons:', Object.keys(iconBySource).length, '| files:', Object.keys(catalog).length, '| dupes:', dupes, '| vectors without svg:', iconFallback);

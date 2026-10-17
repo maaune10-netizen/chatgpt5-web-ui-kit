@@ -12,7 +12,14 @@
   --color-upsell: #373669;
   --color-avatar: #3c6ac3;
   --color-muted: #afafaf;
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /*
+   * سلسلة الإيموجي صريحة لا ضمنية.
+   * بلاها يسقط الرمز على أول خط في النظام يحتوي شكله — وقد يكون أحاديّ
+   * اللون، فيظهر 🟢 دائرة بيضاء بدل دائرة خضراء.
+   */
+  --font-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+    "Twemoji Mozilla", "EmojiOne Color", "Android Emoji", "Segoe UI Symbol", sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", var(--font-emoji);
 }
 
 html, body, #root { height: 100%; }

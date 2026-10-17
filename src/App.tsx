@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { renderScreen, type ScreenData, type ScreenNode } from './lib/render';
+import { preloadIcons, onIconsLoaded } from './lib/icons';
 
 /* كل الشاشات المُستخرجة من ملف Figma */
 const modules = import.meta.glob('./screens-data/*.json', { eager: true, import: 'default' }) as Record<
@@ -31,6 +32,16 @@ const NAV_TARGETS: Record<string, string> = {
 };
 
 export default function App() {
+  /*
+   * الأيقونات تُحمَّل بعد الإقلاع. الواجهة تُعيد الرسم عند وصولها،
+   * فلا حاجة إلى إعادة تشغيل الخادم بعد كل إعادة توليد.
+   */
+  const [, setIconsReady] = useState(0);
+  useEffect(() => {
+    preloadIcons();
+    return onIconsLoaded(() => setIconsReady((n) => n + 1));
+  }, []);
+
   const [slug, setSlug] = useState(SCREENS[0]?.slug ?? '');
   const [pickerOpen, setPickerOpen] = useState(false);
   const [zoom, setZoom] = useState(1);
