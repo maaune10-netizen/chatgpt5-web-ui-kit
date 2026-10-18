@@ -123,6 +123,11 @@ export function renderScreen(screen: ScreenData, opts: RenderOptions = {}): Reac
   // العقد مرتّبة DFS؛ نبني الشجرة بالعمق
   const stack: Array<{ depth: number; children: ReactNode[] }> = [{ depth: -1, children: out }];
 
+  /* فهرس المقطع: اسم وموضع متطابقان يتكرّران فعلًا (نفس العنصر مرسومًا
+     مرّتين)، فالمفتاح يحتاج ترتيبًا لا موضعًا فقط — وإلا حذّر React
+     وأعاد استخدام العناصر خطأً. */
+  let seq = 0;
+
   for (const n of nodes) {
     const depth = n.d ?? 0;
     while (stack.length > 1 && stack[stack.length - 1].depth >= depth) stack.pop();
@@ -132,7 +137,7 @@ export function renderScreen(screen: ScreenData, opts: RenderOptions = {}): Reac
 
     const inner: ReactNode = (
       <div
-        key={n.x + ':' + n.y + ':' + n.n}
+        key={seq++ + ':' + n.d + ':' + n.x + ':' + n.y + ':' + n.n}
         style={{ ...boxStyle(n), ...flexStyle(n) }}
         data-name={n.n}
         onClick={clickable ? () => opts.onNodeClick?.(n) : undefined}
