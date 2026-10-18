@@ -54,11 +54,23 @@ export function Composer({
         style={{
           background: C.input,
           borderRadius: L.inputRadius,
-          /* 56 ارتفاعًا في التصميم: النص 24 وحشو 16 */
-          /* غير مسجَّل: 768x102 من New Chat - Logged Out؛ ومسجَّل: 768x56 */
-          height: tall ? 102 : L.inputH,
-          paddingTop: tall ? 12 : 0,
-          paddingBottom: tall ? 12 : 0,
+          /*
+           * `minHeight` لا `height`.
+           *
+           * كان الارتفاع ثابتًا ٥٦ ومربّع الكتابة يكبر حتى ٢٠٠ — فالنصّ الطويل
+           * يتجاوز الحاوية **فيُقطع**. وقياس: نصّ يحتاج ١٣٦px وحاويته ٥٦،
+           * أي ٨٠ بكسل من النصّ مختفية بلا تمرير.
+           *
+           * والتصميم محفوظ: ٥٦ حين يكون فارغًا (٧٦٨x٥٦)، و١٠٢ لغير المسجَّل
+           * (٧٦٨x١٠٢) — وهي حدود دنيا لا سقوف.
+           */
+          minHeight: tall ? 102 : L.inputH,
+          /*
+           * حشو رأسيّ ٨ في الوضع العاديّ: ٨ + ٤٠ + ٨ = ٥٦، فيبقى التصميم كما هو.
+           * ووجود الحشو هو ما يجعل الأزرار تلتصق بالأسفل لا بالحدّ نفسه.
+           */
+          paddingTop: tall ? 12 : 8,
+          paddingBottom: tall ? 12 : 8,
           boxShadow: focused ? INPUT_SHADOW + ', 0 0 0 1px var(--c-line)' : INPUT_SHADOW,
         }}
       >
@@ -66,7 +78,7 @@ export function Composer({
           type="button"
           title="Add photos & files"
           onClick={() => fileRef.current?.click()}
-          className="grid h-8 w-8 shrink-0 place-items-center self-center rounded-full hover:bg-white/10"
+          className="grid h-8 w-8 shrink-0 place-items-center self-end rounded-full hover:bg-white/10"
         >
           <Icon name="add" size={20} />
         </button>
@@ -105,15 +117,27 @@ export function Composer({
           }}
           rows={1}
           placeholder={placeholder}
-          className="flex-1 resize-none bg-transparent py-2 outline-none placeholder:text-[var(--c-placeholder)]"
-          style={{ fontFamily: FONT.sans, fontSize: 16, lineHeight: '24px', color: C.text, minHeight: 24, alignSelf: 'center' }}
+          /*
+           * `maxHeight` هنا يطابق سقف الكبر في `useEffect` (٢٠٠) فيتحوّل
+           * إلى تمرير داخلي بدل أن يدفع الصفحة.
+           */
+          className="flex-1 resize-none overflow-y-auto bg-transparent py-2 outline-none placeholder:text-[var(--c-placeholder)]"
+          style={{
+            fontFamily: FONT.sans,
+            fontSize: 16,
+            lineHeight: '24px',
+            color: C.text,
+            minHeight: 24,
+            maxHeight: 200,
+            alignSelf: 'center',
+          }}
           disabled={disabled}
         />
 
         <button
           type="button"
           title="Dictate"
-          className="grid h-8 w-8 shrink-0 place-items-center self-center rounded-full hover:bg-white/10"
+          className="grid h-8 w-8 shrink-0 place-items-center self-end rounded-full hover:bg-white/10"
         >
           <Icon name="microphone" size={20} />
         </button>
@@ -123,7 +147,7 @@ export function Composer({
             type="button"
             title="Stop"
             onClick={onStop}
-            className="grid h-9 w-9 shrink-0 place-items-center self-center rounded-full"
+            className="grid h-9 w-9 shrink-0 place-items-center self-end rounded-full"
             style={{ background: '#ffffff', color: '#000000' }}
           >
             <Icon name="stop" size={18} style={{ opacity: 1 }} />
@@ -134,7 +158,7 @@ export function Composer({
             title="Use voice mode"
             onClick={canSend ? onSend : undefined}
             disabled={!canSend}
-            className="grid h-9 w-9 shrink-0 place-items-center self-center rounded-full transition-colors"
+            className="grid h-9 w-9 shrink-0 place-items-center self-end rounded-full transition-colors"
             style={{
               background: canSend ? '#ffffff' : 'var(--c-active)',
               cursor: canSend ? 'pointer' : 'default',
