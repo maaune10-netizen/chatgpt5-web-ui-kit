@@ -54,3 +54,26 @@ export function loadIcons(): Promise<void> {
 export function preloadIcons(): void {
   void loadIcons();
 }
+
+/**
+ * خطّاف: هل وصلت الأيقونات؟
+ *
+ * يُعيد رقمًا يزداد عند كل تحميل، فتُعاد الواجهة رسمها. وبلا هذا كانت
+ * الأيقونات تُرسم مرة واحدة قبل الجلب فلا تظهر أبدًا.
+ */
+import { useEffect, useState } from 'react';
+
+export function useIconsReady(): boolean {
+  const [ready, setReady] = useState(() => Object.keys(iconUrls).length > 0);
+  useEffect(() => {
+    if (ready) return;
+    let alive = true;
+    const off = onIconsLoaded(() => alive && setReady(true));
+    void loadIcons();
+    return () => {
+      alive = false;
+      off();
+    };
+  }, [ready]);
+  return ready;
+}

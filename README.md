@@ -1,70 +1,47 @@
-# ChatGPT 5 Web — UI Kit → code
+# ChatGPT 5 — Web UI Kit
 
-A working React implementation of the **ChatGPT 5 Web: Free UI Kit & Prototype**
-Figma file, built by extracting the design's real numbers instead of eyeballing it.
+تطبيق محادثة يعمل، مبنيّ من ملف Figma حقيقي. وضعان:
 
-Source: https://www.figma.com/design/J4mMUwLS0Mg1Ll5j6gH5wL  (`133:6239` — New Chat, Logged In)
+- **App** — تطبيق تفاعلي: اكتب، أرسل، واستقبل من النموذج بثًّا.
+- **Design** — الشاشات الأربع والعشرون المُستخرجة من Figma بكسلًا ببكسل.
 
-## Where the numbers come from
+المبدّل أسفل يمين الشاشة.
 
-The Figma node tree was pulled through the REST API and flattened into
-[`specs/chatgpt5-newchat.txt`](specs/chatgpt5-newchat.txt) — 175 visible nodes with
-absolute positions, auto-layout direction, padding, gaps, fills (including alpha),
-strokes, corner radii and effects.
-
-Design tokens taken straight from that file:
-
-| Token | Value | Where |
-|---|---|---|
-| `--color-body` | `#212121` | app background |
-| `--color-sidebar` | `#181818` | sidebar surface |
-| `--color-line` | `#3e3e3e` | 1px dividers |
-| `--color-input` | `#303030` | prompt field |
-| `--color-upsell` | `#373669` | "Get Plus" pill |
-| `--color-avatar` | `#3c6ac3` | profile circle |
-| `--color-muted` | `#afafaf` | secondary text |
-
-Type is **Inter**: 14/19.7 for menu rows, 12/15.6 for secondary, 13/18.5 for buttons,
-16/24 for the prompt field, 30/36 semibold for the empty-state title, and
-18/27.9 `-0.72px` for the model selector.
-
-The prompt field uses the kit's exact three-layer shadow:
-
-```css
-box-shadow:
-  inset 0 1px 0 0 rgb(255 255 255 / 0.13),
-  0 8px 16px 0 rgb(0 0 0 / 0.10),
-  0 1.5px 3px 0 rgb(0 0 0 / 0.45);
-```
-
-## Fidelity check
-
-Rendered at the frame's own size (1440×1024) and compared row by row against the
-Figma export. All 19 sidebar rows land within 1px, and the title's text band is
-identical (`432–459`):
-
-```
-REFERENCE  26, 78, 114, 150, 198, 234, 271, 307, 363, 398, 434, 471, 507, 542, 598, 635, 671, 707, 990
-OURS       26, 77, 113, 150, 198, 234, 270, 306, 363, 398, 434, 471, 507, 542, 598, 635, 671, 707, 990
-```
-
-## Run
+## التشغيل
 
 ```bash
 npm install
-npm run dev     # http://localhost:5180
-npm run build
+cp .env.example .env.local     # ثم ضع المفتاح
+node server/proxy.mjs &        # الوسيط — يحمل المفتاح
+npm run dev                    # http://localhost:5180
 ```
 
-## What is still missing
+## لماذا وسيط؟
 
-The Figma API rate-limited this account (a ~4-day `retry-after`) after two of the
-eighteen screens were read, and the MCP server hit the Starter plan's tool-call
-limit. So:
+سببان، وأولهما ليس الأهم:
 
-- **Built from real data:** New Chat — Logged In
-- **Not yet extracted:** the other 17 screens. They are listed in
-  [`src/screens.ts`](src/screens.ts) with their node ids and render a placeholder
-  shell until their node trees can be read.
+1. **المفتاح لا يصل المتصفح.** لو نادى المتصفح المزوّد مباشرةً لكان المفتاح
+   في الصفحة لكل من يفتح أدوات المطوّر.
+2. المزوّد لا يسمح بأصل المتصفح (CORS)، فالطلب المباشر يفشل أصلًا.
 
-`specs/` also keeps the raw node dumps used for the build.
+## البنية
+
+```
+public/screens/         ٢٤ شاشة مستخرجة (بيانات، تُقرأ وقت التشغيل)
+public/generated-icons/ ٢٥١ أيقونة من Figma
+public/generated-images/٤٧ صورة من Figma
+src/app/                التطبيق التفاعلي
+src/lib/                الرموز، عميل النموذج، عارض الشاشات
+tools/                  مولّدات وأدوات فحص
+figma-plugin/           إضافة التصدير (v3.8)
+```
+
+## الأدوات
+
+```bash
+node tools/gen.mjs              # أعِد توليد الشاشات من التصدير
+node tools/build-icon-map.mjs   # ولّد خريطة الأيقونات
+node tools/build-account-menu.mjs
+node tools/sweep.mjs            # افتح كل الشاشات وتحقّق منها
+node tools/merge-icons.mjs      # ادمج تصدير أصول في تصدير سابق
+```
