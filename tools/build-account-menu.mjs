@@ -186,7 +186,8 @@ const idxPath = join(ROOT, 'public/screens/index.json');
 try {
   const idx = JSON.parse(readFileSync(idxPath, 'utf8'));
   const without = idx.filter((e) => e.slug !== 'account-menu');
-  without.push({ slug: 'account-menu', name: screen.name, node: 'composed', count: screen.nodes.length });
+  /* الوسم مهم: يميّزها عن الشاشات المُستخرجة كي لا يمحوها المولّد */
+  without.push({ slug: 'account-menu', name: screen.name, node: 'composed', count: screen.nodes.length, composed: true });
   without.sort((a, b) => a.name.localeCompare(b.name));
   writeFileSync(idxPath, JSON.stringify(without, null, 2));
 } catch (e) {

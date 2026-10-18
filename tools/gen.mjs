@@ -42,8 +42,17 @@ for (const n of j.nodes) byId[n.id] = n;
  * ولو كُتبت في src/ لاحتاجت قائمة Vite إلى إعادة بناء بعد كل تسمية جديدة.
  */
 const ICON_DIR = join(ROOT, 'public/generated-icons');
-rmSync(ICON_DIR, { recursive: true, force: true });
+/*
+ * احذف المحتوى لا المجلد.
+ *
+ * كان يحذف المجلد وي recreatesه، فتفقد Vite فهرسه للحظة — وخلالها يخدم
+ * index.html مكان catalog.json، فيقرأ المتصفح HTML على أنه JSON ويفشل بلا
+ * سبب ظاهر. وإبقاء المجلد قائمًا يزيل تلك اللحظة تمامًا.
+ */
 mkdirSync(ICON_DIR, { recursive: true });
+for (const f of readdirSync(ICON_DIR)) {
+  if (f !== 'catalog.json') unlinkSync(join(ICON_DIR, f));
+}
 
 /** يزيل خلفية الإطار والحدود التي يضيفها Figma عند التصدير */
 function cleanSvg(svg) {
@@ -175,8 +184,26 @@ function lineHeightFor(size, h) {
  * في العارض أو في المولّد.
  */
 const OUT = join(ROOT, 'public/screens');
-rmSync(OUT, { recursive: true, force: true });
+/*
+ * لا تمحُ الشاشات المُركّبة.
+ * كانت هذه الأسطر تحذف المجلد كاملًا، فتمسح account-menu.json — ثم يبحث
+ * الدمج في الفهرس عن ملف لم يعد موجودًا، فيختفي من المنتقي بلا إنذار.
+ * والوسم `composed` هو ما يميّز ما كتبته أداة أخرى عمّا نولّده هنا.
+ */
 mkdirSync(OUT, { recursive: true });
+const keepComposed = [];
+try {
+  const prevIdx = JSON.parse(readFileSync(join(OUT, 'index.json'), 'utf8'));
+  for (const e of prevIdx) {
+    if (e.composed && existsSync(join(OUT, e.slug + '.json'))) keepComposed.push(e);
+  }
+} catch (e) { /* أول تشغيل */ }
+for (const f of readdirSync(OUT)) {
+  if (!f.endsWith('.json') || f === 'index.json') continue;
+  const slug = f.replace(/\.json$/, '');
+  if (keepComposed.some((e) => e.slug === slug)) continue;
+  unlinkSync(join(OUT, f));
+}
 
 /*
  * كل شاشة في قسم «Example Prototype - Dark Mode».
@@ -267,8 +294,9 @@ const rgba = hexToRgba;
  * وحقنها كـdata URL كان سيضخّم بيانات الشاشة بميغابايتات.
  */
 const IMG_DIR = join(ROOT, 'public/generated-images');
-rmSync(IMG_DIR, { recursive: true, force: true });
+/* احذف المحتوى لا المجلد — للسبب نفسه في الأيقونات */
 mkdirSync(IMG_DIR, { recursive: true });
+for (const f of readdirSync(IMG_DIR)) unlinkSync(join(IMG_DIR, f));
 
 const extOf = (url) => {
   const m = /^data:(image\/[a-z+]+);base64,/.exec(url);
@@ -411,9 +439,17 @@ for (const [id, slug] of SCREENS) {
   written.push({ id, slug, name: SCREEN_TITLES[slug] || screen.name, nodes: nodes.length, inferred, missing });
 }
 
-writeFileSync(join(OUT, 'index.json'), JSON.stringify(
-  written.map((w) => ({ slug: w.slug, name: w.name, node: w.id, count: w.nodes })),
-  null, 2));
+/*
+ * الفهرس يُدمج لا يُستبدل.
+ * الشاشات المُركّبة — كقائمة الحساب — تُكتب بأدوات أخرى، وكان المولّد
+ * يمحو مُدخلها من الفهرس فيختفي من المنتقي بعد كل إعادة توليد.
+ */
+const generated = written.map((w) => ({ slug: w.slug, name: w.name, node: w.id, count: w.nodes }));
+const generatedSlugs = new Set(generated.map((g) => g.slug));
+const extra = keepComposed.filter((e) => !generatedSlugs.has(e.slug));
+const index = [...generated, ...extra].sort((a, b) => a.name.localeCompare(b.name));
+writeFileSync(join(OUT, 'index.json'), JSON.stringify(index, null, 2));
+if (extra.length) console.log('kept ' + extra.length + ' composed screen(s): ' + extra.map((e) => e.slug).join(', '));
 
 console.log('\nscreens:', written.length);
 for (const w of written) console.log('  ' + w.slug.padEnd(30) + String(w.nodes).padStart(5) + ' nodes, ' + String(w.inferred).padStart(4) + ' fonts inferred');

@@ -3,7 +3,8 @@
     "slug": "account-menu",
     "name": "Account Menu (composed)",
     "node": "composed",
-    "count": 34
+    "count": 34,
+    "composed": true
   },
   {
     "slug": "explore-gpt-details",
