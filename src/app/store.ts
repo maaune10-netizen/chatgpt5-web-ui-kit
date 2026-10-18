@@ -184,6 +184,19 @@ export function useStore() {
   const api = useMemo(
     () => ({
       async newChat(projectId: string | null = null, temporary = false): Promise<string> {
+        /*
+         * إن كانت المفتوحة فارغة بالفعل فلا ننشئ أخرى.
+         * وكان كل ضغط يُضيف محادثة فارغة، فيمتلئ الشريط بعشرات «New chat»
+         * لا معنى لها — وهذا ما يفعله ChatGPT: الضغط وأنت في فارغة لا يفعل شيئًا.
+         */
+        {
+        const c0 = state.tempConv ?? state.conversations.find((c) => c.id === state.activeId);
+        if (!temporary && c0 && c0.messages.length === 0 && !c0.projectId && !c0.pinned) {
+          patch((s) => ({ ...s, temporary: false, tempConv: null, view: 'chat', viewArg: null }));
+          return c0.id;
+        }
+        }
+
         const local: Conversation = {
           id: uid('c'),
           title: temporary ? 'Temporary chat' : 'New chat',
@@ -469,7 +482,7 @@ export function useStore() {
         errors.current = fn;
       },
     }),
-    [patch, patchConversation, patchMessage, state.conversations, state.model, state.tempConv, load],
+    [patch, patchConversation, patchMessage, state.conversations, state.model, state.tempConv, state.activeId, load],
   );
 
   return { state, active, ...api };

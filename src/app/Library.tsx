@@ -65,7 +65,7 @@ export function Library({ store, onOpenImage }: { store: Store; onOpenImage: (sr
                 type="button"
                 onClick={() => (it.kind === 'image' ? onOpenImage(it.url, it.name) : undefined)}
                 className="group relative aspect-square overflow-hidden"
-                style={{ background: it.kind === 'image' ? '#3a3a3a' : C.raised }}
+                style={{ background: it.kind === 'image' ? 'var(--c-pill)' : C.raised }}
                 title={it.name}
               >
                 {it.kind === 'image' ? (

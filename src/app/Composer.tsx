@@ -105,7 +105,7 @@ export function Composer({
           }}
           rows={1}
           placeholder={placeholder}
-          className="flex-1 resize-none bg-transparent py-2 outline-none placeholder:text-[#8f8f8f]"
+          className="flex-1 resize-none bg-transparent py-2 outline-none placeholder:text-[var(--c-placeholder)]"
           style={{ fontFamily: FONT.sans, fontSize: 16, lineHeight: '24px', color: C.text, minHeight: 24, alignSelf: 'center' }}
           disabled={disabled}
         />

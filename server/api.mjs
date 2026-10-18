@@ -119,6 +119,24 @@ function addColumn(table, col, decl) {
 addColumn('conversations', 'archived', 'INTEGER NOT NULL DEFAULT 0');
 addColumn('conversations', 'sort_order', 'INTEGER NOT NULL DEFAULT 0');
 
+/*
+ * نظّف المحادثات الفارغة المتروكة.
+ * كل ضغطة على «New Chat» كانت تُنشئ واحدة، فتراكمت عشرات بلا رسائل —
+ * ولا معنى لها في القائمة. والواجهة لم تعد تُنشئها، وهذا يزيل القديم.
+ */
+(function tidyEmpty() {
+  try {
+    const n = db.prepare(
+      `DELETE FROM conversations
+       WHERE temporary = 0 AND pinned = 0 AND project_id IS NULL
+         AND id NOT IN (SELECT DISTINCT conversation_id FROM messages)`,
+    ).run().changes;
+    if (n) console.log('[api] removed ' + n + ' empty conversation(s)');
+  } catch (e) {
+    console.warn('[api] tidy skipped:', e.message);
+  }
+})();
+
 const log = (kind, detail) => {
   try {
     db.prepare('INSERT INTO events (at, kind, detail) VALUES (?, ?, ?)').run(

@@ -74,7 +74,7 @@ export function MessageRow({
               rel="noreferrer"
               title={c.title}
               className="grid h-6 w-6 place-items-center rounded-full text-[10px] font-medium hover:brightness-110"
-              style={{ background: '#3a3a3a', color: C.muted }}
+              style={{ background: 'var(--c-pill)', color: C.muted }}
             >
               {i + 1}
             </a>
@@ -141,7 +141,7 @@ function Action({
       onClick={onClick}
       className="grid h-8 w-8 place-items-center rounded-lg transition-colors hover:bg-white/10"
       /* التصويت المُختار يُلوَّن بدل فلتر على الرمز */
-      style={{ color: active ? '#7ab2ff' : 'inherit' }}
+      style={{ color: active ? 'var(--c-link)' : 'inherit' }}
     >
       <Icon name={name} size={18} style={{ opacity: active ? 1 : 0.7 }} />
     </button>
@@ -187,7 +187,7 @@ function Reasoning({ text, live }: { text: string; live?: boolean }) {
       {open && (
         <pre
           className="mt-1 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-lg px-3 py-2"
-          style={{ fontFamily: FONT.sans, fontSize: 13, lineHeight: '19px', color: C.dim, background: 'rgba(255,255,255,0.03)' }}
+          style={{ fontFamily: FONT.sans, fontSize: 13, lineHeight: '19px', color: C.dim, background: 'var(--c-subtle)' }}
         >
           {text}
         </pre>

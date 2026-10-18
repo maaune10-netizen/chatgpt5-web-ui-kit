@@ -30,7 +30,7 @@ function Overlay({
       <div
         onClick={(e) => e.stopPropagation()}
         className="overflow-hidden rounded-2xl"
-        style={{ width, background: '#2b2b2b', boxShadow: MENU_SHADOW, border: `1px solid ${C.line}`, maxHeight: '85vh' }}
+        style={{ width, background: 'var(--c-modal)', boxShadow: MENU_SHADOW, border: `1px solid ${C.line}`, maxHeight: '85vh' }}
       >
         {children}
       </div>
@@ -117,7 +117,7 @@ export function ShareModal({ onClose, title, body }: { onClose: () => void; titl
       </div>
 
       <div className="p-4">
-        <div className="rounded-xl" style={{ background: '#232323', border: `1px solid ${C.line}` }}>
+        <div className="rounded-xl" style={{ background: 'var(--c-modal-2)', border: `1px solid ${C.line}` }}>
           <div className="px-4 py-3" style={{ borderBottom: `1px solid ${C.line}` }}>
             <p style={{ fontSize: 15, fontWeight: 600 }}>{title}</p>
           </div>
@@ -140,7 +140,7 @@ export function ShareModal({ onClose, title, body }: { onClose: () => void; titl
           ))}
         </div>
         {copied && (
-          <p className="mt-3 text-center" style={{ fontSize: 12, color: '#8ee6a0' }}>
+          <p className="mt-3 text-center" style={{ fontSize: 12, color: 'var(--c-ok)' }}>
             Link copied
           </p>
         )}
@@ -183,7 +183,7 @@ export function SearchModal({
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search chats"
-          className="flex-1 bg-transparent outline-none placeholder:text-[#8f8f8f]"
+          className="flex-1 bg-transparent outline-none placeholder:text-[var(--c-placeholder)]"
           style={{ fontSize: 15 }}
         />
         <button type="button" onClick={onClose} className="grid h-8 w-8 place-items-center rounded-lg hover:bg-white/10" aria-label="Close">

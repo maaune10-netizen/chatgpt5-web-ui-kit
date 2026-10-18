@@ -137,7 +137,7 @@ function Inline({ text }: { text: string }) {
         const link = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(p);
         if (link)
           return (
-            <a key={i} href={link[2]} target="_blank" rel="noreferrer" style={{ color: '#7ab2ff', textDecoration: 'underline' }}>
+            <a key={i} href={link[2]} target="_blank" rel="noreferrer" style={{ color: 'var(--c-link)', textDecoration: 'underline' }}>
               {link[1]}
             </a>
           );
@@ -167,7 +167,7 @@ function CodeBlock({ text, lang }: { text: string; lang?: string }) {
         </button>
       </div>
       <pre className="overflow-x-auto px-4 py-3" style={{ margin: 0 }}>
-        <code style={{ fontFamily: FONT.mono, fontSize: 13, lineHeight: 1.6, color: '#e6e6e6' }}>{text}</code>
+        <code style={{ fontFamily: FONT.mono, fontSize: 13, lineHeight: 1.6, color: 'var(--c-code-text)' }}>{text}</code>
       </pre>
     </div>
   );
@@ -233,7 +233,7 @@ export function Markdown({ text, mono }: { text: string; mono?: boolean }) {
                     {body.map((r, ri) => (
                       <tr key={ri}>
                         {r.map((c, ci) => (
-                          <td key={ci} style={{ padding: '8px 12px', borderBottom: `1px solid rgba(255,255,255,0.07)`, verticalAlign: 'top' }}>
+                          <td key={ci} style={{ padding: '8px 12px', borderBottom: `1px solid var(--c-table-line)`, verticalAlign: 'top' }}>
                             <Inline text={c} />
                           </td>
                         ))}

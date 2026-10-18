@@ -108,7 +108,7 @@ export function SettingsModal({
       <div
         onClick={(e) => e.stopPropagation()}
         className="w-[560px] overflow-hidden rounded-2xl"
-        style={{ background: '#2b2b2b', border: `1px solid ${C.line}`, boxShadow: MENU_SHADOW }}
+        style={{ background: 'var(--c-modal)', border: `1px solid ${C.line}`, boxShadow: MENU_SHADOW }}
       >
         <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: `1px solid ${C.line}` }}>
           <h2 style={{ fontSize: 18, fontWeight: 600 }}>Settings</h2>
@@ -158,7 +158,7 @@ export function SettingsModal({
           </Field>
 
           {test && (
-            <p style={{ fontSize: 13, color: test.ok ? '#8ee6a0' : 'var(--c-danger)' }}>{test.msg}</p>
+            <p style={{ fontSize: 13, color: test.ok ? 'var(--c-ok)' : 'var(--c-danger)' }}>{test.msg}</p>
           )}
 
           <div className="flex items-center gap-2 pt-1">
