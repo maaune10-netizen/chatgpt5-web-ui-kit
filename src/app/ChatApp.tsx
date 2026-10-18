@@ -2,21 +2,19 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './Icon';
 import { Sidebar } from './Sidebar';
 import { Composer } from './Composer';
+import { NewChat } from './NewChat';
 import { MessageRow } from './Message';
 import { AccountMenu } from './AccountMenu';
 import { ModelMenu, SettingsModal } from './Settings';
 import { LoginModal, SearchModal, ShareModal, UpgradeModal } from './Modals';
 import { Library, ImageViewer, ProjectPage } from './Library';
 import { useStore, type Citation, type Message } from './store';
-import { C, L, T } from '../lib/tokens';
+import { C, L } from '../lib/tokens';
 import { ChatStream, loadConfig, saveConfig, isConfigured, type Config, type ChatMessage } from '../lib/llm';
 
 /**
  * يستخرج المصادر من نصّ الرد.
- *
- * التصميم يعرض «Sources» بأقراص مرقّمة، ولا يعطيها النموذج في حقل مستقل —
- * فيُستخرج ما ورد فيه من روابط. وإن لم يذكر روابط فلا قسم مصادر أصلًا،
- * وهو أصحّ من عرض قسم فارغ.
+ * التصميم يعرض «Sources» بأقراص مرقّمة، ولا يعطيها النموذج في حقل مستقل.
  */
 function citationsFrom(text: string): Citation[] {
   const seen = new Set<string>();
@@ -29,7 +27,7 @@ function citationsFrom(text: string): Citation[] {
     try {
       host = new URL(url).hostname.replace(/^www\./, '');
     } catch {
-      /* رابط غير صالح — يبقى كما هو */
+      /* رابط غير صالح */
     }
     out.push({ title: m[1], url, host });
     if (out.length >= 8) break;
@@ -37,15 +35,11 @@ function citationsFrom(text: string): Citation[] {
   return out;
 }
 
-const SUGGESTIONS = [
-  { icon: 'image', title: 'Create an image', sub: 'of a cat riding a bike' },
-  { icon: 'brain', title: 'Brainstorm', sub: 'names for a coffee shop' },
-  { icon: 'edit', title: 'Help me write', sub: 'a thank-you note' },
-  { icon: 'code', title: 'Write code', sub: 'to reverse a string' },
-];
-
 export function ChatApp() {
   const store = useStore();
+  const { state } = store;
+  const signedIn = state.signedIn;
+
   const [collapsed, setCollapsed] = useState(false);
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
@@ -64,18 +58,17 @@ export function ChatApp() {
   const [stick, setStick] = useState(true);
 
   const conv = store.active;
+  const isEmpty = !conv || conv.messages.length === 0;
 
-  /* إن لم توجد محادثة مفتوحة، افتح واحدة */
   useEffect(() => {
-    if (store.state.view !== 'chat') return;
-    if (!conv && store.state.conversations.length >= 0) store.newChat();
+    if (state.view !== 'chat' || !signedIn) return;
+    if (!conv) store.newChat();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [store.state.view]);
+  }, [state.view, signedIn]);
 
-  /* ابقَ في الأسفل أثناء البثّ */
   useEffect(() => {
-    if (stick) bottomRef.current?.scrollIntoView({ block: 'end' });
-  }, [conv?.messages, stick]);
+    if (stick && !isEmpty) bottomRef.current?.scrollIntoView({ block: 'end' });
+  }, [conv?.messages, stick, isEmpty]);
 
   const onScroll = () => {
     const el = scrollRef.current;
@@ -85,9 +78,7 @@ export function ChatApp() {
 
   const history = useCallback(
     (messages: Message[]): ChatMessage[] =>
-      messages
-        .filter((m) => !m.error && (m.content || '').trim())
-        .map((m) => ({ role: m.role, content: m.content })),
+      messages.filter((m) => !m.error && (m.content || '').trim()).map((m) => ({ role: m.role, content: m.content })),
     [],
   );
 
@@ -113,14 +104,7 @@ export function ChatApp() {
           onDone: ({ finish }) => {
             store.patchMessage(convId, assistantId, (m) => {
               const content = m.content.trim() || (m.reasoning ? '' : 'No response.');
-              return {
-                ...m,
-                streaming: false,
-                stopped: finish === 'stopped',
-                /* التفكير في الحقل المستقل، لا مخلوطًا بالجواب */
-                content,
-                citations: citationsFrom(content),
-              };
+              return { ...m, streaming: false, stopped: finish === 'stopped', content, citations: citationsFrom(content) };
             });
             resolve();
           },
@@ -141,33 +125,25 @@ export function ChatApp() {
     (text?: string, image?: string) => {
       const body = (text ?? input).trim();
       if (!body && !image) return;
-      /* غير مسجَّل: ادعُه للدخول بدل أن ترسل */
-      if (!store.state.signedIn) {
+      /* غير مسجَّل: لا إرسال — بل دعوة للدخول، كما في التصميم */
+      if (!signedIn) {
         setLoginOpen(true);
         return;
       }
       const convId = conv?.id ?? store.newChat();
       const base = conv?.id ? conv.messages : [];
-
       store.addMessage(convId, { role: 'user', content: body, image });
       setInput('');
       setStick(true);
-
-      const withNew: Message[] = [
-        ...base,
-        { id: 'tmp', role: 'user', content: body, createdAt: Date.now() },
-      ];
-      void run(convId, withNew);
+      void run(convId, [...base, { id: 'tmp', role: 'user', content: body, createdAt: Date.now() }]);
     },
-    [conv, input, run, store],
+    [conv, input, run, signedIn, store],
   );
 
-  const stop = () => streamRef.current?.stop();
-
-  const retry = (msgIndex: number) => {
+  const retry = (i: number) => {
     if (!conv) return;
-    const before = conv.messages.slice(0, msgIndex);
-    store.removeMessagesFrom(conv.id, conv.messages[msgIndex].id);
+    const before = conv.messages.slice(0, i);
+    store.removeMessagesFrom(conv.id, conv.messages[i].id);
     void run(conv.id, before);
   };
 
@@ -190,10 +166,10 @@ export function ChatApp() {
     if (first) send(undefined, first.src);
   };
 
-  const shareTarget = useMemo(
-    () => store.state.conversations.find((c) => c.id === shareFor) ?? null,
-    [shareFor, store.state.conversations],
-  );
+  const pasteImage = (src: string) => {
+    store.addLibrary([{ src, title: 'Pasted image', kind: 'image' }]);
+    send(undefined, src);
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -215,29 +191,43 @@ export function ChatApp() {
     saveConfig(c);
   };
 
-  /* ————— العرض ————— */
-  const showEmpty = !conv || conv.messages.length === 0;
+  const shareTarget = useMemo(() => state.conversations.find((c) => c.id === shareFor) ?? null, [shareFor, state.conversations]);
+
+  const composer = (
+    <Composer
+      value={input}
+      onChange={setInput}
+      onSend={() => send()}
+      onStop={() => streamRef.current?.stop()}
+      streaming={streaming}
+      onAttach={(f) => void onAttach(f)}
+      onPasteImage={pasteImage}
+    />
+  );
 
   return (
     <div className="flex h-full" style={{ background: C.body, color: C.text }}>
-      <Sidebar
-        store={store}
-        collapsed={collapsed}
-        onToggleCollapsed={() => setCollapsed((v) => !v)}
-        onOpenSearch={() => setSearchOpen(true)}
-        onOpenAccount={setAccountAt}
-        onUpgrade={() => setUpgradeOpen(true)}
-        onLogin={() => setLoginOpen(true)}
-      />
+      {/* الشريط الجانبي للمسجَّل فقط — الوضع غير المسجَّل بعرض كامل في التصميم */}
+      {signedIn && (
+        <Sidebar
+          store={store}
+          collapsed={collapsed}
+          onToggleCollapsed={() => setCollapsed((v) => !v)}
+          onOpenSearch={() => setSearchOpen(true)}
+          onOpenAccount={setAccountAt}
+          onUpgrade={() => setUpgradeOpen(true)}
+          onLogin={() => setLoginOpen(true)}
+        />
+      )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* الترويسة — 52px من تصميم App Header */}
+        {/* الترويسة — 52px، App Header */}
         <header
           className="relative flex shrink-0 items-center justify-between px-3"
-          style={{ height: L.headerH, borderBottom: `1px solid ${C.line}` }}
+          style={{ height: L.headerH }}
         >
-          <div className="flex items-center gap-2">
-            {collapsed && (
+          <div className="flex items-center gap-1">
+            {signedIn && collapsed && (
               <button
                 type="button"
                 onClick={() => setCollapsed(false)}
@@ -252,120 +242,139 @@ export function ChatApp() {
               onClick={() => setModelOpen((v) => !v)}
               className="flex h-9 items-center gap-1.5 rounded-lg px-2.5 hover:bg-white/[0.07]"
             >
-              <span className="truncate" style={{ fontSize: 15 }}>
-                {config.model}
-              </span>
+              {/* التصميم يكتب «ChatGPT» هنا لا اسم النموذج */}
+              <span style={{ fontSize: 15, fontWeight: 500 }}>ChatGPT</span>
               <Icon name="chevronDown" size={16} />
             </button>
           </div>
 
+          {/* «Get Plus» موسّطة في الترويسة — Upsell Button 123x36 عند x=528 من 1180 */}
+          {signedIn && (
+            <button
+              type="button"
+              onClick={() => setUpgradeOpen(true)}
+              className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full px-3 py-2 hover:brightness-110 sm:flex"
+              style={{ background: C.upsell, height: 36 }}
+            >
+              <Icon name="upgradeSparkleSolid" size={20} style={{ filter: 'none', opacity: 1 }} />
+              <span style={{ fontSize: 14 }}>Get Plus</span>
+              <Icon name="close" size={14} />
+            </button>
+          )}
+
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => conv && setShareFor(conv.id)}
-              className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm hover:bg-white/10"
-            >
-              <Icon name="share" size={18} />
-              Share
-            </button>
-            <button
-              type="button"
-              onClick={() => setSettingsOpen(true)}
-              className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
-              aria-label="Settings"
-            >
-              <Icon name="settings" size={18} />
-            </button>
+            {signedIn ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => conv && setShareFor(conv.id)}
+                  className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm hover:bg-white/10"
+                >
+                  <Icon name="share" size={18} />
+                  Share
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSettingsOpen(true)}
+                  className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
+                  aria-label="Settings"
+                >
+                  <Icon name="settings" size={18} />
+                </button>
+              </>
+            ) : (
+              /* الوضع غير المسجَّل: زرّا الدخول في الترويسة — من New Chat - Logged Out */
+              <>
+                <button
+                  type="button"
+                  onClick={() => setLoginOpen(true)}
+                  className="h-9 rounded-full px-4 text-sm font-semibold"
+                  style={{ background: '#ffffff', color: '#000000' }}
+                >
+                  Log in
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLoginOpen(true)}
+                  className="h-9 rounded-full px-4 text-sm font-semibold hover:bg-white/10"
+                  style={{ border: `1px solid ${C.line}` }}
+                >
+                  Sign up for free
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSettingsOpen(true)}
+                  className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
+                  aria-label="Settings"
+                >
+                  <Icon name="settings" size={18} />
+                </button>
+              </>
+            )}
           </div>
 
           {modelOpen && <ModelMenu config={config} onConfig={setCfg} onClose={() => setModelOpen(false)} />}
         </header>
 
-        {/* المحتوى */}
-        {store.state.view === 'library' ? (
+        {state.view === 'library' ? (
           <Library store={store} onOpenImage={(src, title) => setViewer({ src, title })} />
-        ) : store.state.view === 'project' && store.state.viewArg ? (
-          <ProjectPage store={store} projectId={store.state.viewArg} onOpenChat={(id) => store.openChat(id)} />
+        ) : state.view === 'project' && state.viewArg ? (
+          <ProjectPage store={store} projectId={state.viewArg} onOpenChat={(id) => store.openChat(id)} />
+        ) : isEmpty ? (
+          <>
+            <NewChat
+              signedIn={signedIn}
+              value={input}
+              onChange={setInput}
+              onSend={() => send()}
+              onStop={() => streamRef.current?.stop()}
+              streaming={streaming}
+              onSuggestion={(t) => send(t)}
+              onAttach={(f) => void onAttach(f)}
+              onPasteImage={pasteImage}
+            />
+            <div className="shrink-0 px-6 pb-3 text-center" style={{ fontSize: 12, color: C.muted }}>
+              {signedIn
+                ? 'ChatGPT can make mistakes. Check important info.'
+                : 'By messaging ChatGPT, you agree to our Terms and have read our Privacy Policy.'}
+            </div>
+          </>
         ) : (
           <>
             <div ref={scrollRef} onScroll={onScroll} className="min-h-0 flex-1 overflow-y-auto">
-              {showEmpty ? (
-                <div className="grid h-full place-items-center px-6">
-                  <div className="w-full" style={{ maxWidth: L.threadW }}>
-                    <h1 className="text-center" style={{ fontSize: T.h3.size, lineHeight: `${T.h3.lh}px`, letterSpacing: T.h3.ls, fontWeight: 600 }}>
-                      Ready when you are.
-                    </h1>
-                    <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                      {SUGGESTIONS.map((s) => (
-                        <button
-                          key={s.title}
-                          type="button"
-                          onClick={() => send(`${s.title} ${s.sub}`)}
-                          className="rounded-2xl p-3 text-start transition-colors hover:bg-white/[0.07]"
-                          style={{ border: `1px solid ${C.line}` }}
-                        >
-                          <Icon name={s.icon} size={20} />
-                          <p className="mt-2" style={{ fontSize: 14 }}>
-                            {s.title}
-                          </p>
-                          <p style={{ fontSize: 12, color: C.muted }}>{s.sub}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="mx-auto px-6 py-4" style={{ maxWidth: L.threadW }}>
-                  {conv!.messages.map((m, i) => (
-                    <MessageRow
-                      key={m.id}
-                      m={m}
-                      onCopy={() => {}}
-                      onShare={() => setShareFor(conv!.id)}
-                      onRetry={() => retry(i)}
-                      onMore={() => setShareFor(conv!.id)}
-                      onOpenImage={(src) => setViewer({ src, title: 'Image' })}
-                    />
-                  ))}
-                  <div ref={bottomRef} style={{ height: 24 }} />
-                </div>
-              )}
+              <div className="mx-auto px-6 py-4" style={{ maxWidth: L.threadW }}>
+                {conv!.messages.map((m, i) => (
+                  <MessageRow
+                    key={m.id}
+                    m={m}
+                    onCopy={() => {}}
+                    onShare={() => setShareFor(conv!.id)}
+                    onRetry={() => retry(i)}
+                    onMore={() => setShareFor(conv!.id)}
+                    onOpenImage={(src) => setViewer({ src, title: 'Image' })}
+                  />
+                ))}
+                <div ref={bottomRef} style={{ height: 24 }} />
+              </div>
             </div>
 
-            {/* لافتة الوضع المؤقت */}
-            {store.state.temporary && (
+            {state.temporary && (
               <div className="px-6">
                 <div
                   className="mx-auto flex items-center gap-2 rounded-xl px-3 py-2"
                   style={{ maxWidth: L.threadW, background: 'rgba(255,255,255,0.05)', fontSize: 12, color: C.muted }}
                 >
                   <Icon name="temporaryChat" size={16} />
-                  <span className="flex-1">This chat won’t appear in your history or be used to train models.</span>
-                  <button
-                    type="button"
-                    onClick={() => store.endTemporary()}
-                    className="rounded-md px-2 py-1 hover:bg-white/10"
-                  >
+                  <span className="flex-1">This chat won’t appear in your history.</span>
+                  <button type="button" onClick={() => store.endTemporary()} className="rounded-md px-2 py-1 hover:bg-white/10">
                     Turn off
                   </button>
                 </div>
               </div>
             )}
 
-            {/* صندوق الإدخال */}
             <div className="shrink-0 px-6 pb-4" style={{ paddingTop: 8 }}>
-              <Composer
-                value={input}
-                onChange={setInput}
-                onSend={() => send()}
-                onStop={stop}
-                streaming={streaming}
-                onAttach={(f) => void onAttach(f)}
-                onPasteImage={(src) => {
-                  store.addLibrary([{ src, title: 'Pasted image', kind: 'image' }]);
-                  send(undefined, src);
-                }}
-              />
+              {composer}
             </div>
           </>
         )}
@@ -375,7 +384,7 @@ export function ChatApp() {
       {accountAt && (
         <AccountMenu
           anchor={accountAt}
-          email="hello@interactionfaction.com"
+          email={state.email}
           onClose={() => setAccountAt(null)}
           onSettings={() => {
             setAccountAt(null);
@@ -389,7 +398,6 @@ export function ChatApp() {
             setAccountAt(null);
             setUpgradeOpen(true);
           }}
-          /* الخروج يُخرج فعلًا، ثم يعرض شاشة الدخول كما في ChatGPT */
           onLogout={() => {
             setAccountAt(null);
             store.signOut();
@@ -399,11 +407,7 @@ export function ChatApp() {
       )}
       {settingsOpen && <SettingsModal config={config} onConfig={setCfg} onClose={() => setSettingsOpen(false)} />}
       {searchOpen && (
-        <SearchModal
-          onClose={() => setSearchOpen(false)}
-          conversations={store.state.conversations}
-          onPick={(id) => store.openChat(id)}
-        />
+        <SearchModal onClose={() => setSearchOpen(false)} conversations={state.conversations} onPick={(id) => store.openChat(id)} />
       )}
       {shareTarget && (
         <ShareModal
