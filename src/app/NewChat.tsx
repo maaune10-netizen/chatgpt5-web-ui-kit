@@ -85,14 +85,24 @@ export function NewChat({
                 key={s.title}
                 type="button"
                 onClick={() => onSuggestion(`${s.title} ${s.sub}`)}
-                className="rounded-2xl px-3 py-2.5 text-start transition-colors hover:bg-white/[0.07]"
+                /*
+                 * كانت ساكنة تمامًا: لا حدّ يتغيّر ولا سطح يرتفع، فلا يُعرف
+                 * أنّها تُضغط. والآن ترتفع قليلًا ويُضيء حدّها.
+                 */
+                className="group rounded-2xl px-3 py-2.5 text-start transition-all duration-150 hover:-translate-y-px hover:bg-[var(--c-hover)] active:translate-y-0"
                 style={{ border: `1px solid ${C.line}` }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--c-divider)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--c-line)';
+                }}
               >
                 <span className="flex items-center gap-2">
                   <Icon name={s.icon} size={16} />
                   <span style={{ fontSize: 13, fontWeight: 500 }}>{s.title}</span>
                 </span>
-                <span className="mt-0.5 block truncate" style={{ fontSize: 12, color: C.muted }}>
+                <span className="mt-0.5 block truncate" style={{ fontSize: 12, color: 'var(--c-muted)' }}>
                   {s.sub}
                 </span>
               </button>

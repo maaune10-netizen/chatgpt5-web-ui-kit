@@ -116,8 +116,14 @@ function Row({
         }}
       >
         {icon ? <Icon name={icon} size={ITEM.icon} /> : <span style={{ width: ITEM.icon }} />}
+        {/*
+         * `dir="auto"` يترك المتصفّح يختار الاتجاه من أوّل حرف.
+         * بلا هذا كان العنوان العربيّ في حاوية LTR يُقطع من **أوّله** فيظهر
+         * «شر الصناعي في جملين» — أي ذيله بلا رأسه.
+         */}
         <span
           className="flex-1 truncate"
+          dir="auto"
           style={{ fontSize: ITEM.labelSize, lineHeight: `${ITEM.labelLh}px`, fontWeight: bold ? 500 : 400 }}
         >
           {label}
@@ -457,12 +463,8 @@ export function Sidebar({
           <SectionLabel open={isOpen('chats')} onToggle={() => toggle('chats')}>
             Chats
           </SectionLabel>
+          {/* ولا نصّ «لا محادثات» — ChatGPT يُظهر قسمًا فارغًا صامتًا */}
           {isOpen('chats') && rest.map((c) => chatRow(c))}
-          {isOpen('chats') && rest.length === 0 && pinned.length === 0 && (
-            <p className="px-2.5 py-2" style={{ fontSize: 12, color: C.dim }}>
-              No chats yet.
-            </p>
-          )}
 
           {/* الأرشيف */}
           {state.archived.length > 0 && (

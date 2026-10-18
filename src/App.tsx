@@ -20,9 +20,31 @@ export default function App() {
    * الوضع على الجذر: كل الألوان متغيّرات CSS فتتغيّر معه بلا إعادة رسم.
    * و«auto» يتبع النظام، وهو افتراضي ChatGPT نفسه.
    */
+  /*
+   * أثر التطوير لا يظهر للمستخدم: `#design` في العنوان، أو Ctrl+Shift+D،
+   * أو `?dev=1`. وكان الزرّ ظاهرًا في أسفل كل شاشة بلا سبب.
+   */
+  const [devMode, setDevMode] = useState(
+    () =>
+      typeof location !== 'undefined' &&
+      (location.hash.includes('design') || new URLSearchParams(location.search).has('dev')),
+  );
+
   const [theme, setTheme] = useState<'dark' | 'light' | 'auto'>(
     () => (typeof localStorage !== 'undefined' ? (localStorage.getItem('gpt5.theme') as 'dark' | 'light' | 'auto') : null) || 'auto',
   );
+  /* Ctrl+Shift+D يُظهر زرّ الشاشات المستخرجة */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        setDevMode((v) => !v);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: light)');
     const apply = () => {
@@ -65,16 +87,27 @@ export default function App() {
     <div className="h-full" style={{ background: C.body, color: C.text }}>
       {mode === 'app' ? <ChatApp theme={theme} onTheme={setTheme} /> : <DesignViewer />}
 
-      {/* مبدّل الوضع — صغير وغير متطفّل */}
-      <button
-        type="button"
-        onClick={() => setMode((m) => (m === 'app' ? 'design' : 'app'))}
-        title={mode === 'app' ? 'Show the extracted Figma screens' : 'Back to the working app'}
-        className="fixed bottom-3 end-3 z-[300] rounded-full px-3 py-1.5 text-xs transition-colors hover:bg-white/15"
-        style={{ background: 'rgba(255,255,255,0.10)', border: `1px solid ${C.line}`, color: C.muted, backdropFilter: 'blur(6px)' }}
-      >
-        {mode === 'app' ? 'Design' : 'App'}
-      </button>
+      {/*
+       * مبدّل الشاشات المستخرجة — أثر تطويري، فلا يُعرض في واجهة عادية.
+       * يظهر بـ#design في العنوان أو بضغط Ctrl+Shift+D، فالمستخدم لا يراه
+       * والمسؤول عنه يجده. وكان ظاهرًا دائمًا في أسفل الشاشة.
+       */}
+      {devMode && (
+        <button
+          type="button"
+          onClick={() => setMode((m) => (m === 'app' ? 'design' : 'app'))}
+          title={mode === 'app' ? 'Show the extracted Figma screens' : 'Back to the working app'}
+          className="fixed bottom-3 end-3 z-[300] rounded-full px-3 py-1.5 text-xs transition-colors hover:bg-white/15"
+          style={{
+            background: 'rgba(255,255,255,0.10)',
+            border: `1px solid ${C.line}`,
+            color: C.muted,
+            backdropFilter: 'blur(6px)',
+          }}
+        >
+          {mode === 'app' ? 'Design' : 'App'}
+        </button>
+      )}
     </div>
   );
 }
