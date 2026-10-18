@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>تشخيص العرض</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 28px 20px 60px; background: #212121; color: #fff;
+    font: 15px/1.7 "Inter", "Segoe UI", system-ui, sans-serif;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .sub { color: #afafaf; font-size: 13px; margin-bottom: 22px; }
+  section { background: #2a2a2a; border: 1px solid rgba(255,255,255,.12); border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
+  h2 { font-size: 14px; margin: 0 0 10px; color: #cfcfcf; font-weight: 600; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .row:last-child { border-bottom: 0; }
+  .k { flex: 0 0 230px; color: #afafaf; font-size: 13px; }
+  .v { flex: 1; font-size: 13px; font-family: ui-monospace, monospace; word-break: break-all; }
+  .ok { color: #8ee6a0; } .bad { color: #ff9b9b; } .warn { color: #ffd479; }
+  .big { font-size: 40px; line-height: 1.2; }
+  button {
+    background: #fff; color: #000; border: 0; border-radius: 999px;
+    padding: 9px 18px; font: inherit; font-weight: 600; cursor: pointer;
+  }
+  pre {
+    background: #1b1b1b; border: 1px solid rgba(255,255,255,.1); border-radius: 10px;
+    padding: 12px; overflow: auto; font-size: 12px; line-height: 1.6;
+    max-height: 300px; direction: ltr; text-align: left;
+  }
+  .samples { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .samples span { font-size: 30px; }
+  .samples img { width: 26px; height: 26px; filter: invert(1); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>تشخيص العرض</h1>
+  <p class="sub">يفحص ما يعرضه متصفحك فعلًا — الخطوط والأيقونات والصور والنموذج. انسخ التقرير وأرسله.</p>
+
+  <section>
+    <h2>الإيموجي — هل تُرسم؟</h2>
+    <div class="samples" id="emoji"></div>
+    <p class="sub" style="margin:12px 0 0">
+      إن رأيت مربّعات فارغة أو رموزًا أحادية اللون بدل الدائرة الخضراء، فالمشكلة خطوط لا كود.
+    </p>
+  </section>
+
+  <section>
+    <h2>الأيقونات — هل تُحمَّل؟</h2>
+    <div class="samples" id="icons"></div>
+    <div id="iconDetail"></div>
+  </section>
+
+  <section>
+    <h2>الفحوص</h2>
+    <div id="rows"></div>
+  </section>
+
+  <section>
+    <h2>التقرير</h2>
+    <pre id="report">جارٍ الفحص…</pre>
+    <button id="copy">انسخ التقرير</button>
+  </section>
+</div>
+
+<script>
+const rows = [];
+const report = {};
+const row = (k, v, cls) => rows.push({ k, v: String(v), cls: cls || '' });
+
+async function fetchOk(url) {
+  try {
+    const r = await fetch(url, { cache: 'no-store' });
+    return { ok: r.ok, status: r.status, size: (await r.blob()).size };
+  } catch (e) {
+    return { ok: false, status: 0, size: 0, err: String(e.message || e) };
+  }
+}
+
+async function imgOk(url) {
+  return new Promise((res) => {
+    const i = new Image();
+    i.onload = () => res({ ok: true, w: i.naturalWidth, h: i.naturalHeight });
+    i.onerror = () => res({ ok: false, w: 0, h: 0 });
+    i.src = url;
+  });
+}
+
+(async function run() {
+  const BASE = location.pathname.replace(/\/[^/]*$/, '/');
+
+  /* ١) الإيموجي */
+  const EMOJI = ['🟢', '🔍', '☕', '😀', '✻', '✓'];
+  document.getElementById('emoji').innerHTML = EMOJI.map((e) => `<span>${e}</span>`).join('');
+
+  await document.fonts.ready;
+  const noto = document.fonts.check('16px "Noto Color Emoji"');
+  const segui = document.fonts.check('16px "Segoe UI Emoji"');
+  const apple = document.fonts.check('16px "Apple Color Emoji"');
+  row('Noto Color Emoji (ويب)', noto ? 'متاح' : 'غير متاح', noto ? 'ok' : 'warn');
+  row('Segoe UI Emoji (ويندوز)', segui ? 'متاح' : 'غير متاح', segui ? 'ok' : 'warn');
+  row('Apple Color Emoji (ماك)', apple ? 'متاح' : 'غير متاح', apple ? 'ok' : 'warn');
+  row('خطوط محمّلة', [...document.fonts].filter((f) => f.status === 'loaded').length);
+  row('Inter', document.fonts.check('16px Inter') ? 'متاح' : 'غير متاح');
+
+  /* ٢) الأيقونات */
+  const cat = await fetchOk(BASE + 'generated-icons/catalog.json');
+  row('catalog.json', cat.ok ? `HTTP ${cat.status} · ${cat.size} بايت` : `فشل (${cat.err || cat.status})`, cat.ok ? 'ok' : 'bad');
+
+  let iconNames = [];
+  if (cat.ok) {
+    try {
+      const r = await fetch(BASE + 'generated-icons/catalog.json', { cache: 'no-store' });
+      iconNames = Object.keys(await r.json()).slice(0, 6);
+    } catch (e) { /* — */ }
+  }
+
+  const box = document.getElementById('icons');
+  const detail = document.getElementById('iconDetail');
+  const results = [];
+  for (const n of iconNames) {
+    const url = BASE + 'generated-icons/' + n + '.svg';
+    const ok = await imgOk(url);
+    results.push({ n, ...ok });
+    const img = document.createElement('img');
+    img.src = url;
+    box.appendChild(img);
+  }
+  const broken = results.filter((r) => !r.ok).length;
+  row('أيقونات فُحصت', results.length);
+  row('أيقونات مكسورة', broken, broken ? 'bad' : 'ok');
+  if (results.length) {
+    detail.innerHTML = '<div class="row"><span class="k">عيّنة</span><span class="v">' +
+      results.map((r) => r.n.slice(0, 14) + '=' + (r.ok ? r.w + 'px' : 'فشل')).join(' · ') + '</span></div>';
+  }
+
+  /* ٣) الصور */
+  const imgs = await fetchOk(BASE + 'screens/index.json');
+  row('screens/index.json', imgs.ok ? `HTTP ${imgs.status}` : 'فشل', imgs.ok ? 'ok' : 'bad');
+
+  let shotCount = 0;
+  if (imgs.ok) {
+    try {
+      const r = await fetch(BASE + 'screens/index.json', { cache: 'no-store' });
+      shotCount = (await r.json()).length;
+    } catch (e) { /* — */ }
+  }
+  row('شاشات في الفهرس', shotCount);
+
+  /* ٤) النموذج */
+  const health = await fetchOk(BASE + 'api/health');
+  let healthBody = null;
+  if (health.ok) {
+    try {
+      const r = await fetch(BASE + 'api/health', { cache: 'no-store' });
+      healthBody = await r.json();
+    } catch (e) { /* — */ }
+  }
+  row('الوسيط /api/health', health.ok && healthBody ? `يعمل · النموذج ${healthBody.model}` : 'لا يعمل', health.ok ? 'ok' : 'bad');
+  row('المفتاح في الخادم', healthBody ? (healthBody.hasKey ? 'محمّل' : 'مفقود') : '—', healthBody && healthBody.hasKey ? 'ok' : 'warn');
+  row('upstream', healthBody ? healthBody.upstream : '—');
+
+  /* ٥) البيئة */
+  row('المتصفح', navigator.userAgent.slice(0, 90));
+  row('الجهاز بكسل', window.devicePixelRatio);
+  row('مقياس العرض', window.innerWidth + '×' + window.innerHeight);
+  row('المسار', location.href.slice(0, 90));
+  row('حجم خط الجذر', getComputedStyle(document.documentElement).fontSize);
+
+  document.getElementById('rows').innerHTML = rows.map((r) =>
+    `<div class="row"><span class="k">${r.k}</span><span class="v ${r.cls}">${r.v}</span></div>`).join('');
+
+  Object.assign(report, {
+    when: new Date().toISOString(),
+    emoji: { noto, segui, apple },
+    catalog: cat,
+    icons: { checked: results.length, broken },
+    screens: shotCount,
+    proxy: healthBody,
+    env: {
+      ua: navigator.userAgent,
+      dpr: window.devicePixelRatio,
+      viewport: window.innerWidth + 'x' + window.innerHeight,
+      href: location.href,
+      fonts: [...document.fonts].filter((f) => f.status === 'loaded').map((f) => f.family).slice(0, 20),
+    },
+  });
+  document.getElementById('report').textContent = JSON.stringify(report, null, 2);
+})();
+
+document.getElementById('copy').onclick = () => {
+  navigator.clipboard.writeText(document.getElementById('report').textContent)
+    .then(() => { document.getElementById('copy').textContent = 'تم النسخ ✓'; })
+    .catch(() => { document.getElementById('copy').textContent = 'حدّد النص وانسخه يدويًا'; });
+};
+</script>
+</body>
+</html>
