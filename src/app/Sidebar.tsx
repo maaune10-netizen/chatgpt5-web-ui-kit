@@ -572,37 +572,30 @@ function ChatMenu({
     >
       {sub === null ? (
         <>
-          <button type="button" className={item} style={style} onClick={() => { onShare(); onClose(); }}>
-            <Icon name="share" size={18} /> Share
-          </button>
-          <button type="button" className={item} style={style} onClick={() => { void store.togglePin(id); onClose(); }}>
-            <Icon name={conv.pinned ? 'pinFilled' : 'pin'} size={18} /> {conv.pinned ? 'Unpin chat' : 'Pin chat'}
-          </button>
+          {/*
+            الترتيب كما هو في ChatGPT — مقسّمًا بخطوط:
+              Rename · Pin
+              ──────
+              Share
+              ──────
+              Archive · Delete
+              ──────
+              Move to project ›
+          */}
           <button type="button" className={item} style={style} onClick={() => { onRename(); onClose(); }}>
             <Icon name="edit" size={18} /> Rename
           </button>
-          {/*
-            التسمية تتبع الحال: المحادثة داخل مشروع يُقال لها «Remove from project».
-            وهذا ما يفعله ChatGPT نفسه، وورد في توثيق OpenAI.
-          */}
-          {conv.projectId ? (
-            <button
-              type="button"
-              className={item}
-              style={style}
-              onClick={() => { void store.moveToProject(id, null); onClose(); }}
-            >
-              <Icon name="folderOpen" size={18} /> Remove from project
-            </button>
-          ) : (
-            <button type="button" className={item} style={style} onClick={() => setSub('project')}>
-              <Icon name="folder" size={18} />
-              <span className="flex-1">Move to project</span>
-              <Icon name="chevronRight" size={14} />
-            </button>
-          )}
+          <button type="button" className={item} style={style} onClick={() => { void store.togglePin(id); onClose(); }}>
+            <Icon name={conv.pinned ? 'pinFilled' : 'pin'} size={18} /> {conv.pinned ? 'Unpin' : 'Pin'}
+          </button>
 
-          <div className="my-1 h-px" style={{ background: C.line }} />
+          <Divider />
+
+          <button type="button" className={item} style={style} onClick={() => { onShare(); onClose(); }}>
+            <Icon name="share" size={18} /> Share
+          </button>
+
+          <Divider />
 
           <button type="button" className={item} style={style} onClick={() => { void store.archiveChat(id, true); onClose(); }}>
             <Icon name="archive" size={18} /> Archive
@@ -619,22 +612,45 @@ function ChatMenu({
             onBlur={() => setConfirm(false)}
           >
             <Icon name="delete" size={18} />
-            {confirm ? 'Confirm delete?' : 'Delete'}
+            {confirm ? 'Confirm delete' : 'Delete'}
+          </button>
+
+          <Divider />
+
+          <button type="button" className={item} style={style} onClick={() => setSub('project')}>
+            <Icon name="move" size={18} />
+            <span className="flex-1">{conv.projectId ? 'Move to another project' : 'Move to project'}</span>
+            <Icon name="chevronRight" size={14} />
           </button>
         </>
       ) : (
         <>
+          {/* القائمة الفرعية: مشروع موجود، أو إنشاء مشروع جديد */}
           <button type="button" className={item} style={{ ...style, color: C.muted }} onClick={() => setSub(null)}>
             <Icon name="chevronLeft" size={16} /> Move to project
           </button>
-          <div className="my-1 h-px" style={{ background: C.line }} />
+          <Divider />
+          {conv.projectId && (
+            <button
+              type="button"
+              className={item}
+              style={style}
+              onClick={() => { void store.moveToProject(id, null); onClose(); }}
+            >
+              <Icon name="close" size={16} /> Remove from project
+            </button>
+          )}
           <button
             type="button"
             className={item}
             style={style}
-            onClick={() => { void store.moveToProject(id, null); onClose(); }}
+            onClick={async () => {
+              const pid = await store.newProject('New project');
+              void store.moveToProject(id, pid);
+              onClose();
+            }}
           >
-            <Icon name="close" size={16} /> No project
+            <Icon name="folderAdd" size={16} /> New project
           </button>
           {store.state.projects.map((p) => (
             <button
@@ -645,11 +661,12 @@ function ChatMenu({
               onClick={() => { void store.moveToProject(id, p.id); onClose(); }}
             >
               <Icon name="folder" size={16} /> {p.name}
+              {conv.projectId === p.id && <Icon name="check" size={14} style={{ marginInlineStart: 'auto' }} />}
             </button>
           ))}
           {store.state.projects.length === 0 && (
             <p className="px-3 py-2" style={{ fontSize: 12, color: C.dim }}>
-              No projects yet.
+              No projects yet — create one above.
             </p>
           )}
         </>
@@ -657,3 +674,9 @@ function ChatMenu({
     </div>
   );
 }
+
+/* فاصل داخل القائمة — نفس لون فواصل الشريط */
+function Divider() {
+  return <div className="my-1 h-px" style={{ background: C.line }} />;
+}
+
