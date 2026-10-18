@@ -31,6 +31,18 @@ export default function App() {
     }
   }, [mode]);
 
+  /*
+   * تابع تغيير الـhash.
+   *
+   * كان الوضع يُقرأ عند الإقلاع فقط، وتغيير العنوان لا يُعيد تحميل الصفحة —
+   * فمن يكتب #design بنفسه يبقى في التطبيق ولا يفهم لماذا لم يحدث شيء.
+   */
+  useEffect(() => {
+    const onHash = () => setMode(location.hash.replace('#', '') === 'design' ? 'design' : 'app');
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
   return (
     <div className="h-full" style={{ background: C.body, color: C.text }}>
       {mode === 'app' ? <ChatApp /> : <DesignViewer />}
