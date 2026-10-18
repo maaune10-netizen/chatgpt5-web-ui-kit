@@ -50,8 +50,10 @@ const ICON_DIR = join(ROOT, 'public/generated-icons');
  * سبب ظاهر. وإبقاء المجلد قائمًا يزيل تلك اللحظة تمامًا.
  */
 mkdirSync(ICON_DIR, { recursive: true });
+/* المرسوم يدويًا في public/app-icons ولا يمرّ من هنا إطلاقًا */
 for (const f of readdirSync(ICON_DIR)) {
-  if (f !== 'catalog.json') unlinkSync(join(ICON_DIR, f));
+  if (f === 'catalog.json') continue;
+  unlinkSync(join(ICON_DIR, f));
 }
 
 /** يزيل خلفية الإطار والحدود التي يضيفها Figma عند التصدير */
@@ -66,10 +68,12 @@ function cleanSvg(svg) {
 const slugify = (s) => String(s || '').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase().slice(0, 40);
 const GENERIC = /^(vector|shape|union|path|line|group|rectangle|ellipse|icon|subtract|intersect|exclude|mask|fill)$/;
 
-/* المجلد يُبنى من الصفر — وإلا تراكمت أيقونات لم تعد مستعملة */
-if (existsSync(ICON_DIR)) for (const f of readdirSync(ICON_DIR)) {
-  if (f.endsWith('.svg')) unlinkSync(join(ICON_DIR, f));
-}
+/*
+ * حُذف هذا القبض.
+ * كان يمحو كل SVG في المجلد، فيأكل الأيقونات المرسومة يدويًا (pin) —
+ * وهي ليست في أي حزمة فلا يمكن تعويضها بالتوليد. والحذف صار في الأعلى
+ * مرة واحدة، مع استثناء المرسوم.
+ */
 
 const iconOf = {};        // nodeId -> filename (بدون svg)
 const seenHash = new Map();

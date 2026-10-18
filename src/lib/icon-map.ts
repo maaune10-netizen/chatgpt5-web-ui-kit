@@ -174,6 +174,8 @@ export const ICONS: Record<string, string> = {
   "work": "icon-a0b50a15ea51",
   "workingIndicator": "working-indicator-f6a06b8cd4c1",
   "x": "icon-91565fb4326a",
+  "pin": "app-icons/pin",
+  "pinFilled": "app-icons/pin-filled",
 };
 
 /** يسقط إلى undefined بدل أن يرسم شيئًا خطأً */

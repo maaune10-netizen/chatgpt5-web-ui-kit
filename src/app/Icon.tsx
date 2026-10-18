@@ -26,7 +26,11 @@ export function Icon({
 }) {
   const ready = useIconsReady();
   const file = ICONS[name];
-  const src = file ? `/generated-icons/${file}.svg` : undefined;
+  /*
+   * قيمة فيها شرطة مائلة = مسار كامل (أيقونة مرسومة يدويًا في app-icons).
+   * وما عداها اسم ملف داخل مجلد المولَّد.
+   */
+  const src = file ? (file.includes('/') ? `/${file}.svg` : `/generated-icons/${file}.svg`) : undefined;
 
   /* بلا أيقونة لا نرسم صندوقًا فارغًا — نحفظ المساحة ونسكت */
   if (!src || !ready) {

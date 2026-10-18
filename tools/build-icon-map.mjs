@@ -113,6 +113,16 @@ const lines = [
   '',
 ];
 
+/* أيقونتان مرسومتان هنا لأن الحزم لا تحويهما — لا تُمسحان مع التوليد */
+/*
+ * المرسوم يدويًا يُشار إليه بمسار كامل، لا باسم ملف داخل مجلد المولَّد.
+ * ومجلد `app-icons` لا يمسّه المولّد إطلاقًا.
+ */
+lines.splice(lines.indexOf('};'), 0,
+  '  "pin": "app-icons/pin",',
+  '  "pinFilled": "app-icons/pin-filled",',
+);
+
 writeFileSync(join(ROOT, 'src/lib/icon-map.ts'), lines.join('\n'));
 
 console.log('icon map: ' + Object.keys(out).length + ' entries');

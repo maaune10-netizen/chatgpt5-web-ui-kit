@@ -35,6 +35,7 @@ function Row({
   renaming,
   onRename,
   onRenameCancel,
+  compact,
 }: {
   icon?: string;
   label: string;
@@ -49,6 +50,8 @@ function Row({
   renaming?: boolean;
   onRename?: (v: string) => void;
   onRenameCancel?: () => void;
+  /** الشريط ضيّق: الاختصار يُخفى بدل أن يزاحم الاسم */
+  compact?: boolean;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -95,9 +98,16 @@ function Row({
         type="button"
         onClick={onClick}
         onDoubleClick={() => onMenu && ref.current && onMenu(ref.current.getBoundingClientRect())}
-        className="flex w-full items-center gap-2 rounded-[10px] ps-2.5 pe-8 text-start transition-colors hover:bg-white/[0.07]"
+        /*
+         * الحشو الأيمن يحجز مكان **زرّين** (تثبيت + المزيد) لا زرّ واحد.
+         * كان 32px والزرّان يشغلان 58 — فيركب السهم على آخر الكلام.
+         */
+        className="flex w-full items-center gap-2 rounded-[10px] ps-2.5 text-start transition-colors hover:bg-white/[0.07]"
+        data-actions={onMenu || onTogglePin ? '2' : '0'}
         style={{
           height: ITEM.h,
+          /* زرّان (٢٨+٢+٢٨) + هامش ٤ = ٦٢. والحشو ٦٠ كان يترك تراكبًا بكسلين */
+          paddingInlineEnd: onMenu && onTogglePin ? 64 : onMenu || onTogglePin ? 34 : 10,
           background: active ? 'rgba(255,255,255,0.10)' : undefined,
           color: muted ? C.muted : C.text,
         }}
@@ -109,7 +119,7 @@ function Row({
         >
           {label}
         </span>
-        {trailing && !onMenu && !onTogglePin ? (
+        {trailing && !onMenu && !onTogglePin && !compact ? (
           <span style={{ fontSize: 12, color: C.dim, whiteSpace: 'nowrap' }}>{trailing}</span>
         ) : null}
       </button>
@@ -128,7 +138,7 @@ function Row({
             className="grid h-7 w-7 place-items-center rounded-md hover:bg-white/15"
             style={{ color: pinned ? '#fff' : C.muted }}
           >
-            <Icon name={pinned ? 'star' : 'arrowBendDownRight'} size={15} />
+            <Icon name={pinned ? 'pinFilled' : 'pin'} size={16} />
           </button>
         )}
         {onMenu && (
@@ -217,6 +227,11 @@ export function Sidebar({
   overlay?: boolean;
 }) {
   const { state } = store;
+  /*
+   * عرض أقل من ٢٩٠ لا يكفي للاسم والاختصار معًا.
+   * وكان الاختصار يبقى فينكمش «New Chat» إلى حرف واحد — وهو أسوأ من إخفائه.
+   */
+  const compact = width < 290;
   const [menuFor, setMenuFor] = useState<{ id: string; at: DOMRect } | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [archiveOpen, setArchiveOpen] = useState(false);
@@ -349,7 +364,7 @@ export function Sidebar({
         </div>
 
         <div className="px-1.5 pt-1">
-          <Row icon="create" label="New Chat" trailing="Ctrl + Shift + O" onClick={() => void store.newChat()} />
+          <Row icon="create" label="New Chat" trailing="Ctrl + Shift + O" compact={compact} onClick={() => void store.newChat()} />
           <Row icon="search" label="Search chats" onClick={onOpenSearch} />
           <Row icon="images" label="Library" onClick={() => store.go('library')} />
           <Row icon="temporaryChat" label="Temporary chat" onClick={() => void store.newChat(null, true)} />
@@ -561,16 +576,31 @@ function ChatMenu({
             <Icon name="share" size={18} /> Share
           </button>
           <button type="button" className={item} style={style} onClick={() => { void store.togglePin(id); onClose(); }}>
-            <Icon name="star" size={18} /> {conv.pinned ? 'Unpin chat' : 'Pin chat'}
+            <Icon name={conv.pinned ? 'pinFilled' : 'pin'} size={18} /> {conv.pinned ? 'Unpin chat' : 'Pin chat'}
           </button>
           <button type="button" className={item} style={style} onClick={() => { onRename(); onClose(); }}>
             <Icon name="edit" size={18} /> Rename
           </button>
-          <button type="button" className={item} style={style} onClick={() => setSub('project')}>
-            <Icon name="folder" size={18} />
-            <span className="flex-1">Move to project</span>
-            <Icon name="chevronRight" size={14} />
-          </button>
+          {/*
+            التسمية تتبع الحال: المحادثة داخل مشروع يُقال لها «Remove from project».
+            وهذا ما يفعله ChatGPT نفسه، وورد في توثيق OpenAI.
+          */}
+          {conv.projectId ? (
+            <button
+              type="button"
+              className={item}
+              style={style}
+              onClick={() => { void store.moveToProject(id, null); onClose(); }}
+            >
+              <Icon name="folderOpen" size={18} /> Remove from project
+            </button>
+          ) : (
+            <button type="button" className={item} style={style} onClick={() => setSub('project')}>
+              <Icon name="folder" size={18} />
+              <span className="flex-1">Move to project</span>
+              <Icon name="chevronRight" size={14} />
+            </button>
+          )}
 
           <div className="my-1 h-px" style={{ background: C.line }} />
 
