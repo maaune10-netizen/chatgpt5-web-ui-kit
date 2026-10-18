@@ -3,6 +3,7 @@ import { Icon } from './Icon';
 import { C, MENU_SHADOW } from '../lib/tokens';
 import type { Config } from '../lib/llm';
 import { listModels } from '../lib/llm';
+import { SYSTEM_PROMPT_PRESETS, DEFAULT_SYSTEM_PROMPT } from '../lib/prompt';
 
 /* ————— محدّد النموذج — 113x36 بنصف قطر 8 من الترويسة ————— */
 export function ModelMenu({
@@ -93,6 +94,7 @@ export function SettingsModal({
   onClose: () => void;
 }) {
   const [draft, setDraft] = useState(config);
+  const set = <K extends keyof Config>(k: K, v: Config[K]) => setDraft((d) => ({ ...d, [k]: v }));
   const [test, setTest] = useState<{ ok: boolean; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -159,6 +161,123 @@ export function SettingsModal({
 
           {test && (
             <p style={{ fontSize: 13, color: test.ok ? 'var(--c-ok)' : 'var(--c-danger)' }}>{test.msg}</p>
+          )}
+
+          {/* ————— تعليمات النظام ————— */}
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <p style={{ fontSize: 13, fontWeight: 600 }}>System prompt</p>
+              <select
+                className="rounded-lg px-2 py-1"
+                style={{ fontSize: 12, background: C.raised, color: C.text, border: `1px solid ${C.line}` }}
+                value={SYSTEM_PROMPT_PRESETS.some((x) => x.value === draft.systemPrompt) ? draft.systemPrompt : '__custom'}
+                onChange={(e) => {
+                  if (e.target.value !== '__custom') set('systemPrompt', e.target.value);
+                }}
+              >
+                {SYSTEM_PROMPT_PRESETS.map((x) => (
+                  <option key={x.label} value={x.value}>
+                    {x.label}
+                  </option>
+                ))}
+                {!SYSTEM_PROMPT_PRESETS.some((x) => x.value === draft.systemPrompt) && (
+                  <option value="__custom">Custom</option>
+                )}
+              </select>
+            </div>
+            <textarea
+              value={draft.systemPrompt}
+              onChange={(e) => set('systemPrompt', e.target.value)}
+              rows={6}
+              spellCheck={false}
+              placeholder="Leave empty to send no system message at all"
+              className="w-full resize-y rounded-lg px-3 py-2 outline-none"
+              style={{
+                background: C.input,
+                border: `1px solid ${C.line}`,
+                color: C.text,
+                fontSize: 12,
+                lineHeight: '18px',
+                fontFamily: 'ui-monospace, monospace',
+              }}
+            />
+            <p className="mt-1" style={{ fontSize: 11, color: C.dim }}>
+              {draft.systemPrompt.trim()
+                ? `${draft.systemPrompt.length} characters sent as one system message before the conversation.`
+                : 'No system message is sent — the model receives the conversation alone.'}
+              {draft.systemPrompt === DEFAULT_SYSTEM_PROMPT ? ' (default)' : ''}
+            </p>
+          </div>
+
+          {/* ————— معاملات النموذج ————— */}
+          <div className="grid grid-cols-3 gap-3">
+            <label className="block">
+              <span className="mb-1 flex justify-between" style={{ fontSize: 12, color: C.muted }}>
+                Temperature <b style={{ color: C.text }}>{draft.temperature.toFixed(2)}</b>
+              </span>
+              <input
+                type="range"
+                min={0}
+                max={2}
+                step={0.05}
+                value={draft.temperature}
+                onChange={(e) => set('temperature', Number(e.target.value))}
+                className="w-full"
+              />
+              <span style={{ fontSize: 10, color: C.dim }}>0 exact · 2 wild</span>
+            </label>
+
+            <label className="block">
+              <span className="mb-1 flex justify-between" style={{ fontSize: 12, color: C.muted }}>
+                Top P <b style={{ color: C.text }}>{draft.topP.toFixed(2)}</b>
+              </span>
+              <input
+                type="range"
+                min={0.05}
+                max={1}
+                step={0.05}
+                value={draft.topP}
+                onChange={(e) => set('topP', Number(e.target.value))}
+                className="w-full"
+              />
+              <span style={{ fontSize: 10, color: C.dim }}>nucleus sampling</span>
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block" style={{ fontSize: 12, color: C.muted }}>
+                Max output tokens
+              </span>
+              <input
+                type="number"
+                min={0}
+                step={256}
+                value={draft.maxTokens}
+                onChange={(e) => set('maxTokens', Number(e.target.value))}
+                className="w-full rounded-lg px-2 py-1.5"
+                style={{ background: C.input, border: `1px solid ${C.line}`, color: C.text, fontSize: 13 }}
+              />
+              <span style={{ fontSize: 10, color: C.dim }}>0 = provider default</span>
+            </label>
+          </div>
+
+          {/*
+           * تحذير من قياس لا من تخمين: النموذج يستهلك الميزانية في تفكيره
+           * قبل أن يكتب حرفًا. وmax_tokens=16 أعاد نصًّا فارغًا.
+           */}
+          {draft.maxTokens > 0 && draft.maxTokens < 1024 && (
+            <p
+              className="rounded-lg px-3 py-2"
+              style={{
+                fontSize: 11,
+                lineHeight: '16px',
+                background: 'color-mix(in srgb, var(--c-danger) 12%, transparent)',
+                color: C.muted,
+              }}
+            >
+              Below 1024 this model usually returns nothing: it spends the whole budget on hidden
+              reasoning before writing any visible text. Measured — a limit of 16 produced zero
+              characters and 16 reasoning tokens.
+            </p>
           )}
 
           <div className="flex items-center gap-2 pt-1">

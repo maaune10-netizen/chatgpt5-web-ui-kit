@@ -6,15 +6,33 @@
  * لكن في مكانين مختلفين — التفكير ليس جوابًا.
  */
 
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_PARAMS } from './prompt';
+
 export interface Config {
   baseUrl: string;
   apiKey: string;
   model: string;
+  /** تعليمات النظام — '' تعني «لا شيء»، لا «الافتراضي» */
+  systemPrompt: string;
+  temperature: number;
+  /** 0 = افتراضي المزوّد */
+  maxTokens: number;
+  topP: number;
 }
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
+}
+
+/**
+ * الحقول المقبولة من المزوّد. مقيسة لا مُفترضة: كلّها قُبِلت بـHTTP 200،
+ * والمعامل المجهول يُتجاهل صامتًا ولا يُخطئ.
+ */
+export interface ChatParams {
+  temperature: number;
+  max_tokens: number;
+  top_p: number;
 }
 
 export interface StreamDelta {
@@ -40,6 +58,10 @@ export const DEFAULT_CONFIG: Config = {
   baseUrl: PROXY_BASE,
   apiKey: '',
   model: (import.meta.env.VITE_LLM_MODEL as string) || 'deepseek-v4.1-flash',
+  systemPrompt: DEFAULT_SYSTEM_PROMPT,
+  temperature: DEFAULT_PARAMS.temperature,
+  maxTokens: DEFAULT_PARAMS.maxTokens,
+  topP: DEFAULT_PARAMS.topP,
 };
 
 /** الإعداد محفوظ في المتصفح، والافتراضي من متغيرات البيئة */
@@ -50,13 +72,23 @@ export function loadConfig(): Config {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return { ...DEFAULT_CONFIG };
     const saved = JSON.parse(raw) as Partial<Config>;
-    /* ارفض ما يوجّه الطلب بعيدًا عن الوسيط: المفتاح في الخادم لا في الصفحة */
-    const keepProxy = !saved.baseUrl || saved.baseUrl === PROXY_BASE;
+    /*
+     * العنوان ثابت على الوسيط دائمًا: المفتاح في الخادم لا في الصفحة.
+     * فلا يُحترم أي عنوان محفوظ يوجّه الطلب بعيدًا عنه.
+     */
     return {
       baseUrl: PROXY_BASE,
       apiKey: '',
       model: saved.model || DEFAULT_CONFIG.model,
-      ...(keepProxy ? {} : {}),
+      /*
+       * `systemPrompt` يُفحص بـ`typeof` لا بـ`||`:
+       * فالمستخدم قد يختار «None» فيصير `''` عن قصد، و`||` كان سيُعيد
+       * الافتراضي مكانه فيستحيل إسكاته.
+       */
+      systemPrompt: typeof saved.systemPrompt === 'string' ? saved.systemPrompt : DEFAULT_CONFIG.systemPrompt,
+      temperature: typeof saved.temperature === 'number' ? saved.temperature : DEFAULT_CONFIG.temperature,
+      maxTokens: typeof saved.maxTokens === 'number' ? saved.maxTokens : DEFAULT_CONFIG.maxTokens,
+      topP: typeof saved.topP === 'number' ? saved.topP : DEFAULT_CONFIG.topP,
     };
   } catch {
     return { ...DEFAULT_CONFIG };
@@ -108,9 +140,19 @@ export class ChatStream {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: config.model,
-          messages,
+          /*
+           * تعليمات النظام تُقدَّم أولًا — وهذا ما كان غائبًا كليًا.
+           * و`messages` المرسلة لا تحتوي رسائل system، فلا تكرار.
+           */
+          messages: config.systemPrompt?.trim()
+            ? [{ role: 'system', content: config.systemPrompt }, ...messages]
+            : messages,
           stream: true,
           stream_options: { include_usage: true },
+          temperature: config.temperature,
+          top_p: config.topP,
+          /* 0 تعني «اتركه للمزوّد» ولا تُرسل حقلًا صفريًّا يُشلّ الردّ */
+          ...(config.maxTokens > 0 ? { max_tokens: config.maxTokens } : {}),
         }),
       });
     } catch (e) {
