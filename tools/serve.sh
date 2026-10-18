@@ -20,10 +20,24 @@ start_app() {
   fi
 }
 
+# HTTPS عبر tailscale — المتصفحات الحديثة تفرض HTTPS، والمنفذ المجرّد يفشل عندها
+expose() {
+  if command -v tailscale >/dev/null 2>&1; then
+    if ! tailscale serve status 2>/dev/null | grep -q ':8446'; then
+      echo "[serve] exposing https://<host>:8446 → 127.0.0.1:5180"
+      sudo tailscale serve --bg --https=8446 http://127.0.0.1:5180 >/dev/null 2>&1 || \
+        echo "[serve] could not add the HTTPS mapping — run: sudo tailscale serve --bg --https=8446 http://127.0.0.1:5180"
+    fi
+  fi
+}
+
 if [ "${1:-}" = "--watch" ]; then
   while true; do start_proxy; start_app; sleep 15; done
 else
-  start_proxy; start_app
+  start_proxy; start_app; expose
   curl -s http://127.0.0.1:5199/api/health; echo
-  echo "[serve] app on http://127.0.0.1:5180  design on /#design"
+  echo "[serve] http://127.0.0.1:5180          التطبيق"
+  echo "[serve] https://<host>.ts.net:8446/     التطبيق (HTTPS)"
+  echo "[serve] .../#design                     الشاشات"
+  echo "[serve] .../diag.html                   التشخيص"
 fi
