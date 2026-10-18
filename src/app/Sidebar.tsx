@@ -245,9 +245,9 @@ export function Sidebar({
           >
             <span
               className="grid shrink-0 place-items-center rounded-full"
-              style={{ width: 24, height: 24, background: C.avatar }}
+              style={{ width: 24, height: 24, background: C.avatar, color: '#ffffff' }}
             >
-              <Icon name="user" size={14} style={{ filter: 'none', opacity: 1 }} />
+              <Icon name="user" size={14} style={{ opacity: 1 }} />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate" style={{ fontSize: 14, lineHeight: '20px' }}>

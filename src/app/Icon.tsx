@@ -4,8 +4,14 @@ import { useIconsReady } from '../lib/icons';
 /**
  * أيقونة من ملفات Figma المُصدَّرة.
  *
- * الاسم المنطقي (`copy`, `thumbsUp`) لا اسم الملف — فالأخير يحمل بصمة
- * محتواه ويتغيّر مع كل تصدير. والخريطة مولَّدة في `src/lib/icon-map.ts`.
+ * تُرسم بـ**قناع CSS** لا بوسم `img`.
+ *
+ * السبب: الأيقونات في التصميم سوداء على خلفية فاتحة. ولأن التطبيق داكن، كنت
+ * أقلبها بـ`filter: invert(1)` — وهو حلّ هشّ: كل موضع أُلغي فيه الفلتر يعود
+ * الرمز أسود على خلفية سوداء فيختفي تمامًا. وقد حدث في ثلاثة مواضع.
+ *
+ * والقناع يجعل الرمز يأخذ `currentColor`، أي **لون النص حوله**. فلا فلتر،
+ * ولا حالة خاصة، ويستحيل أن يختفي رمز بسبب الخلفية.
  */
 export function Icon({
   name,
@@ -27,20 +33,26 @@ export function Icon({
     return <span aria-hidden style={{ width: size, height: size, display: 'inline-block', ...style }} />;
   }
 
+  const url = `url("${src}")`;
+
   return (
-    <img
-      src={src}
-      alt=""
+    <span
       aria-hidden
-      draggable={false}
       className={className}
       style={{
-        width: size,
-        height: size,
         display: 'block',
         flex: '0 0 auto',
-        /* الأيقونات سوداء في الملف، والتطبيق داكن */
-        filter: 'invert(1)',
+        width: size,
+        height: size,
+        backgroundColor: 'currentColor',
+        WebkitMaskImage: url,
+        maskImage: url,
+        WebkitMaskRepeat: 'no-repeat',
+        maskRepeat: 'no-repeat',
+        WebkitMaskPosition: 'center',
+        maskPosition: 'center',
+        WebkitMaskSize: 'contain',
+        maskSize: 'contain',
         opacity: 0.92,
         ...style,
       }}

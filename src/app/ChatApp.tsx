@@ -254,9 +254,9 @@ export function ChatApp() {
               type="button"
               onClick={() => setUpgradeOpen(true)}
               className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full px-3 py-2 hover:brightness-110 sm:flex"
-              style={{ background: C.upsell, height: 36 }}
+              style={{ background: C.upsell, height: 36, color: '#ffffff' }}
             >
-              <Icon name="upgradeSparkleSolid" size={20} style={{ filter: 'none', opacity: 1 }} />
+              <Icon name="upgradeSparkleSolid" size={20} style={{ opacity: 1 }} />
               <span style={{ fontSize: 14 }}>Get Plus</span>
               <Icon name="close" size={14} />
             </button>

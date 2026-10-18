@@ -140,8 +140,10 @@ function Action({
       aria-label={label}
       onClick={onClick}
       className="grid h-8 w-8 place-items-center rounded-lg transition-colors hover:bg-white/10"
+      /* التصويت المُختار يُلوَّن بدل فلتر على الرمز */
+      style={{ color: active ? '#7ab2ff' : 'inherit' }}
     >
-      <Icon name={name} size={18} style={{ opacity: active ? 1 : 0.7, filter: active ? 'invert(1) sepia(1) saturate(3) hue-rotate(180deg)' : 'invert(1)' }} />
+      <Icon name={name} size={18} style={{ opacity: active ? 1 : 0.7 }} />
     </button>
   );
 }

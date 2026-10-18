@@ -124,9 +124,9 @@ export function Composer({
             title="Stop"
             onClick={onStop}
             className="grid h-9 w-9 shrink-0 place-items-center self-center rounded-full"
-            style={{ background: '#ffffff' }}
+            style={{ background: '#ffffff', color: '#000000' }}
           >
-            <Icon name="stop" size={18} style={{ filter: 'invert(1)', opacity: 1, background: '#000' }} />
+            <Icon name="stop" size={18} style={{ opacity: 1 }} />
           </button>
         ) : (
           <button
@@ -141,7 +141,7 @@ export function Composer({
             }}
           >
             {canSend ? (
-              <Icon name="arrowUp" size={18} style={{ filter: 'invert(1)', opacity: 1 }} />
+              <Icon name="arrowUp" size={18} style={{ opacity: 1 }} />
             ) : (
               <Icon name="voice" size={20} />
             )}
