@@ -35,7 +35,13 @@ function citationsFrom(text: string): Citation[] {
   return out;
 }
 
-export function ChatApp() {
+export function ChatApp({
+  theme = 'auto',
+  onTheme = () => {},
+}: {
+  theme?: 'dark' | 'light' | 'auto';
+  onTheme?: (t: 'dark' | 'light' | 'auto') => void;
+} = {}) {
   const store = useStore();
   const { state } = store;
   const signedIn = state.signedIn;
@@ -427,7 +433,7 @@ export function ChatApp() {
               <div className="px-6">
                 <div
                   className="mx-auto flex items-center gap-2 rounded-xl px-3 py-2"
-                  style={{ maxWidth: L.threadW, background: 'rgba(255,255,255,0.05)', fontSize: 12, color: C.muted }}
+                  style={{ maxWidth: L.threadW, background: 'var(--c-hover)', fontSize: 12, color: C.muted }}
                 >
                   <Icon name="temporaryChat" size={16} />
                   <span className="flex-1">This chat won’t appear in your history.</span>
@@ -470,7 +476,15 @@ export function ChatApp() {
           }}
         />
       )}
-      {settingsOpen && <SettingsModal config={config} onConfig={setCfg} onClose={() => setSettingsOpen(false)} />}
+      {settingsOpen && (
+        <SettingsModal
+          config={config}
+          onConfig={setCfg}
+          theme={theme}
+          onTheme={onTheme}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
       {searchOpen && (
         <SearchModal onClose={() => setSearchOpen(false)} conversations={state.conversations} onPick={(id) => store.openChat(id)} />
       )}

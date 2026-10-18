@@ -16,6 +16,24 @@ type Mode = 'app' | 'design';
  * المقاسات، فيبقى الاثنان بجانب بعضهما.
  */
 export default function App() {
+  /*
+   * الوضع على الجذر: كل الألوان متغيّرات CSS فتتغيّر معه بلا إعادة رسم.
+   * و«auto» يتبع النظام، وهو افتراضي ChatGPT نفسه.
+   */
+  const [theme, setTheme] = useState<'dark' | 'light' | 'auto'>(
+    () => (typeof localStorage !== 'undefined' ? (localStorage.getItem('gpt5.theme') as 'dark' | 'light' | 'auto') : null) || 'auto',
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: light)');
+    const apply = () => {
+      const resolved = theme === 'auto' ? (mq.matches ? 'light' : 'dark') : theme;
+      document.documentElement.dataset.theme = resolved;
+    };
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, [theme]);
+
   const [mode, setMode] = useState<Mode>(() => {
     const h = typeof location !== 'undefined' ? location.hash.replace('#', '') : '';
     return h === 'design' ? 'design' : 'app';
@@ -45,7 +63,7 @@ export default function App() {
 
   return (
     <div className="h-full" style={{ background: C.body, color: C.text }}>
-      {mode === 'app' ? <ChatApp /> : <DesignViewer />}
+      {mode === 'app' ? <ChatApp theme={theme} onTheme={setTheme} /> : <DesignViewer />}
 
       {/* مبدّل الوضع — صغير وغير متطفّل */}
       <button

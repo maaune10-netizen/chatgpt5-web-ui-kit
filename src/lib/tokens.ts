@@ -7,27 +7,27 @@
 
 export const C = {
   /* أسطح — Thread - Logged In، New Chat - Logged In */
-  body: '#212121',
-  sidebar: '#181818',
-  input: '#303030', // Prompt Input Field 768x56
-  menu: '#353535', // Context Menu 61:13896
-  raised: '#424242',
-  hover: 'rgba(255, 255, 255, 0.05)', // Button في ترويسة التطبيق
-  active: 'rgba(255, 255, 255, 0.10)',
-  line: 'rgba(255, 255, 255, 0.15)',
-  divider: 'rgba(255, 255, 255, 0.26)', // Line 1 في Divider
+  body: 'var(--c-body)',
+  sidebar: 'var(--c-sidebar)',
+  input: 'var(--c-input)', // Prompt Input Field 768x56
+  menu: 'var(--c-menu)', // Context Menu 61:13896
+  raised: 'var(--c-raised)',
+  hover: 'var(--c-hover)', // Button في ترويسة التطبيق
+  active: 'var(--c-active)',
+  line: 'var(--c-line)',
+  divider: 'var(--c-divider)', // Line 1 في Divider
 
   /* نص */
-  text: '#ffffff',
-  muted: '#afafaf', // Secondary text
-  dim: '#696969',
-  faint: '#8f8f8f',
+  text: 'var(--c-text)',
+  muted: 'var(--c-muted)', // Secondary text
+  dim: 'var(--c-dim)',
+  faint: 'var(--c-muted)',
 
-  accent: '#3c6ac3', // .User Profile Icon
-  avatar: '#3c6ac3', // .User Profile Icon
-  upsell: '#373669',
-  userBubble: '#303030',
-  codeBg: '#2f2f2f',
+  accent: 'var(--c-accent)', // .User Profile Icon
+  avatar: 'var(--c-accent)', // .User Profile Icon
+  upsell: 'var(--c-upsell)',
+  userBubble: 'var(--c-user-bubble)',
+  codeBg: 'var(--c-code)',
 } as const;
 
 export const L = {
@@ -60,12 +60,10 @@ export const FONT = {
 } as const;
 
 /* الظل الثلاثي — Context Menu */
-export const MENU_SHADOW =
-  'inset 0 0 1px 1px rgba(255,255,255,0.13), 0 6px 8px 0 rgba(0,0,0,0.10), 0 0 1.5px 0 rgba(0,0,0,0.45)';
+export const MENU_SHADOW = 'var(--c-shadow-menu)';
 
 /* ظل صندوق الإدخال — Prompt Input Field */
-export const INPUT_SHADOW =
-  'inset 0 1px 0 0 rgba(255,255,255,0.13), 0 8px 16px rgba(0,0,0,0.10), 0 1.5px 3px rgba(0,0,0,0.45)';
+export const INPUT_SHADOW = 'var(--c-shadow-input)';
 
 /* سلّم الطباعة — من قسم Typography */
 export const T = {
@@ -79,6 +77,6 @@ export const T = {
 
 /* ألوان المستخدم/المساعد */
 export const MSG = {
-  userBg: 'rgba(48, 48, 48, 1)',
+  userBg: 'var(--c-user-bubble)',
   assistantBg: 'transparent',
 } as const;

@@ -4,6 +4,71 @@
  * Design tokens — extracted from the ChatGPT 5 Web UI Kit
  * (Figma file J4mMUwLS0Mg1Ll5j6gH5wL, via the Design Dump plugin)
  */
+/*
+ * ألوان الوضعين — مقروءة من قسمَي Figma:
+ *   «Example Prototype - Dark Mode»  و «Example Prototype - Light Mode»
+ * وكل قيمة هنا مأخوذة من العقدة نفسها، لا مُقدَّرة.
+ *
+ * والتبديل بمتغيّرات CSS لا بإعادة رسم: فكل مكوّن يقرأ `var(--c-text)`
+ * فيتغيّر لونه تلقائيًا حين يتغيّر `data-theme` على الجذر.
+ */
+:root {
+  --c-body: #212121;
+  --c-sidebar: #181818;
+  --c-input: #303030;
+  --c-menu: #353535;
+  --c-raised: #424242;
+
+  --c-text: #ffffff;
+  --c-muted: #afafaf;
+  --c-dim: #696969;
+
+  --c-line: rgba(255, 255, 255, 0.15);
+  --c-divider: rgba(255, 255, 255, 0.26);
+  --c-hover: rgba(255, 255, 255, 0.07);
+  --c-active: rgba(255, 255, 255, 0.10);
+
+  --c-accent: #3c6ac3;
+  --c-upsell: #373669;
+  --c-user-bubble: #303030;
+  --c-code: #2f2f2f;
+  --c-danger: #ff8a8a;
+
+  --c-shadow-menu: inset 0 0 1px 1px rgba(255,255,255,0.13), 0 6px 8px 0 rgba(0,0,0,0.10), 0 0 1.5px 0 rgba(0,0,0,0.45);
+  --c-shadow-input: inset 0 1px 0 0 rgba(255,255,255,0.13), 0 8px 16px rgba(0,0,0,0.10), 0 1.5px 3px rgba(0,0,0,0.45);
+
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --c-body: #ffffff;
+  --c-sidebar: #f9f9f9;
+  --c-input: #ffffff;
+  --c-menu: #ffffff;
+  --c-raised: #ececec;
+
+  --c-text: #0d0d0d;
+  --c-muted: #8f8f8f;
+  --c-dim: #9b9b9b;
+
+  --c-line: #f2f2f2;
+  --c-divider: rgba(0, 0, 0, 0.10);
+  --c-hover: rgba(0, 0, 0, 0.05);
+  --c-active: rgba(0, 0, 0, 0.08);
+
+  --c-accent: #3c6ac3;
+  --c-upsell: #5d5bd0;
+  --c-user-bubble: #ececec;
+  --c-code: #f2f2f2;
+  --c-danger: #d93a3a;
+
+  /* الظل نفسه في الوضعين إلا حدّه الداخلي: أبيض على داكن، أسود على فاتح */
+  --c-shadow-menu: inset 0 0 1px 1px rgba(0,0,0,0.15), 0 6px 8px 0 rgba(0,0,0,0.10), 0 0 1.5px 0 rgba(0,0,0,0.45);
+  --c-shadow-input: inset 0 1px 0 0 rgba(0,0,0,0.06), 0 8px 16px rgba(0,0,0,0.08), 0 1.5px 3px rgba(0,0,0,0.16);
+
+  color-scheme: light;
+}
+
 @theme {
   --color-body: #212121;
   --color-sidebar: #181818;

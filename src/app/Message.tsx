@@ -54,8 +54,8 @@ export function MessageRow({
       {m.reasoning ? <Reasoning text={m.reasoning} live={m.streaming} /> : null}
 
       {m.error ? (
-        <div className="my-2 rounded-xl px-4 py-3" style={{ background: 'rgba(255,90,90,0.10)', border: '1px solid rgba(255,90,90,0.30)' }}>
-          <p style={{ fontSize: 14, color: '#ffb4b4' }}>{m.error}</p>
+        <div className="my-2 rounded-xl px-4 py-3" style={{ background: 'color-mix(in srgb, var(--c-danger) 12%, transparent)', border: '1px solid color-mix(in srgb, var(--c-danger) 35%, transparent)' }}>
+          <p style={{ fontSize: 14, color: 'var(--c-danger)' }}>{m.error}</p>
         </div>
       ) : m.streaming && !m.content ? (
         <Typing />

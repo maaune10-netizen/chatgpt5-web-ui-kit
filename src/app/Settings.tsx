@@ -43,7 +43,7 @@ export function ModelMenu({
         Model
       </p>
       {err && (
-        <p className="px-3 py-2" style={{ fontSize: 12, color: '#ffb4b4' }}>
+        <p className="px-3 py-2" style={{ fontSize: 12, color: 'var(--c-danger)' }}>
           {err}
         </p>
       )}
@@ -79,7 +79,19 @@ export function ModelMenu({
 }
 
 /* ————— الإعدادات ————— */
-export function SettingsModal({ config, onConfig, onClose }: { config: Config; onConfig: (c: Config) => void; onClose: () => void }) {
+export function SettingsModal({
+  config,
+  onConfig,
+  theme,
+  onTheme,
+  onClose,
+}: {
+  config: Config;
+  onConfig: (c: Config) => void;
+  theme: 'dark' | 'light' | 'auto';
+  onTheme: (t: 'dark' | 'light' | 'auto') => void;
+  onClose: () => void;
+}) {
   const [draft, setDraft] = useState(config);
   const [test, setTest] = useState<{ ok: boolean; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -106,7 +118,32 @@ export function SettingsModal({ config, onConfig, onClose }: { config: Config; o
         </div>
 
         <div className="space-y-4 p-5">
-          <p className="rounded-lg px-3 py-2.5" style={{ background: 'rgba(255,255,255,0.05)', fontSize: 12, color: C.muted, lineHeight: '18px' }}>
+          {/* الوضع — كما في Settings عند ChatGPT */}
+          <div>
+            <p className="mb-2" style={{ fontSize: 13, fontWeight: 600 }}>Appearance</p>
+            <div className="flex gap-2">
+              {([['auto', 'System'], ['light', 'Light'], ['dark', 'Dark']] as const).map(([v, label]) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => onTheme(v)}
+                  className="flex-1 rounded-lg py-2.5 text-sm transition-colors"
+                  style={{
+                    background: theme === v ? 'var(--c-text)' : 'var(--c-hover)',
+                    color: theme === v ? 'var(--c-body)' : 'var(--c-text)',
+                    border: `1px solid ${theme === v ? 'transparent' : 'var(--c-line)'}`,
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2" style={{ fontSize: 11, color: 'var(--c-dim)' }}>
+              Auto follows your system — that is ChatGPT’s own default.
+            </p>
+          </div>
+
+          <p className="rounded-lg px-3 py-2.5" style={{ background: 'var(--c-hover)', fontSize: 12, color: C.muted, lineHeight: '18px' }}>
             المفتاح يبقى في الخادم ولا يصل هذه الصفحة. لتغييره حرّر
             <code style={{ fontFamily: 'ui-monospace, monospace', margin: '0 4px' }}>.env.local</code>
             ثم أعد تشغيل الوسيط.
@@ -121,7 +158,7 @@ export function SettingsModal({ config, onConfig, onClose }: { config: Config; o
           </Field>
 
           {test && (
-            <p style={{ fontSize: 13, color: test.ok ? '#8ee6a0' : '#ffb4b4' }}>{test.msg}</p>
+            <p style={{ fontSize: 13, color: test.ok ? '#8ee6a0' : 'var(--c-danger)' }}>{test.msg}</p>
           )}
 
           <div className="flex items-center gap-2 pt-1">

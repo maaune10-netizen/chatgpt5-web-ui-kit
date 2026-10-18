@@ -14,7 +14,7 @@ export function Composer({
   onStop,
   streaming,
   disabled,
-  placeholder = 'Ask anything',
+  placeholder = 'Ask ChatGPT',
   onAttach,
   onPasteImage,
   tall,
@@ -59,7 +59,7 @@ export function Composer({
           height: tall ? 102 : L.inputH,
           paddingTop: tall ? 12 : 0,
           paddingBottom: tall ? 12 : 0,
-          boxShadow: focused ? INPUT_SHADOW + ', 0 0 0 1px rgba(255,255,255,0.08)' : INPUT_SHADOW,
+          boxShadow: focused ? INPUT_SHADOW + ', 0 0 0 1px var(--c-line)' : INPUT_SHADOW,
         }}
       >
         <button
@@ -136,7 +136,7 @@ export function Composer({
             disabled={!canSend}
             className="grid h-9 w-9 shrink-0 place-items-center self-center rounded-full transition-colors"
             style={{
-              background: canSend ? '#ffffff' : 'rgba(255,255,255,0.10)',
+              background: canSend ? '#ffffff' : 'var(--c-active)',
               cursor: canSend ? 'pointer' : 'default',
             }}
           >

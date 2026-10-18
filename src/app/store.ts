@@ -61,7 +61,10 @@ export interface LibraryItem {
   createdAt: number;
 }
 
+export type Theme = 'dark' | 'light' | 'auto';
+
 export interface AppState {
+  theme: Theme;
   /** المحادثة المفتوحة */
   activeId: string | null;
   /** المسار المعروض */
@@ -107,6 +110,7 @@ export const uid = (p = 'id'): string =>
 
 export function useStore() {
   const [state, setState] = useState<AppState>({
+    theme: (typeof localStorage !== 'undefined' ? (localStorage.getItem('gpt5.theme') as Theme) : null) || 'auto',
     activeId: null,
     view: 'chat',
     viewArg: null,
@@ -422,6 +426,15 @@ export function useStore() {
       },
 
       /* ————— الحساب والوضع ————— */
+      setTheme(t: Theme) {
+        patch((s) => ({ ...s, theme: t }));
+        try {
+          localStorage.setItem('gpt5.theme', t);
+        } catch {
+          /* — */
+        }
+      },
+
       signIn(email = 'hello@interactionfaction.com') {
         patch((s) => ({ ...s, signedIn: true, email }));
         try {

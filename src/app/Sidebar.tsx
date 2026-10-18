@@ -84,7 +84,7 @@ function Row({
             height: ITEM.h,
             background: C.input,
             fontSize: ITEM.labelSize,
-            border: '1px solid rgba(255,255,255,0.25)',
+            border: '1px solid var(--c-line)',
           }}
         />
       </div>
@@ -108,7 +108,7 @@ function Row({
           height: ITEM.h,
           /* زرّان (٢٨+٢+٢٨) + هامش ٤ = ٦٢. والحشو ٦٠ كان يترك تراكبًا بكسلين */
           paddingInlineEnd: onMenu && onTogglePin ? 64 : onMenu || onTogglePin ? 34 : 10,
-          background: active ? 'rgba(255,255,255,0.10)' : undefined,
+          background: active ? 'var(--c-active)' : undefined,
           color: muted ? C.muted : C.text,
         }}
       >
@@ -343,14 +343,19 @@ export function Sidebar({
       <div className="flex h-full flex-col" style={{ width: overlay ? Math.min(width, 320) : width }}>
         {/* الترويسة */}
         <div className="flex items-center justify-between px-2.5 pt-2">
+          {/*
+            الموقع الحقيقي يستعمل **كلمة** «ChatGPT» هنا لا الأيقونة.
+            وقد ظننتها أيقونة حتى رأيت اللقطة.
+          */}
           <button
             type="button"
             onClick={() => void store.newChat()}
             title="ChatGPT"
             aria-label="ChatGPT"
-            className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
+            className="flex h-9 items-center rounded-lg px-2 hover:bg-white/10"
+            style={{ fontSize: 17, fontWeight: 600, letterSpacing: -0.2 }}
           >
-            <Icon name="chatgpt" size={22} />
+            ChatGPT
           </button>
           <button
             type="button"
@@ -449,13 +454,25 @@ export function Sidebar({
         {/* التذييل */}
         <div className="flex items-center justify-between gap-2 px-2 py-2">
           {!state.signedIn ? (
-            <button
-              type="button"
-              onClick={onLogin}
-              className="flex-1 rounded-[10px] px-3 py-2 text-start text-sm font-medium hover:bg-white/[0.07]"
-            >
-              Log in
-            </button>
+            /*
+              كتلة التذييل لغير المسجَّل — منقولة من الموقع الحقيقي:
+                عنوان + شرح + زر بعرض الشريط.
+              ولم أكن أعرف بوجودها قبل اللقطة.
+            */
+            <div className="flex-1">
+              <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Get responses tailored to you</p>
+              <p style={{ fontSize: 12, lineHeight: '16px', color: C.muted, marginBottom: 10 }}>
+                Log in to get answers based on saved chats, plus create images and upload files.
+              </p>
+              <button
+                type="button"
+                onClick={onLogin}
+                className="w-full rounded-full py-2 text-sm font-medium transition-colors hover:bg-white/10"
+                style={{ border: `1px solid ${C.line}` }}
+              >
+                Log in
+              </button>
+            </div>
           ) : (
             <button
               ref={accountRef}
@@ -482,14 +499,16 @@ export function Sidebar({
               </span>
             </button>
           )}
-          <button
-            type="button"
-            onClick={onUpgrade}
-            className="shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors hover:bg-white/15"
-            style={{ background: 'rgba(255,255,255,0.10)', border: `1px solid ${C.line}` }}
-          >
-            Upgrade
-          </button>
+          {state.signedIn && (
+            <button
+              type="button"
+              onClick={onUpgrade}
+              className="shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors hover:bg-white/15"
+              style={{ background: 'var(--c-active)', border: `1px solid ${C.line}` }}
+            >
+              Upgrade
+            </button>
+          )}
         </div>
       </div>
 
@@ -603,7 +622,7 @@ function ChatMenu({
           <button
             type="button"
             className={item}
-            style={{ ...style, color: confirm ? '#ff8a8a' : undefined }}
+            style={{ ...style, color: confirm ? 'var(--c-danger)' : undefined }}
             onClick={() => {
               if (!confirm) return setConfirm(true);
               void store.deleteChat(id);

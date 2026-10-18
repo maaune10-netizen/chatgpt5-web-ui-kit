@@ -26,7 +26,7 @@ export function Library({ store, onOpenImage }: { store: Store; onOpenImage: (sr
             onClick={() => setTab(t)}
             className="rounded-full px-3 py-1.5 text-sm transition-colors"
             style={{
-              background: tab === t ? 'rgba(255,255,255,0.12)' : 'transparent',
+              background: tab === t ? 'var(--c-active)' : 'transparent',
               color: tab === t ? C.text : C.muted,
             }}
           >
@@ -185,7 +185,7 @@ export function ProjectPage({ store, projectId, onOpenChat }: { store: Store; pr
           type="button"
           onClick={() => store.deleteProject(project.id)}
           className="mt-10 rounded-full px-4 py-2 text-sm"
-          style={{ background: 'rgba(255,90,90,0.12)', color: '#ffb4b4' }}
+          style={{ background: 'color-mix(in srgb, var(--c-danger) 14%, transparent)', color: 'var(--c-danger)' }}
         >
           Delete project
         </button>

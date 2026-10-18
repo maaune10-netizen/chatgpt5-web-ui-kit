@@ -54,7 +54,8 @@ export function NewChat({
             className="text-center"
             style={{ fontSize: T.h1.size, lineHeight: `${T.h1.lh}px`, fontWeight: 600 }}
           >
-            {signedIn ? 'Ready when you are.' : 'ChatGPT'}
+            {/* من الموقع الحقيقي: غير المسجَّل يرى «Where should we begin?» */}
+            {signedIn ? 'Ready when you are.' : 'Where should we begin?'}
           </h1>
 
           {/*
@@ -69,7 +70,7 @@ export function NewChat({
               onSend={onSend}
               onStop={onStop}
               streaming={streaming}
-              placeholder="Ask anything"
+              placeholder="Ask ChatGPT"
               tall={!signedIn}
               onAttach={onAttach}
               onPasteImage={onPasteImage}

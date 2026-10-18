@@ -238,7 +238,7 @@ export function UpgradeModal({ onClose }: { onClose: () => void }) {
                 <p style={{ fontSize: 12, color: C.muted }}>{sub}</p>
               </div>
               {cta ? (
-                <span className="rounded-full px-3 py-1 text-xs" style={{ background: 'rgba(255,255,255,0.12)' }}>
+                <span className="rounded-full px-3 py-1 text-xs" style={{ background: 'var(--c-active)' }}>
                   {cta}
                 </span>
               ) : null}
