@@ -33,7 +33,13 @@
   }
   .samples { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   .samples span { font-size: 30px; }
-  .samples img { width: 26px; height: 26px; filter: invert(1); }
+  /*
+   * بلا فلتر.
+   * ملفات الأيقونات تحمل fill="white" أصلًا، فأي invert عليها يقلبها سوداء
+   * على خلفية داكنة. وهذا ما جعل الحروف تظهر كأنها لا تُرسم.
+   */
+  .samples img { width: 26px; height: 26px; }
+  .samples .lbl { font-size: 11px; color: #8f8f8f; font-family: system-ui, sans-serif; }
 </style>
 </head>
 <body>
@@ -126,13 +132,28 @@ async function imgOk(url) {
     const url = BASE + 'generated-icons/' + n + '.svg';
     const ok = await imgOk(url);
     results.push({ n, ...ok });
-    const img = document.createElement('img');
-    img.src = url;
-    box.appendChild(img);
+    /*
+     * تُرسم بالقناع نفسه الذي يستعمله التطبيق — فيُقاس ما يُرى فعلًا.
+     * وعرض الصورة الخام بجانبها كان يضاعف الرموز ويُشوّش القراءة.
+     */
+    const el = document.createElement('span');
+    el.style.cssText =
+      'display:inline-block;width:26px;height:26px;background:currentColor;color:#fff;' +
+      `-webkit-mask:url("${url}") center/contain no-repeat;mask:url("${url}") center/contain no-repeat;`;
+    box.appendChild(el);
   }
   const broken = results.filter((r) => !r.ok).length;
   row('أيقونات فُحصت', results.length);
   row('أيقونات مكسورة', broken, broken ? 'bad' : 'ok');
+
+  /* اللون الفعلي: أيقونة سوداء على خلفية داكنة تعني رمزًا لا يُرى */
+  const first = box.firstElementChild;
+  const iconColour = first ? getComputedStyle(first).backgroundColor : null;
+  const luma = iconColour && /rgb\((\d+), (\d+), (\d+)/.exec(iconColour);
+  const bright = luma ? 0.299 * +luma[1] + 0.587 * +luma[2] + 0.114 * +luma[3] : null;
+  row('لون الأيقونة', iconColour || '—',
+    bright === null ? '' : bright > 120 ? 'ok' : 'bad');
+  row('دقّة الجهاز', window.devicePixelRatio + '×');
   if (results.length) {
     detail.innerHTML = '<div class="row"><span class="k">عيّنة</span><span class="v">' +
       results.map((r) => r.n.slice(0, 14) + '=' + (r.ok ? r.w + 'px' : 'فشل')).join(' · ') + '</span></div>';
@@ -178,7 +199,7 @@ async function imgOk(url) {
     when: new Date().toISOString(),
     emoji: { noto, segui, apple },
     catalog: cat,
-    icons: { checked: results.length, broken },
+    icons: { checked: results.length, broken, colour: iconColour },
     screens: shotCount,
     proxy: healthBody,
     env: {
