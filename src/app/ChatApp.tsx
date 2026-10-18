@@ -7,9 +7,35 @@ import { AccountMenu } from './AccountMenu';
 import { ModelMenu, SettingsModal } from './Settings';
 import { LoginModal, SearchModal, ShareModal, UpgradeModal } from './Modals';
 import { Library, ImageViewer, ProjectPage } from './Library';
-import { useStore, type Message } from './store';
+import { useStore, type Citation, type Message } from './store';
 import { C, L, T } from '../lib/tokens';
 import { ChatStream, loadConfig, saveConfig, isConfigured, type Config, type ChatMessage } from '../lib/llm';
+
+/**
+ * يستخرج المصادر من نصّ الرد.
+ *
+ * التصميم يعرض «Sources» بأقراص مرقّمة، ولا يعطيها النموذج في حقل مستقل —
+ * فيُستخرج ما ورد فيه من روابط. وإن لم يذكر روابط فلا قسم مصادر أصلًا،
+ * وهو أصحّ من عرض قسم فارغ.
+ */
+function citationsFrom(text: string): Citation[] {
+  const seen = new Set<string>();
+  const out: Citation[] = [];
+  for (const m of text.matchAll(/\[([^\]]{2,80})\]\((https?:\/\/[^)]+)\)/g)) {
+    const url = m[2];
+    if (seen.has(url)) continue;
+    seen.add(url);
+    let host = url;
+    try {
+      host = new URL(url).hostname.replace(/^www\./, '');
+    } catch {
+      /* رابط غير صالح — يبقى كما هو */
+    }
+    out.push({ title: m[1], url, host });
+    if (out.length >= 8) break;
+  }
+  return out;
+}
 
 const SUGGESTIONS = [
   { icon: 'image', title: 'Create an image', sub: 'of a cat riding a bike' },
@@ -85,13 +111,17 @@ export function ChatApp() {
               reasoning: (m.reasoning || '') + (d.reasoning || ''),
             })),
           onDone: ({ finish }) => {
-            store.patchMessage(convId, assistantId, (m) => ({
-              ...m,
-              streaming: false,
-              stopped: finish === 'stopped',
-              /* التفكير في الحقل المستقل، لا مخلوطًا بالجواب */
-              content: m.content.trim() || (m.reasoning ? '' : 'No response.'),
-            }));
+            store.patchMessage(convId, assistantId, (m) => {
+              const content = m.content.trim() || (m.reasoning ? '' : 'No response.');
+              return {
+                ...m,
+                streaming: false,
+                stopped: finish === 'stopped',
+                /* التفكير في الحقل المستقل، لا مخلوطًا بالجواب */
+                content,
+                citations: citationsFrom(content),
+              };
+            });
             resolve();
           },
           onError: (e) => {
@@ -111,6 +141,11 @@ export function ChatApp() {
     (text?: string, image?: string) => {
       const body = (text ?? input).trim();
       if (!body && !image) return;
+      /* غير مسجَّل: ادعُه للدخول بدل أن ترسل */
+      if (!store.state.signedIn) {
+        setLoginOpen(true);
+        return;
+      }
       const convId = conv?.id ?? store.newChat();
       const base = conv?.id ? conv.messages : [];
 
@@ -192,6 +227,7 @@ export function ChatApp() {
         onOpenSearch={() => setSearchOpen(true)}
         onOpenAccount={setAccountAt}
         onUpgrade={() => setUpgradeOpen(true)}
+        onLogin={() => setLoginOpen(true)}
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -296,6 +332,26 @@ export function ChatApp() {
               )}
             </div>
 
+            {/* لافتة الوضع المؤقت */}
+            {store.state.temporary && (
+              <div className="px-6">
+                <div
+                  className="mx-auto flex items-center gap-2 rounded-xl px-3 py-2"
+                  style={{ maxWidth: L.threadW, background: 'rgba(255,255,255,0.05)', fontSize: 12, color: C.muted }}
+                >
+                  <Icon name="temporaryChat" size={16} />
+                  <span className="flex-1">This chat won’t appear in your history or be used to train models.</span>
+                  <button
+                    type="button"
+                    onClick={() => store.endTemporary()}
+                    className="rounded-md px-2 py-1 hover:bg-white/10"
+                  >
+                    Turn off
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* صندوق الإدخال */}
             <div className="shrink-0 px-6 pb-4" style={{ paddingTop: 8 }}>
               <Composer
@@ -333,8 +389,10 @@ export function ChatApp() {
             setAccountAt(null);
             setUpgradeOpen(true);
           }}
+          /* الخروج يُخرج فعلًا، ثم يعرض شاشة الدخول كما في ChatGPT */
           onLogout={() => {
             setAccountAt(null);
+            store.signOut();
             setLoginOpen(true);
           }}
         />
@@ -355,7 +413,15 @@ export function ChatApp() {
         />
       )}
       {upgradeOpen && <UpgradeModal onClose={() => setUpgradeOpen(false)} />}
-      {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} onLogin={() => setLoginOpen(false)} />}
+      {loginOpen && (
+        <LoginModal
+          onClose={() => setLoginOpen(false)}
+          onLogin={() => {
+            store.signIn();
+            setLoginOpen(false);
+          }}
+        />
+      )}
       {viewer && <ImageViewer src={viewer.src} title={viewer.title} onClose={() => setViewer(null)} />}
     </div>
   );

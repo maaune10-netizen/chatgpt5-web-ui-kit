@@ -56,6 +56,13 @@ export interface LibraryItem {
 }
 
 export interface AppState {
+  /** مسجَّل الدخول؟ — يغيّر الشريط الجانبي وسلوك الإدخال */
+  signedIn: boolean;
+  email: string;
+  /** الوضع المؤقت: لا يُحفظ في القائمة */
+  temporary: boolean;
+  /** محادثة المؤقت — منفصلة كي لا تختلط بالمحفوظات */
+  tempConv: Conversation | null;
   conversations: Conversation[];
   projects: Project[];
   library: LibraryItem[];
@@ -100,7 +107,18 @@ function seed(): AppState {
     { id: uid('c'), title: 'Response Types', messages: [], createdAt: Date.now() - 80000, updatedAt: Date.now() - 80000 },
     { id: uid('c'), title: 'Loading Animations', messages: [], createdAt: Date.now() - 70000, updatedAt: Date.now() - 70000 },
   ];
-  return { conversations, projects, library: [], activeId: null, view: 'chat', viewArg: null };
+  return {
+    signedIn: true,
+    email: 'hello@interactionfaction.com',
+    temporary: false,
+    tempConv: null,
+    conversations,
+    projects,
+    library: [],
+    activeId: null,
+    view: 'chat',
+    viewArg: null,
+  };
 }
 
 function load(): AppState {
@@ -113,6 +131,10 @@ function load(): AppState {
       for (const m of c.messages || []) if (m.streaming) m.streaming = false;
     }
     return {
+      signedIn: j.signedIn !== false,
+      email: j.email || 'hello@interactionfaction.com',
+      temporary: Boolean(j.temporary),
+      tempConv: null,
       conversations: j.conversations || [],
       projects: j.projects || [],
       library: j.library || [],
@@ -145,18 +167,18 @@ export function useStore() {
   }, [state]);
 
   const active = useMemo(
-    () => state.conversations.find((c) => c.id === state.activeId) ?? null,
-    [state.conversations, state.activeId],
+    () => state.tempConv ?? state.conversations.find((c) => c.id === state.activeId) ?? null,
+    [state.tempConv, state.conversations, state.activeId],
   );
 
   const patch = useCallback((fn: (s: AppState) => AppState) => setState((s) => fn(s)), []);
 
   const patchConversation = useCallback(
     (id: string, fn: (c: Conversation) => Conversation) =>
-      patch((s) => ({
-        ...s,
-        conversations: s.conversations.map((c) => (c.id === id ? fn(c) : c)),
-      })),
+      patch((s) => {
+        if (s.tempConv && s.tempConv.id === id) return { ...s, tempConv: fn(s.tempConv) };
+        return { ...s, conversations: s.conversations.map((c) => (c.id === id ? fn(c) : c)) };
+      }),
     [patch],
   );
 
@@ -183,7 +205,16 @@ export function useStore() {
           projectId,
           temporary,
         };
-        patch((s) => ({ ...s, conversations: [c, ...s.conversations], activeId: c.id, view: 'chat', viewArg: null }));
+        /*
+         * المؤقتة تسكن خارج القائمة، فلا تظهر ولا تُحفظ.
+         * وكانت `temporary` لا تُضبط في الحالة، فلا تظهر اللافتة ولا يُعرف
+         * أن الوضع مؤقت أصلًا.
+         */
+        patch((s) =>
+          temporary
+            ? { ...s, temporary: true, tempConv: c, view: 'chat', viewArg: null }
+            : { ...s, temporary: false, tempConv: null, conversations: [c, ...s.conversations], activeId: c.id, view: 'chat', viewArg: null },
+        );
         return c.id;
       },
       openChat(id: string) {
@@ -197,6 +228,7 @@ export function useStore() {
           ...s,
           conversations: s.conversations.filter((c) => c.id !== id),
           activeId: s.activeId === id ? null : s.activeId,
+          tempConv: s.tempConv?.id === id ? null : s.tempConv,
         }));
       },
       togglePin(id: string) {
@@ -253,6 +285,20 @@ export function useStore() {
       },
       removeLibrary(id: string) {
         patch((s) => ({ ...s, library: s.library.filter((x) => x.id !== id) }));
+      },
+
+      /* —— الحساب والوضع —— */
+      signIn(email = 'hello@interactionfaction.com') {
+        patch((s) => ({ ...s, signedIn: true, email }));
+      },
+      signOut() {
+        patch((s) => ({ ...s, signedIn: false }));
+      },
+      setTemporary(on: boolean) {
+        patch((s) => ({ ...s, temporary: on, tempConv: on ? s.tempConv : null }));
+      },
+      endTemporary() {
+        patch((s) => ({ ...s, temporary: false, tempConv: null, activeId: null }));
       },
 
       /* —— تنقّل —— */

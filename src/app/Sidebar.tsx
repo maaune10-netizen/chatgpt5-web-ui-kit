@@ -63,6 +63,7 @@ export function Sidebar({
   onOpenSearch,
   onOpenAccount,
   onUpgrade,
+  onLogin,
   collapsed,
   onToggleCollapsed,
 }: {
@@ -70,6 +71,7 @@ export function Sidebar({
   onOpenSearch: () => void;
   onOpenAccount: (anchor: DOMRect) => void;
   onUpgrade: () => void;
+  onLogin: () => void;
   collapsed: boolean;
   onToggleCollapsed: () => void;
 }) {
@@ -106,6 +108,7 @@ export function Sidebar({
             type="button"
             onClick={() => store.newChat()}
             title="ChatGPT"
+            aria-label="ChatGPT"
             className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
           >
             <Icon name="chatgpt" size={22} />
@@ -114,6 +117,7 @@ export function Sidebar({
             type="button"
             onClick={onToggleCollapsed}
             title="Close sidebar"
+            aria-label="Close sidebar"
             className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
           >
             <Icon name="sidebar" size={20} />
@@ -124,6 +128,12 @@ export function Sidebar({
           <Row icon="create" label="New Chat" trailing="Ctrl + Shift + O" onClick={() => store.newChat()} />
           <Row icon="search" label="Search chats" onClick={onOpenSearch} />
           <Row icon="images" label="Library" onClick={() => store.go('library')} />
+          <Row
+            icon="temporaryChat"
+            label="Temporary chat"
+            active={state.temporary}
+            onClick={() => store.newChat(null, true)}
+          />
         </div>
 
         {/* GPTs */}
@@ -141,6 +151,7 @@ export function Sidebar({
               <button
                 type="button"
                 title="New project"
+                aria-label="New project"
                 onClick={() => store.newProject('New project')}
                 className="grid h-6 w-6 place-items-center rounded-md hover:bg-white/10"
               >
@@ -214,6 +225,15 @@ export function Sidebar({
 
         {/* التذييل */}
         <div className="flex items-center justify-between gap-2 px-2 py-2">
+          {!state.signedIn ? (
+            <button
+              type="button"
+              onClick={onLogin}
+              className="flex-1 rounded-[10px] px-3 py-2 text-start text-sm font-medium hover:bg-white/[0.07]"
+            >
+              Log in
+            </button>
+          ) : (
           <button
             ref={accountRef}
             type="button"
@@ -238,6 +258,7 @@ export function Sidebar({
               </span>
             </span>
           </button>
+          )}
           <button
             type="button"
             onClick={onUpgrade}
@@ -257,18 +278,11 @@ export function Sidebar({
           />
         )}
 
-        {/* زر إظهار الشريط حين يكون مطويًا */}
-        {collapsed && (
-          <button
-            type="button"
-            onClick={onToggleCollapsed}
-            title="Open sidebar"
-            className="absolute left-2 top-2 grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
-            style={{ background: C.sidebar }}
-          >
-            <Icon name="sidebar" size={20} />
-          </button>
-        )}
+        {/*
+          زر الإظهار ليس هنا.
+          كان داخل الشريط المطوي، والشريط عرضه صفر مع overflow مخفي — فكان
+          الزر مقصوصًا لا يمكن بلوغه. وهو في ترويسة التطبيق حيث يبقى ظاهرًا.
+        */}
       </div>
 
       {/* زر الطيّ حين يكون مقفلًا */}
