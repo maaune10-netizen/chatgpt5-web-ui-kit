@@ -72,6 +72,7 @@ export interface AppState {
   temporary: boolean;
   tempConv: Conversation | null;
   conversations: Conversation[];
+  archived: Conversation[];
   projects: Project[];
   files: LibraryItem[];
   model: string;
@@ -114,6 +115,7 @@ export function useStore() {
     temporary: false,
     tempConv: null,
     conversations: [],
+    archived: [],
     projects: [],
     files: [],
     model: '',
@@ -244,6 +246,20 @@ export function useStore() {
         }));
         try {
           await req('DELETE', `/conversations/${id}`);
+        } catch (e) {
+          errors.current?.((e as Error).message);
+        }
+      },
+
+      async archiveChat(id: string, archived: boolean) {
+        patch((s) => ({
+          ...s,
+          conversations: s.conversations.filter((c) => c.id !== id),
+          activeId: s.activeId === id ? null : s.activeId,
+        }));
+        try {
+          await req('PATCH', `/conversations/${id}`, { archived });
+          await load();
         } catch (e) {
           errors.current?.((e as Error).message);
         }

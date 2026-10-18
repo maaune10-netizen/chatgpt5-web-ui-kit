@@ -1,32 +1,92 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './Icon';
-import { C, ITEM, L } from '../lib/tokens';
-import type { Store } from './store';
+import { C, ITEM } from '../lib/tokens';
+import type { Store, Conversation } from './store';
 
-/** صف الشريط الجانبي — 260x36 بنصف قطر 10، من Menu List Item Base */
+/**
+ * الشريط الجانبي.
+ *
+ * ثلاثة أشياء تُدار هنا ويجب أن تبقى منفصلة:
+ *
+ * ١) **العرض** — يُسحب من حافته اليمنى بين حدّين، ويُحفظ في المتصفح.
+ * ٢) **الطيّ** — زر في الترويسة يخفيه كاملًا.
+ * ٣) **الأقسام** — لكل قسم سهم يطويه، وحالته محفوظة.
+ *
+ * وكلها مستقلّة: طيّ قسم لا يغيّر العرض، وسحب العرض لا يفتح قسمًا.
+ */
+
+const MIN_W = 200;
+const MAX_W = 460;
+const LS_WIDTH = 'gpt5.sidebar.width';
+const LS_CLOSED = 'gpt5.sidebar.closed';
+
+/* ————— صفّ ————— */
 function Row({
   icon,
   label,
   trailing,
   active,
+  pinned,
   onClick,
-  onContextMenu,
   onMenu,
+  onTogglePin,
   muted,
   bold,
+  renaming,
+  onRename,
+  onRenameCancel,
 }: {
   icon?: string;
   label: string;
   trailing?: string;
   active?: boolean;
+  pinned?: boolean;
   onClick?: () => void;
-  onContextMenu?: (e: React.MouseEvent) => void;
-  /** يفتح قائمة الإجراءات — التصميم يضعها في .List Item Trailing Content عند x=218 */
   onMenu?: (at: DOMRect) => void;
+  onTogglePin?: () => void;
   muted?: boolean;
   bold?: boolean;
+  renaming?: boolean;
+  onRename?: (v: string) => void;
+  onRenameCancel?: () => void;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [draft, setDraft] = useState(label);
+
+  useEffect(() => {
+    if (renaming) {
+      setDraft(label);
+      requestAnimationFrame(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      });
+    }
+  }, [renaming, label]);
+
+  if (renaming) {
+    return (
+      <div className="px-1">
+        <input
+          ref={inputRef}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={() => onRename?.(draft.trim() || label)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') onRename?.(draft.trim() || label);
+            if (e.key === 'Escape') onRenameCancel?.();
+          }}
+          className="w-full rounded-[10px] px-2.5 outline-none"
+          style={{
+            height: ITEM.h,
+            background: C.input,
+            fontSize: ITEM.labelSize,
+            border: '1px solid rgba(255,255,255,0.25)',
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="group/row relative">
@@ -34,8 +94,8 @@ function Row({
         ref={ref}
         type="button"
         onClick={onClick}
-        onContextMenu={onContextMenu}
-        className="flex w-full items-center gap-2 rounded-[10px] px-2.5 text-start transition-colors hover:bg-white/[0.07]"
+        onDoubleClick={() => onMenu && ref.current && onMenu(ref.current.getBoundingClientRect())}
+        className="flex w-full items-center gap-2 rounded-[10px] ps-2.5 pe-8 text-start transition-colors hover:bg-white/[0.07]"
         style={{
           height: ITEM.h,
           background: active ? 'rgba(255,255,255,0.10)' : undefined,
@@ -49,37 +109,49 @@ function Row({
         >
           {label}
         </span>
-        {trailing && !onMenu ? (
+        {trailing && !onMenu && !onTogglePin ? (
           <span style={{ fontSize: 12, color: C.dim, whiteSpace: 'nowrap' }}>{trailing}</span>
         ) : null}
       </button>
 
-      {/* يظهر عند المرور فقط، فلا يزدحم الشريط */}
-      {onMenu && (
-        <button
-          type="button"
-          title="More"
-          aria-label={`More options for ${label}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            const r = ref.current?.getBoundingClientRect();
-            if (r) onMenu(r);
-          }}
-          className="absolute right-1 top-1/2 hidden h-7 w-7 -translate-y-1/2 place-items-center rounded-md hover:bg-white/15 group-hover/row:grid"
-        >
-          <Icon name="overflow" size={16} />
-        </button>
-      )}
+      {/* الإجراءات تظهر عند المرور — فلا يزدحم الشريط */}
+      <div className="absolute end-1 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 group-hover/row:flex">
+        {onTogglePin && (
+          <button
+            type="button"
+            title={pinned ? 'Unpin' : 'Pin'}
+            aria-label={pinned ? `Unpin ${label}` : `Pin ${label}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onTogglePin();
+            }}
+            className="grid h-7 w-7 place-items-center rounded-md hover:bg-white/15"
+            style={{ color: pinned ? '#fff' : C.muted }}
+          >
+            <Icon name={pinned ? 'star' : 'arrowBendDownRight'} size={15} />
+          </button>
+        )}
+        {onMenu && (
+          <button
+            type="button"
+            title="More"
+            aria-label={`More options for ${label}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              const r = ref.current?.getBoundingClientRect();
+              if (r) onMenu(r);
+            }}
+            className="grid h-7 w-7 place-items-center rounded-md hover:bg-white/15"
+          >
+            <Icon name="overflow" size={16} />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
 
-/**
- * عنوان قسم قابل للطيّ.
- *
- * التصميم لا يضع سهمًا هنا — أُضيف بطلب، لأن الأقسام تطول فتحتاج طيًّا.
- * والمقاسات من `.Sidebar Title`: صفّ 248x36 ونصّ 14px بلون #afafaf.
- */
+/* ————— عنوان قسم قابل للطيّ ————— */
 function SectionLabel({
   children,
   action,
@@ -92,22 +164,19 @@ function SectionLabel({
   onToggle?: () => void;
 }) {
   const collapsible = typeof open === 'boolean' && onToggle;
-
   return (
     <div className="flex items-center justify-between ps-2.5 pe-1 pt-3">
       <button
         type="button"
         onClick={collapsible ? onToggle : undefined}
         disabled={!collapsible}
-        className={
-          'flex items-center gap-1 rounded-md py-0.5 ' + (collapsible ? 'hover:text-white/80' : 'cursor-default')
-        }
+        className={'flex items-center gap-1 rounded-md py-0.5 ' + (collapsible ? 'hover:text-white/80' : 'cursor-default')}
         style={{ fontSize: 13, color: C.dim }}
         aria-expanded={collapsible ? open : undefined}
       >
         {collapsible && (
           <span
-            className="grid place-items-center transition-transform"
+            className="grid place-items-center transition-transform duration-150"
             style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', width: 14, height: 14 }}
           >
             <Icon name="chevronDown" size={14} />
@@ -120,31 +189,43 @@ function SectionLabel({
   );
 }
 
+/* ————— الشريط ————— */
 export function Sidebar({
   store,
   onOpenSearch,
   onOpenAccount,
   onUpgrade,
   onLogin,
+  onShare,
   collapsed,
   onToggleCollapsed,
+  width,
+  onWidth,
+  overlay,
 }: {
   store: Store;
   onOpenSearch: () => void;
   onOpenAccount: (anchor: DOMRect) => void;
   onUpgrade: () => void;
   onLogin: () => void;
+  onShare: (id: string) => void;
   collapsed: boolean;
   onToggleCollapsed: () => void;
+  width: number;
+  onWidth: (w: number) => void;
+  /** على الشاشات الضيّقة يصير درجًا منسدلًا فوق المحتوى لا عمودًا بجانبه */
+  overlay?: boolean;
 }) {
-  const { state, active } = store;
+  const { state } = store;
   const [menuFor, setMenuFor] = useState<{ id: string; at: DOMRect } | null>(null);
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const [archiveOpen, setArchiveOpen] = useState(false);
   const accountRef = useRef<HTMLButtonElement>(null);
+  const dragging = useRef(false);
 
-  /* الأقسام المطويّة — محفوظة كي لا تُفتح من جديد في كل زيارة */
   const [closed, setClosed] = useState<Record<string, boolean>>(() => {
     try {
-      return JSON.parse(localStorage.getItem('gpt5.sidebar.closed') || '{}') as Record<string, boolean>;
+      return JSON.parse(localStorage.getItem(LS_CLOSED) || '{}') as Record<string, boolean>;
     } catch {
       return {};
     }
@@ -153,42 +234,103 @@ export function Sidebar({
     setClosed((c) => {
       const next = { ...c, [k]: !c[k] };
       try {
-        localStorage.setItem('gpt5.sidebar.closed', JSON.stringify(next));
+        localStorage.setItem(LS_CLOSED, JSON.stringify(next));
       } catch {
-        /* التخزين معطّل */
+        /* — */
       }
       return next;
     });
   const isOpen = (k: string) => !closed[k];
 
+  /* السحب لتغيير العرض */
+  const onPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault();
+      dragging.current = true;
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+
+      /*
+       * نتذكّر آخر عرض لا موضع الضغط.
+       * الحفظ كان يقرأ `e.clientX` من حدث الضغط — أي الموضع الابتدائي — فيُحفظ
+       * العرض القديم ويُفقد ما سحبه المستخدم.
+       */
+      let latest = Math.min(MAX_W, Math.max(MIN_W, e.clientX));
+
+      const move = (ev: PointerEvent) => {
+        if (!dragging.current) return;
+        latest = Math.min(MAX_W, Math.max(MIN_W, ev.clientX));
+        onWidth(latest);
+      };
+      const up = () => {
+        dragging.current = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+        try {
+          localStorage.setItem(LS_WIDTH, String(Math.round(latest)));
+        } catch {
+          /* — */
+        }
+      };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+    },
+    [onWidth],
+  );
+
   /*
-   * محادثة المشروع تظهر داخل مشروعها فقط.
-   * وكانت تظهر مرّتين — مرة تحت المشروع ومرة في Chats — لأن الشرط لم يكن
-   * يستثني ما له مشروع.
+   * المحادثة تظهر في قسم واحد فقط.
+   * المثبّتة في «Pinned»، وما له مشروع داخل مشروعه، والباقي في «Chats».
+   * وكانت المشاريع تظهر مرّتين لأن الشرط لم يكن يستثني.
    */
   const { pinned, rest } = useMemo(() => {
     const free = state.conversations.filter((c) => !c.projectId);
-    const p: typeof state.conversations = [];
-    const r: typeof state.conversations = [];
-    for (const c of free) (c.pinned ? p : r).push(c);
-    r.sort((a, b) => b.updatedAt - a.updatedAt);
-    return { pinned: p, rest: r };
+    return {
+      pinned: free.filter((c) => c.pinned),
+      rest: free.filter((c) => !c.pinned).sort((a, b) => b.updatedAt - a.updatedAt),
+    };
   }, [state.conversations]);
 
-  const w = collapsed ? 0 : L.sidebarW;
+  const chatRow = (c: Conversation, inPinned = false) => (
+    <Row
+      key={c.id}
+      label={c.title}
+      active={c.id === state.activeId && state.view === 'chat'}
+      pinned={inPinned}
+      bold={inPinned}
+      onClick={() => store.openChat(c.id)}
+      renaming={renaming === c.id}
+      onRename={(v) => {
+        store.renameChat(c.id, v);
+        setRenaming(null);
+      }}
+      onRenameCancel={() => setRenaming(null)}
+      onTogglePin={() => store.togglePin(c.id)}
+      onMenu={(at) => setMenuFor({ id: c.id, at })}
+    />
+  );
 
   return (
     <aside
-      className="relative flex h-full shrink-0 flex-col overflow-hidden transition-[width] duration-200"
-      style={{ width: w, background: C.sidebar, borderRight: `1px solid ${C.line}` }}
+      className={'flex h-full flex-col ' + (overlay ? 'fixed inset-y-0 start-0 z-[90] transition-transform duration-200' : 'relative shrink-0')}
+      style={{
+        width: overlay ? Math.min(width, 320) : collapsed ? 0 : width,
+        background: C.sidebar,
+        borderRight: !overlay && !collapsed ? `1px solid ${C.line}` : 'none',
+        overflow: !overlay && collapsed ? 'hidden' : undefined,
+        boxShadow: overlay ? '0 12px 40px rgba(0,0,0,0.6)' : undefined,
+        transform: overlay ? `translateX(${collapsed ? '-100%' : '0'})` : undefined,
+      }}
       aria-hidden={collapsed}
     >
-      <div style={{ width: L.sidebarW }} className="flex h-full flex-col">
-        {/* الترويسة: الشعار + طيّ الشريط */}
+      <div className="flex h-full flex-col" style={{ width: overlay ? Math.min(width, 320) : width }}>
+        {/* الترويسة */}
         <div className="flex items-center justify-between px-2.5 pt-2">
           <button
             type="button"
-            onClick={() => store.newChat()}
+            onClick={() => void store.newChat()}
             title="ChatGPT"
             aria-label="ChatGPT"
             className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
@@ -207,21 +349,21 @@ export function Sidebar({
         </div>
 
         <div className="px-1.5 pt-1">
-          <Row icon="create" label="New Chat" trailing="Ctrl + Shift + O" onClick={() => store.newChat()} />
+          <Row icon="create" label="New Chat" trailing="Ctrl + Shift + O" onClick={() => void store.newChat()} />
           <Row icon="search" label="Search chats" onClick={onOpenSearch} />
           <Row icon="images" label="Library" onClick={() => store.go('library')} />
-          <Row
-            icon="temporaryChat"
-            label="Temporary chat"
-            active={state.temporary}
-            onClick={() => store.newChat(null, true)}
-          />
+          <Row icon="temporaryChat" label="Temporary chat" onClick={() => void store.newChat(null, true)} />
         </div>
 
-        {/*
-          قسم GPTs أُزيل بطلب: Explore و Example GPT 1/2 عناصر قديمة لم تعد
-          في الواجهة الحديثة، ولا وظيفة لها هنا — فكانت صفوفًا تفتح محادثة فارغة.
-        */}
+        {/* المثبّتة — قسم مستقل في الأعلى */}
+        {pinned.length > 0 && (
+          <div className="px-1.5">
+            <SectionLabel open={isOpen('pinned')} onToggle={() => toggle('pinned')}>
+              Pinned
+            </SectionLabel>
+            {isOpen('pinned') && pinned.map((c) => chatRow(c, true))}
+          </div>
+        )}
 
         {/* المشاريع */}
         <div className="px-1.5">
@@ -233,7 +375,7 @@ export function Sidebar({
                 type="button"
                 title="New project"
                 aria-label="New project"
-                onClick={() => store.newProject('New project')}
+                onClick={() => void store.newProject('New project')}
                 className="grid h-6 w-6 place-items-center rounded-md hover:bg-white/10"
               >
                 <Icon name="add" size={16} />
@@ -242,75 +384,50 @@ export function Sidebar({
           >
             Projects
           </SectionLabel>
-          {!isOpen('projects') ? null : state.projects.map((p) => (
-            <div key={p.id}>
-              <Row icon="folder" label={p.name} onClick={() => store.go('project', p.id)} />
-              {state.conversations
-                .filter((c) => c.projectId === p.id)
-                .map((c) => (
-                  <div key={c.id} className="ps-6">
-                    <Row
-                      label={c.title}
-                      active={c.id === state.activeId && state.view === 'chat'}
-                      onClick={() => store.openChat(c.id)}
-                      onMenu={(at) => setMenuFor({ id: c.id, at })}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        setMenuFor({ id: c.id, at: new DOMRect(e.clientX, e.clientY, 0, 0) });
-                      }}
-                    />
-                  </div>
-                ))}
-            </div>
-          ))}
+          {isOpen('projects') &&
+            state.projects.map((p) => (
+              <div key={p.id}>
+                <Row icon="folder" label={p.name} onClick={() => store.go('project', p.id)} />
+                {state.conversations
+                  .filter((c) => c.projectId === p.id)
+                  .map((c) => (
+                    <div key={c.id} className="ps-4">
+                      {chatRow(c)}
+                    </div>
+                  ))}
+              </div>
+            ))}
         </div>
 
         {/* المحادثات */}
         <div className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-2">
-          {pinned.length > 0 && (
-            <>
-              <SectionLabel open={isOpen('pinned')} onToggle={() => toggle('pinned')}>
-                Pinned
-              </SectionLabel>
-              {isOpen('pinned') &&
-                pinned.map((c) => (
-                  <Row
-                    key={c.id}
-                    label={c.title}
-                    active={c.id === state.activeId && state.view === 'chat'}
-                    onClick={() => store.openChat(c.id)}
-                    onMenu={(at) => setMenuFor({ id: c.id, at })}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      setMenuFor({ id: c.id, at: new DOMRect(e.clientX, e.clientY, 0, 0) });
-                    }}
-                    bold
-                  />
-                ))}
-            </>
-          )}
-
           <SectionLabel open={isOpen('chats')} onToggle={() => toggle('chats')}>
             Chats
           </SectionLabel>
-          {isOpen('chats') &&
-            rest.map((c) => (
-              <Row
-                key={c.id}
-                label={c.title}
-                active={c.id === state.activeId && state.view === 'chat'}
-                onClick={() => store.openChat(c.id)}
-                onMenu={(at) => setMenuFor({ id: c.id, at })}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  setMenuFor({ id: c.id, at: new DOMRect(e.clientX, e.clientY, 0, 0) });
-                }}
-              />
-            ))}
-          {rest.length === 0 && pinned.length === 0 && (
+          {isOpen('chats') && rest.map((c) => chatRow(c))}
+          {isOpen('chats') && rest.length === 0 && pinned.length === 0 && (
             <p className="px-2.5 py-2" style={{ fontSize: 12, color: C.dim }}>
               No chats yet.
             </p>
+          )}
+
+          {/* الأرشيف */}
+          {state.archived.length > 0 && (
+            <>
+              <SectionLabel open={archiveOpen} onToggle={() => setArchiveOpen((v) => !v)}>
+                Archived · {state.archived.length}
+              </SectionLabel>
+              {archiveOpen &&
+                state.archived.map((c) => (
+                  <Row
+                    key={c.id}
+                    label={c.title}
+                    muted
+                    onClick={() => store.openChat(c.id)}
+                    onMenu={() => store.archiveChat(c.id, false)}
+                  />
+                ))}
+            </>
           )}
         </div>
 
@@ -325,120 +442,188 @@ export function Sidebar({
               Log in
             </button>
           ) : (
-          <button
-            ref={accountRef}
-            type="button"
-            onClick={() => {
-              const r = accountRef.current?.getBoundingClientRect();
-              if (r) onOpenAccount(r);
-            }}
-            className="flex min-w-0 flex-1 items-center gap-2 rounded-[10px] px-1.5 py-1.5 text-start hover:bg-white/[0.07]"
-          >
-            <span
-              className="grid shrink-0 place-items-center rounded-full"
-              style={{ width: 24, height: 24, background: C.avatar, color: '#ffffff' }}
+            <button
+              ref={accountRef}
+              type="button"
+              onClick={() => {
+                const r = accountRef.current?.getBoundingClientRect();
+                if (r) onOpenAccount(r);
+              }}
+              className="flex min-w-0 flex-1 items-center gap-2 rounded-[10px] px-1.5 py-1.5 text-start hover:bg-white/[0.07]"
             >
-              <Icon name="user" size={14} style={{ opacity: 1 }} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate" style={{ fontSize: 14, lineHeight: '20px' }}>
-                Username
+              <span
+                className="grid shrink-0 place-items-center rounded-full"
+                style={{ width: 24, height: 24, background: C.avatar, color: '#fff' }}
+              >
+                <Icon name="user" size={14} style={{ opacity: 1 }} />
               </span>
-              <span className="block truncate" style={{ fontSize: 12, lineHeight: '16px', color: C.muted }}>
-                Free
+              <span className="min-w-0 flex-1">
+                <span className="block truncate" style={{ fontSize: 14, lineHeight: '20px' }}>
+                  Username
+                </span>
+                <span className="block truncate" style={{ fontSize: 12, lineHeight: '16px', color: C.muted }}>
+                  Free
+                </span>
               </span>
-            </span>
-          </button>
+            </button>
           )}
           <button
             type="button"
             onClick={onUpgrade}
-            className="rounded-full px-3 py-1.5 text-xs font-medium transition-colors hover:bg-white/15"
+            className="shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors hover:bg-white/15"
             style={{ background: 'rgba(255,255,255,0.10)', border: `1px solid ${C.line}` }}
           >
             Upgrade
           </button>
         </div>
-
-        {/* قائمة سياق المحادثة */}
-        {menuFor && (
-          <ConversationMenu store={store} id={menuFor.id} at={menuFor.at} onClose={() => setMenuFor(null)} />
-        )}
-
-        {/*
-          زر الإظهار ليس هنا.
-          كان داخل الشريط المطوي، والشريط عرضه صفر مع overflow مخفي — فكان
-          الزر مقصوصًا لا يمكن بلوغه. وهو في ترويسة التطبيق حيث يبقى ظاهرًا.
-        */}
       </div>
 
-      {/* زر الطيّ حين يكون مقفلًا */}
-      {!collapsed && (
-        <span className="pointer-events-none absolute inset-y-0 right-0 w-px" style={{ background: C.line }} />
+      {/* مقبض السحب — يغيّر العرض لا الطيّ */}
+      {!collapsed && !overlay && (
+        <div
+          onPointerDown={onPointerDown}
+          title="Drag to resize"
+          role="separator"
+          aria-orientation="vertical"
+          className="group/resize absolute inset-y-0 -right-1 z-20 w-2 cursor-col-resize"
+        >
+          <span className="absolute inset-y-0 right-1 w-px transition-colors group-hover/resize:bg-white/40" />
+        </div>
       )}
 
-      {active == null ? null : null}
-
-      <div className="hidden">{active?.title}</div>
+      {menuFor && (
+        <ChatMenu
+          store={store}
+          id={menuFor.id}
+          at={menuFor.at}
+          onClose={() => setMenuFor(null)}
+          onRename={() => setRenaming(menuFor.id)}
+          onShare={() => onShare(menuFor.id)}
+        />
+      )}
     </aside>
   );
 }
 
-function ConversationMenu({
+/* ————— قائمة المحادثة ————— */
+function ChatMenu({
   store,
   id,
   at,
   onClose,
+  onRename,
+  onShare,
 }: {
   store: Store;
   id: string;
   at: DOMRect;
   onClose: () => void;
+  onRename: () => void;
+  onShare: () => void;
 }) {
-  const conv = store.state.conversations.find((c) => c.id === id);
+  const conv = store.state.conversations.find((c) => c.id === id) ?? store.state.archived.find((c) => c.id === id);
+  const [sub, setSub] = useState<'project' | null>(null);
+  const [confirm, setConfirm] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
+    const onKey = (e: KeyboardEvent) => (e.key === 'Escape' ? onClose() : null);
+    window.addEventListener('mousedown', onDown);
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('mousedown', onDown);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [onClose]);
+
   if (!conv) return null;
-  const item = 'w-full rounded-[8px] px-3 py-2 text-start hover:bg-white/10';
+
+  const item = 'flex w-full items-center gap-2.5 rounded-[8px] px-2.5 py-2 text-start hover:bg-white/10';
+  const style = { fontSize: 14 } as const;
+
+  /* يبقى داخل الشاشة */
+  const top = Math.min(at.bottom + 4, window.innerHeight - 300);
+  const left = Math.min(at.left, window.innerWidth - 280);
 
   return (
-    <>
-      <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div
-        className="absolute z-50 w-48 overflow-hidden rounded-xl p-1"
-        style={{
-          background: C.menu,
-          boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-          left: Math.max(8, Math.min(at.left, 60)),
-          top: Math.min(at.bottom + 4, window.innerHeight - 240),
-        }}
-      >
-        <button type="button" className={item} style={{ fontSize: 14 }} onClick={() => { store.togglePin(id); onClose(); }}>
-          {conv.pinned ? 'Unpin' : 'Pin'}
-        </button>
-        <button
-          type="button"
-          className={item}
-          style={{ fontSize: 14 }}
-          onClick={() => {
-            const name = window.prompt('Rename chat', conv.title);
-            if (name) store.renameChat(id, name);
-            onClose();
-          }}
-        >
-          Rename
-        </button>
-        <button type="button" className={item} style={{ fontSize: 14 }} onClick={() => { store.go('chat', null); onClose(); }}>
-          Open in new chat
-        </button>
-        <div className="my-1 h-px" style={{ background: C.line }} />
-        <button
-          type="button"
-          className={item}
-          style={{ fontSize: 14, color: '#ff8a8a' }}
-          onClick={() => { store.deleteChat(id); onClose(); }}
-        >
-          Delete
-        </button>
-      </div>
-    </>
+    <div
+      ref={ref}
+      role="menu"
+      className="fixed z-[200] w-[248px] overflow-hidden rounded-xl p-1"
+      style={{ background: C.menu, boxShadow: '0 12px 32px rgba(0,0,0,0.55)', border: `1px solid ${C.line}`, top, left }}
+    >
+      {sub === null ? (
+        <>
+          <button type="button" className={item} style={style} onClick={() => { onShare(); onClose(); }}>
+            <Icon name="share" size={18} /> Share
+          </button>
+          <button type="button" className={item} style={style} onClick={() => { void store.togglePin(id); onClose(); }}>
+            <Icon name="star" size={18} /> {conv.pinned ? 'Unpin chat' : 'Pin chat'}
+          </button>
+          <button type="button" className={item} style={style} onClick={() => { onRename(); onClose(); }}>
+            <Icon name="edit" size={18} /> Rename
+          </button>
+          <button type="button" className={item} style={style} onClick={() => setSub('project')}>
+            <Icon name="folder" size={18} />
+            <span className="flex-1">Move to project</span>
+            <Icon name="chevronRight" size={14} />
+          </button>
+
+          <div className="my-1 h-px" style={{ background: C.line }} />
+
+          <button type="button" className={item} style={style} onClick={() => { void store.archiveChat(id, true); onClose(); }}>
+            <Icon name="archive" size={18} /> Archive
+          </button>
+          <button
+            type="button"
+            className={item}
+            style={{ ...style, color: confirm ? '#ff8a8a' : undefined }}
+            onClick={() => {
+              if (!confirm) return setConfirm(true);
+              void store.deleteChat(id);
+              onClose();
+            }}
+            onBlur={() => setConfirm(false)}
+          >
+            <Icon name="delete" size={18} />
+            {confirm ? 'Confirm delete?' : 'Delete'}
+          </button>
+        </>
+      ) : (
+        <>
+          <button type="button" className={item} style={{ ...style, color: C.muted }} onClick={() => setSub(null)}>
+            <Icon name="chevronLeft" size={16} /> Move to project
+          </button>
+          <div className="my-1 h-px" style={{ background: C.line }} />
+          <button
+            type="button"
+            className={item}
+            style={style}
+            onClick={() => { void store.moveToProject(id, null); onClose(); }}
+          >
+            <Icon name="close" size={16} /> No project
+          </button>
+          {store.state.projects.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              className={item}
+              style={style}
+              onClick={() => { void store.moveToProject(id, p.id); onClose(); }}
+            >
+              <Icon name="folder" size={16} /> {p.name}
+            </button>
+          ))}
+          {store.state.projects.length === 0 && (
+            <p className="px-3 py-2" style={{ fontSize: 12, color: C.dim }}>
+              No projects yet.
+            </p>
+          )}
+        </>
+      )}
+    </div>
   );
 }

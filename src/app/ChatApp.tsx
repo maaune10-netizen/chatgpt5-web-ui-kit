@@ -41,6 +41,31 @@ export function ChatApp() {
   const signedIn = state.signedIn;
 
   const [collapsed, setCollapsed] = useState(false);
+  /*
+   * الشاشات الضيّقة: الشريط يصير درجًا منسدلًا لا عمودًا.
+   * وكان يبقى 260 مثبّتًا فيضغط المحتوى ويُظهر تمريرًا أفقيًا.
+   */
+  const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && window.innerWidth < 900);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 899px)');
+    const on = () => setNarrow(mq.matches);
+    on();
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+
+  /* على الضيّق يبدأ الشريط مخفيًا */
+  useEffect(() => {
+    if (narrow) setCollapsed(true);
+  }, [narrow]);
+  /*
+   * عرض الشريط — يُسحب ويُحفظ.
+   * منفصل عن الطيّ: الطيّ يخفيه كاملًا، والسحب يضيّقه أو يوسّعه.
+   */
+  const [sidebarW, setSidebarW] = useState(() => {
+    const v = typeof localStorage !== 'undefined' ? Number(localStorage.getItem('gpt5.sidebar.width')) : 0;
+    return v >= 200 && v <= 460 ? v : 260;
+  });
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [accountAt, setAccountAt] = useState<DOMRect | null>(null);
@@ -243,12 +268,21 @@ export function ChatApp() {
         <Sidebar
           store={store}
           collapsed={collapsed}
+          width={sidebarW}
+          onWidth={setSidebarW}
+          overlay={narrow}
           onToggleCollapsed={() => setCollapsed((v) => !v)}
           onOpenSearch={() => setSearchOpen(true)}
           onOpenAccount={setAccountAt}
           onUpgrade={() => setUpgradeOpen(true)}
           onLogin={() => setLoginOpen(true)}
+          onShare={(id) => setShareFor(id)}
         />
+      )}
+
+      {/* حاجب يُغلق الدرج بالنقر — على الضيّق فقط */}
+      {narrow && !collapsed && (
+        <div className="fixed inset-0 z-[80] bg-black/50" onClick={() => setCollapsed(true)} aria-hidden />
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -258,7 +292,7 @@ export function ChatApp() {
           style={{ height: L.headerH }}
         >
           <div className="flex items-center gap-1">
-            {signedIn && collapsed && (
+            {signedIn && (collapsed || narrow) && (
               <button
                 type="button"
                 onClick={() => setCollapsed(false)}
@@ -364,7 +398,7 @@ export function ChatApp() {
               onAttach={(f) => void onAttach(f)}
               onPasteImage={pasteImage}
             />
-            <div className="shrink-0 px-6 pb-3 text-center" style={{ fontSize: 12, color: C.muted }}>
+            <div className="shrink-0 px-4 pb-3 text-center" style={{ fontSize: 12, color: C.muted, lineHeight: '16px' }}>
               {signedIn
                 ? 'ChatGPT can make mistakes. Check important info.'
                 : 'By messaging ChatGPT, you agree to our Terms and have read our Privacy Policy.'}

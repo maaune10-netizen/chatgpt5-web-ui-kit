@@ -104,6 +104,21 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_conv_updated ON conversations(updated_at DESC);
 `);
 
+/*
+ * ترقية المخطّط.
+ * SQLite لا تقبل ADD COLUMN إن وُجد، فنفحص أولًا — والتطبيق يعمل على قاعدة
+ * قائمة من دون أن يفقد بياناتها.
+ */
+function addColumn(table, col, decl) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
+  if (!cols.includes(col)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${decl}`);
+    console.log(`[api] migrated: ${table}.${col}`);
+  }
+}
+addColumn('conversations', 'archived', 'INTEGER NOT NULL DEFAULT 0');
+addColumn('conversations', 'sort_order', 'INTEGER NOT NULL DEFAULT 0');
+
 const log = (kind, detail) => {
   try {
     db.prepare('INSERT INTO events (at, kind, detail) VALUES (?, ?, ?)').run(
@@ -127,6 +142,7 @@ const convOut = (r) => ({
   title: r.title,
   projectId: r.project_id,
   pinned: !!r.pinned,
+  archived: !!r.archived,
   temporary: !!r.temporary,
   model: r.model,
   createdAt: r.created_at,
@@ -236,7 +252,7 @@ const server = createServer(async (req, res) => {
           id: r.id, name: r.name, createdAt: r.created_at,
         })),
         conversations: db
-          .prepare('SELECT * FROM conversations WHERE temporary = 0 ORDER BY pinned DESC, updated_at DESC')
+          .prepare('SELECT * FROM conversations WHERE temporary = 0 AND archived = 0 ORDER BY pinned DESC, sort_order, updated_at DESC')
           .all()
           .map((c) => ({
             ...convOut(c),
@@ -381,6 +397,7 @@ const server = createServer(async (req, res) => {
           if (typeof b.title === 'string') { sets.push('title = ?'); vals.push(b.title); }
           if ('projectId' in b) { sets.push('project_id = ?'); vals.push(b.projectId || null); }
           if ('pinned' in b) { sets.push('pinned = ?'); vals.push(b.pinned ? 1 : 0); }
+          if ('archived' in b) { sets.push('archived = ?'); vals.push(b.archived ? 1 : 0); }
           if ('temporary' in b) { sets.push('temporary = ?'); vals.push(b.temporary ? 1 : 0); }
           if (typeof b.model === 'string') { sets.push('model = ?'); vals.push(b.model); }
           if (sets.length) {
@@ -435,6 +452,14 @@ const server = createServer(async (req, res) => {
         log('file.delete', { id: seg[2] });
         return send(res, 200, { ok: true });
       }
+    }
+
+    /* ===== الأرشيف ===== */
+    if (path === '/api/archived') {
+      return send(res, 200, db
+        .prepare('SELECT * FROM conversations WHERE archived = 1 ORDER BY updated_at DESC')
+        .all()
+        .map(convOut));
     }
 
     /* ===== تصدير كامل — للفحص والتعديل من الخارج ===== */

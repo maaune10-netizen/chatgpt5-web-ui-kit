@@ -52,7 +52,7 @@ export default function App() {
         type="button"
         onClick={() => setMode((m) => (m === 'app' ? 'design' : 'app'))}
         title={mode === 'app' ? 'Show the extracted Figma screens' : 'Back to the working app'}
-        className="fixed bottom-3 right-3 z-[300] rounded-full px-3 py-1.5 text-xs transition-colors hover:bg-white/15"
+        className="fixed bottom-3 end-3 z-[300] rounded-full px-3 py-1.5 text-xs transition-colors hover:bg-white/15"
         style={{ background: 'rgba(255,255,255,0.10)', border: `1px solid ${C.line}`, color: C.muted, backdropFilter: 'blur(6px)' }}
       >
         {mode === 'app' ? 'Design' : 'App'}
