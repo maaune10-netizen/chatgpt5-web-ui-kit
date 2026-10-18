@@ -6,8 +6,8 @@ cd "$(dirname "$0")/.."
 
 start_proxy() {
   if ! curl -sf -o /dev/null http://127.0.0.1:5199/api/health; then
-    echo "[serve] starting the proxy"
-    setsid nohup node server/proxy.mjs > /tmp/proxy.log 2>&1 < /dev/null &
+    echo "[serve] starting the api"
+    setsid nohup node server/api.mjs > /tmp/proxy.log 2>&1 < /dev/null &
     sleep 2
   fi
 }

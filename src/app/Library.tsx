@@ -9,11 +9,11 @@ import type { Store } from './store';
  */
 export function Library({ store, onOpenImage }: { store: Store; onOpenImage: (src: string, title: string) => void }) {
   const [tab, setTab] = useState<'images' | 'files'>('images');
-  const { library } = store.state;
+  const { files } = store.state;
 
   const items = useMemo(
-    () => library.filter((i) => (tab === 'images' ? i.kind === 'image' : i.kind === 'file')),
-    [library, tab],
+    () => files.filter((f) => (tab === 'images' ? f.kind === 'image' : f.kind === 'file')),
+    [files, tab],
   );
 
   return (
@@ -63,13 +63,13 @@ export function Library({ store, onOpenImage }: { store: Store; onOpenImage: (sr
               <button
                 key={it.id}
                 type="button"
-                onClick={() => (it.kind === 'image' ? onOpenImage(it.src, it.title) : undefined)}
+                onClick={() => (it.kind === 'image' ? onOpenImage(it.url, it.name) : undefined)}
                 className="group relative aspect-square overflow-hidden"
                 style={{ background: it.kind === 'image' ? '#3a3a3a' : C.raised }}
-                title={it.title}
+                title={it.name}
               >
                 {it.kind === 'image' ? (
-                  <img src={it.src} alt={it.title} className="h-full w-full object-cover transition-transform group-hover:scale-[1.03]" />
+                  <img src={it.url} alt={it.name} className="h-full w-full object-cover transition-transform group-hover:scale-[1.03]" />
                 ) : (
                   <span className="grid h-full place-items-center">
                     <Icon name="document" size={28} />
@@ -79,7 +79,7 @@ export function Library({ store, onOpenImage }: { store: Store; onOpenImage: (sr
                   className="absolute inset-x-0 bottom-0 truncate px-2 py-1 text-start opacity-0 transition-opacity group-hover:opacity-100"
                   style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.75))', fontSize: 12 }}
                 >
-                  {it.title}
+                  {it.name}
                 </span>
               </button>
             ))}
@@ -143,8 +143,7 @@ export function ProjectPage({ store, projectId, onOpenChat }: { store: Store; pr
           <button
             type="button"
             onClick={() => {
-              const id = store.newChat(project.id);
-              onOpenChat(id);
+              void store.newChat(project.id).then(onOpenChat);
             }}
             className="rounded-full px-4 py-2 text-sm font-medium"
             style={{ background: '#fff', color: '#000' }}

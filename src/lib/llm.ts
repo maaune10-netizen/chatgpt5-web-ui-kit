@@ -114,9 +114,11 @@ export class ChatStream {
         }),
       });
     } catch (e) {
+      console.log('[llm] FETCH THREW', (e as Error).name, (e as Error).message);
       if ((e as Error).name === 'AbortError') return h.onDone({ finish: 'stopped' });
       return h.onError(new Error('تعذّر الوصول إلى النموذج: ' + (e as Error).message));
     }
+    console.log('[llm] RESPONSE', res.status);
 
     if (!res.ok) {
       let detail = `HTTP ${res.status}`;

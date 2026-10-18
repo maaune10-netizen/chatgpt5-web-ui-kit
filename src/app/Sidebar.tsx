@@ -11,6 +11,7 @@ function Row({
   active,
   onClick,
   onContextMenu,
+  onMenu,
   muted,
   bold,
 }: {
@@ -20,39 +21,100 @@ function Row({
   active?: boolean;
   onClick?: () => void;
   onContextMenu?: (e: React.MouseEvent) => void;
+  /** يفتح قائمة الإجراءات — التصميم يضعها في .List Item Trailing Content عند x=218 */
+  onMenu?: (at: DOMRect) => void;
   muted?: boolean;
   bold?: boolean;
 }) {
+  const ref = useRef<HTMLButtonElement>(null);
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      onContextMenu={onContextMenu}
-      className="flex w-full items-center gap-2 rounded-[10px] px-2.5 text-start transition-colors hover:bg-white/[0.07]"
-      style={{
-        height: ITEM.h,
-        background: active ? 'rgba(255,255,255,0.10)' : undefined,
-        color: muted ? C.muted : C.text,
-      }}
-    >
-      {icon ? <Icon name={icon} size={ITEM.icon} /> : <span style={{ width: ITEM.icon }} />}
-      <span
-        className="flex-1 truncate"
-        style={{ fontSize: ITEM.labelSize, lineHeight: `${ITEM.labelLh}px`, fontWeight: bold ? 500 : 400 }}
+    <div className="group/row relative">
+      <button
+        ref={ref}
+        type="button"
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+        className="flex w-full items-center gap-2 rounded-[10px] px-2.5 text-start transition-colors hover:bg-white/[0.07]"
+        style={{
+          height: ITEM.h,
+          background: active ? 'rgba(255,255,255,0.10)' : undefined,
+          color: muted ? C.muted : C.text,
+        }}
       >
-        {label}
-      </span>
-      {trailing ? (
-        <span style={{ fontSize: 12, color: C.dim, whiteSpace: 'nowrap' }}>{trailing}</span>
-      ) : null}
-    </button>
+        {icon ? <Icon name={icon} size={ITEM.icon} /> : <span style={{ width: ITEM.icon }} />}
+        <span
+          className="flex-1 truncate"
+          style={{ fontSize: ITEM.labelSize, lineHeight: `${ITEM.labelLh}px`, fontWeight: bold ? 500 : 400 }}
+        >
+          {label}
+        </span>
+        {trailing && !onMenu ? (
+          <span style={{ fontSize: 12, color: C.dim, whiteSpace: 'nowrap' }}>{trailing}</span>
+        ) : null}
+      </button>
+
+      {/* يظهر عند المرور فقط، فلا يزدحم الشريط */}
+      {onMenu && (
+        <button
+          type="button"
+          title="More"
+          aria-label={`More options for ${label}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            const r = ref.current?.getBoundingClientRect();
+            if (r) onMenu(r);
+          }}
+          className="absolute right-1 top-1/2 hidden h-7 w-7 -translate-y-1/2 place-items-center rounded-md hover:bg-white/15 group-hover/row:grid"
+        >
+          <Icon name="overflow" size={16} />
+        </button>
+      )}
+    </div>
   );
 }
 
-function SectionLabel({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
+/**
+ * عنوان قسم قابل للطيّ.
+ *
+ * التصميم لا يضع سهمًا هنا — أُضيف بطلب، لأن الأقسام تطول فتحتاج طيًّا.
+ * والمقاسات من `.Sidebar Title`: صفّ 248x36 ونصّ 14px بلون #afafaf.
+ */
+function SectionLabel({
+  children,
+  action,
+  open,
+  onToggle,
+}: {
+  children: React.ReactNode;
+  action?: React.ReactNode;
+  open?: boolean;
+  onToggle?: () => void;
+}) {
+  const collapsible = typeof open === 'boolean' && onToggle;
+
   return (
-    <div className="flex items-center justify-between px-2.5 pb-1 pt-4">
-      <span style={{ fontSize: 12, color: C.dim, letterSpacing: 0.2 }}>{children}</span>
+    <div className="flex items-center justify-between ps-2.5 pe-1 pt-3">
+      <button
+        type="button"
+        onClick={collapsible ? onToggle : undefined}
+        disabled={!collapsible}
+        className={
+          'flex items-center gap-1 rounded-md py-0.5 ' + (collapsible ? 'hover:text-white/80' : 'cursor-default')
+        }
+        style={{ fontSize: 13, color: C.dim }}
+        aria-expanded={collapsible ? open : undefined}
+      >
+        {collapsible && (
+          <span
+            className="grid place-items-center transition-transform"
+            style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', width: 14, height: 14 }}
+          >
+            <Icon name="chevronDown" size={14} />
+          </span>
+        )}
+        {children}
+      </button>
       {action}
     </div>
   );
@@ -76,8 +138,28 @@ export function Sidebar({
   onToggleCollapsed: () => void;
 }) {
   const { state, active } = store;
-  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [menuFor, setMenuFor] = useState<{ id: string; at: DOMRect } | null>(null);
   const accountRef = useRef<HTMLButtonElement>(null);
+
+  /* الأقسام المطويّة — محفوظة كي لا تُفتح من جديد في كل زيارة */
+  const [closed, setClosed] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('gpt5.sidebar.closed') || '{}') as Record<string, boolean>;
+    } catch {
+      return {};
+    }
+  });
+  const toggle = (k: string) =>
+    setClosed((c) => {
+      const next = { ...c, [k]: !c[k] };
+      try {
+        localStorage.setItem('gpt5.sidebar.closed', JSON.stringify(next));
+      } catch {
+        /* التخزين معطّل */
+      }
+      return next;
+    });
+  const isOpen = (k: string) => !closed[k];
 
   /*
    * محادثة المشروع تظهر داخل مشروعها فقط.
@@ -144,6 +226,8 @@ export function Sidebar({
         {/* المشاريع */}
         <div className="px-1.5">
           <SectionLabel
+            open={isOpen('projects')}
+            onToggle={() => toggle('projects')}
             action={
               <button
                 type="button"
@@ -158,7 +242,7 @@ export function Sidebar({
           >
             Projects
           </SectionLabel>
-          {state.projects.map((p) => (
+          {!isOpen('projects') ? null : state.projects.map((p) => (
             <div key={p.id}>
               <Row icon="folder" label={p.name} onClick={() => store.go('project', p.id)} />
               {state.conversations
@@ -169,9 +253,10 @@ export function Sidebar({
                       label={c.title}
                       active={c.id === state.activeId && state.view === 'chat'}
                       onClick={() => store.openChat(c.id)}
+                      onMenu={(at) => setMenuFor({ id: c.id, at })}
                       onContextMenu={(e) => {
                         e.preventDefault();
-                        setMenuFor(c.id);
+                        setMenuFor({ id: c.id, at: new DOMRect(e.clientX, e.clientY, 0, 0) });
                       }}
                     />
                   </div>
@@ -182,37 +267,46 @@ export function Sidebar({
 
         {/* المحادثات */}
         <div className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-2">
-          <SectionLabel>Chats</SectionLabel>
           {pinned.length > 0 && (
             <>
-              {pinned.map((c) => (
-                <Row
-                  key={c.id}
-                  label={c.title}
-                  active={c.id === state.activeId && state.view === 'chat'}
-                  onClick={() => store.openChat(c.id)}
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    setMenuFor(c.id);
-                  }}
-                  bold
-                />
-              ))}
-              <SectionLabel>Recents</SectionLabel>
+              <SectionLabel open={isOpen('pinned')} onToggle={() => toggle('pinned')}>
+                Pinned
+              </SectionLabel>
+              {isOpen('pinned') &&
+                pinned.map((c) => (
+                  <Row
+                    key={c.id}
+                    label={c.title}
+                    active={c.id === state.activeId && state.view === 'chat'}
+                    onClick={() => store.openChat(c.id)}
+                    onMenu={(at) => setMenuFor({ id: c.id, at })}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setMenuFor({ id: c.id, at: new DOMRect(e.clientX, e.clientY, 0, 0) });
+                    }}
+                    bold
+                  />
+                ))}
             </>
           )}
-          {rest.map((c) => (
-            <Row
-              key={c.id}
-              label={c.title}
-              active={c.id === state.activeId && state.view === 'chat'}
-              onClick={() => store.openChat(c.id)}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                setMenuFor(c.id);
-              }}
-            />
-          ))}
+
+          <SectionLabel open={isOpen('chats')} onToggle={() => toggle('chats')}>
+            Chats
+          </SectionLabel>
+          {isOpen('chats') &&
+            rest.map((c) => (
+              <Row
+                key={c.id}
+                label={c.title}
+                active={c.id === state.activeId && state.view === 'chat'}
+                onClick={() => store.openChat(c.id)}
+                onMenu={(at) => setMenuFor({ id: c.id, at })}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setMenuFor({ id: c.id, at: new DOMRect(e.clientX, e.clientY, 0, 0) });
+                }}
+              />
+            ))}
           {rest.length === 0 && pinned.length === 0 && (
             <p className="px-2.5 py-2" style={{ fontSize: 12, color: C.dim }}>
               No chats yet.
@@ -268,11 +362,7 @@ export function Sidebar({
 
         {/* قائمة سياق المحادثة */}
         {menuFor && (
-          <ConversationMenu
-            store={store}
-            id={menuFor}
-            onClose={() => setMenuFor(null)}
-          />
+          <ConversationMenu store={store} id={menuFor.id} at={menuFor.at} onClose={() => setMenuFor(null)} />
         )}
 
         {/*
@@ -294,7 +384,17 @@ export function Sidebar({
   );
 }
 
-function ConversationMenu({ store, id, onClose }: { store: Store; id: string; onClose: () => void }) {
+function ConversationMenu({
+  store,
+  id,
+  at,
+  onClose,
+}: {
+  store: Store;
+  id: string;
+  at: DOMRect;
+  onClose: () => void;
+}) {
   const conv = store.state.conversations.find((c) => c.id === id);
   if (!conv) return null;
   const item = 'w-full rounded-[8px] px-3 py-2 text-start hover:bg-white/10';
@@ -304,7 +404,12 @@ function ConversationMenu({ store, id, onClose }: { store: Store; id: string; on
       <div className="fixed inset-0 z-40" onClick={onClose} />
       <div
         className="absolute z-50 w-48 overflow-hidden rounded-xl p-1"
-        style={{ background: C.menu, boxShadow: '0 8px 24px rgba(0,0,0,0.5)', left: 12, bottom: 80 }}
+        style={{
+          background: C.menu,
+          boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+          left: Math.max(8, Math.min(at.left, 60)),
+          top: Math.min(at.bottom + 4, window.innerHeight - 240),
+        }}
       >
         <button type="button" className={item} style={{ fontSize: 14 }} onClick={() => { store.togglePin(id); onClose(); }}>
           {conv.pinned ? 'Unpin' : 'Pin'}

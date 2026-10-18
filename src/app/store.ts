@@ -1,8 +1,14 @@
 /**
- * حالة التطبيق: محادثات، مشاريع، مكتبة.
+ * حالة التطبيق — من الخادم، لا من المتصفح.
  *
- * مخزّنة في localStorage لأن التطبيق بلا خادم خلفي. والبثّ يُحدّث الرسالة
- * الأخيرة مباشرةً عبر `patchMessage` بدل إعادة بناء القائمة كلها.
+ * كل شيء في قاعدة بيانات على الخادم: المحادثات والرسائل والمشاريع والملفات.
+ * فالمتصفح واجهة عرض فقط، ويمكن قراءة كل شيء وتعديله عبر API.
+ *
+ * والكتابة **متفائلة**: الواجهة تتحدّث فورًا ثم يُرسل الطلب، فإن فشل رُوجع
+ * التغيير وأُبلغ المستخدم. فالنقر لا ينتظر الشبكة.
+ *
+ * والبثّ يُجمَّع: النص يُحدَّث محليًا مع كل وصول، ويُرسل للخادم كل ٤٠٠ ملي
+ * ثانية وعند الانتهاء — لأن إرسال كل حرف يعني مئات الطلبات في الرد الواحد.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -20,13 +26,11 @@ export interface Message {
   content: string;
   reasoning?: string;
   createdAt: number;
-  /** ما زال يتدفّق */
   streaming?: boolean;
   error?: string;
   stopped?: boolean;
   citations?: Citation[];
   model?: string;
-  /** صورة مرفقة أو ملصقة */
   image?: string;
 }
 
@@ -49,136 +53,116 @@ export interface Project {
 
 export interface LibraryItem {
   id: string;
-  src: string;
-  title: string;
-  createdAt: number;
+  name: string;
+  mime?: string;
+  size: number;
   kind: 'image' | 'file';
+  url: string;
+  createdAt: number;
 }
 
 export interface AppState {
-  /** مسجَّل الدخول؟ — يغيّر الشريط الجانبي وسلوك الإدخال */
+  /** المحادثة المفتوحة */
+  activeId: string | null;
+  /** المسار المعروض */
+  view: 'chat' | 'library' | 'project' | 'image';
+  viewArg: string | null;
   signedIn: boolean;
   email: string;
-  /** الوضع المؤقت: لا يُحفظ في القائمة */
   temporary: boolean;
-  /** محادثة المؤقت — منفصلة كي لا تختلط بالمحفوظات */
   tempConv: Conversation | null;
   conversations: Conversation[];
   projects: Project[];
-  library: LibraryItem[];
-  activeId: string | null;
-  /** مسار العرض */
-  view: 'chat' | 'library' | 'project' | 'image';
-  viewArg: string | null;
+  files: LibraryItem[];
+  model: string;
+  ready: boolean;
+  offline?: string;
 }
 
-const LS = 'gpt5.app.state.v1';
+const API = '/api';
+
+async function req<T>(method: string, path: string, body?: unknown): Promise<T> {
+  const r = await fetch(API + path, {
+    method,
+    headers: body !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  const text = await r.text();
+  let data: unknown = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    throw new Error(`${method} ${path} — ردّ غير مفهوم`);
+  }
+  if (!r.ok) {
+    const msg = (data as { error?: { message?: string } })?.error?.message || `HTTP ${r.status}`;
+    throw new Error(msg);
+  }
+  return data as T;
+}
 
 export const uid = (p = 'id'): string =>
   `${p}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
-export function titleFrom(text: string): string {
-  const s = text.replace(/\s+/g, ' ').trim();
-  if (!s) return 'New chat';
-  return s.length > 42 ? s.slice(0, 42).trimEnd() + '…' : s;
-}
-
-function seed(): AppState {
-  const projects: Project[] = [
-    { id: 'p1', name: 'Example Project 1', createdAt: Date.now() - 86400000 },
-    { id: 'p2', name: 'Example Project 2', createdAt: Date.now() - 43200000 },
-  ];
-  const conversations: Conversation[] = [
-    {
-      id: uid('c'),
-      title: 'Example Chat 1',
-      messages: [
-        {
-          id: uid('m'),
-          role: 'user',
-          content: 'ChatGPT edge cases',
-          createdAt: Date.now() - 90000,
-        },
-      ],
-      createdAt: Date.now() - 90000,
-      updatedAt: Date.now() - 90000,
-      projectId: 'p1',
-    },
-    { id: uid('c'), title: 'Response Types', messages: [], createdAt: Date.now() - 80000, updatedAt: Date.now() - 80000 },
-    { id: uid('c'), title: 'Loading Animations', messages: [], createdAt: Date.now() - 70000, updatedAt: Date.now() - 70000 },
-  ];
-  return {
-    signedIn: true,
-    email: 'hello@interactionfaction.com',
-    temporary: false,
-    tempConv: null,
-    conversations,
-    projects,
-    library: [],
+export function useStore() {
+  const [state, setState] = useState<AppState>({
     activeId: null,
     view: 'chat',
     viewArg: null,
-  };
-}
+    signedIn: typeof localStorage !== 'undefined' ? localStorage.getItem('gpt5.signedIn') !== '0' : true,
+    email: 'hello@interactionfaction.com',
+    temporary: false,
+    tempConv: null,
+    conversations: [],
+    projects: [],
+    files: [],
+    model: '',
+    ready: false,
+  });
 
-function load(): AppState {
-  try {
-    const raw = localStorage.getItem(LS);
-    if (!raw) return seed();
-    const j = JSON.parse(raw) as AppState;
-    /* لا تستأنف رسالة كانت تتدفّق */
-    for (const c of j.conversations || []) {
-      for (const m of c.messages || []) if (m.streaming) m.streaming = false;
+  const patch = useCallback((fn: (s: AppState) => AppState) => setState(fn), []);
+  const errors = useRef<((m: string) => void) | null>(null);
+
+  /* ————— التحميل الأول ————— */
+  const load = useCallback(async () => {
+    try {
+      const s = await req<{
+        conversations: Conversation[];
+        projects: Project[];
+        files: LibraryItem[];
+        model: string;
+      }>('GET', '/state');
+      patch((prev) => ({
+        ...prev,
+        conversations: (s.conversations || []).map((c) => ({ ...c, messages: c.messages ?? [] })),
+        projects: s.projects || [],
+        files: s.files || [],
+        model: s.model || prev.model,
+        ready: true,
+        offline: undefined,
+      }));
+    } catch (e) {
+      patch((prev) => ({ ...prev, ready: true, offline: (e as Error).message }));
     }
-    return {
-      signedIn: j.signedIn !== false,
-      email: j.email || 'hello@interactionfaction.com',
-      temporary: Boolean(j.temporary),
-      tempConv: null,
-      conversations: j.conversations || [],
-      projects: j.projects || [],
-      library: j.library || [],
-      activeId: j.activeId ?? null,
-      view: j.view || 'chat',
-      viewArg: j.viewArg ?? null,
-    };
-  } catch {
-    return seed();
-  }
-}
+  }, [patch]);
 
-export function useStore() {
-  const [state, setState] = useState<AppState>(load);
-  const saveTimer = useRef<number | null>(null);
-
-  /* كتابة مؤجّلة: البثّ يحدّث كثيرًا، ولا يصحّ كتابة القرص مع كل حرف */
   useEffect(() => {
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = window.setTimeout(() => {
-      try {
-        localStorage.setItem(LS, JSON.stringify(state));
-      } catch {
-        /* ممتلئ أو معطّل — نتجاهل */
-      }
-    }, 400);
-    return () => {
-      if (saveTimer.current) clearTimeout(saveTimer.current);
-    };
-  }, [state]);
+    void load();
+  }, [load]);
 
-  const active = useMemo(
-    () => state.tempConv ?? state.conversations.find((c) => c.id === state.activeId) ?? null,
-    [state.tempConv, state.conversations, state.activeId],
-  );
+  const active = useMemo(() => {
+    if (state.tempConv) return state.tempConv;
+    return state.conversations.find((c) => c.id === state.activeId) ?? null;
+  }, [state.tempConv, state.conversations, state.activeId]);
 
-  const patch = useCallback((fn: (s: AppState) => AppState) => setState((s) => fn(s)), []);
-
+  /* ————— المحادثات ————— */
   const patchConversation = useCallback(
     (id: string, fn: (c: Conversation) => Conversation) =>
-      patch((s) => {
-        if (s.tempConv && s.tempConv.id === id) return { ...s, tempConv: fn(s.tempConv) };
-        return { ...s, conversations: s.conversations.map((c) => (c.id === id ? fn(c) : c)) };
-      }),
+      patch((s) =>
+        s.tempConv?.id === id
+          ? { ...s, tempConv: fn(s.tempConv) }
+          : { ...s, conversations: s.conversations.map((c) => (c.id === id ? fn(c) : c)) },
+      ),
     [patch],
   );
 
@@ -186,7 +170,6 @@ export function useStore() {
     (convId: string, msgId: string, fn: (m: Message) => Message) =>
       patchConversation(convId, (c) => ({
         ...c,
-        updatedAt: Date.now(),
         messages: c.messages.map((m) => (m.id === msgId ? fn(m) : m)),
       })),
     [patchConversation],
@@ -194,9 +177,8 @@ export function useStore() {
 
   const api = useMemo(
     () => ({
-      /* —— محادثات —— */
-      newChat(projectId: string | null = null, temporary = false) {
-        const c: Conversation = {
+      async newChat(projectId: string | null = null, temporary = false): Promise<string> {
+        const local: Conversation = {
           id: uid('c'),
           title: temporary ? 'Temporary chat' : 'New chat',
           messages: [],
@@ -205,94 +187,240 @@ export function useStore() {
           projectId,
           temporary,
         };
-        /*
-         * المؤقتة تسكن خارج القائمة، فلا تظهر ولا تُحفظ.
-         * وكانت `temporary` لا تُضبط في الحالة، فلا تظهر اللافتة ولا يُعرف
-         * أن الوضع مؤقت أصلًا.
-         */
-        patch((s) =>
-          temporary
-            ? { ...s, temporary: true, tempConv: c, view: 'chat', viewArg: null }
-            : { ...s, temporary: false, tempConv: null, conversations: [c, ...s.conversations], activeId: c.id, view: 'chat', viewArg: null },
-        );
-        return c.id;
+        /* المؤقتة لا تُرسل للخادم إلا عند أول رسالة */
+        if (temporary) {
+          patch((s) => ({ ...s, temporary: true, tempConv: local, view: 'chat', viewArg: null }));
+          return local.id;
+        }
+        patch((s) => ({ ...s, temporary: false, tempConv: null, activeId: local.id, view: 'chat', viewArg: null }));
+        try {
+          const saved = await req<Conversation>('POST', '/conversations', { id: local.id, title: local.title, projectId, model: state.model });
+          /*
+           * الخادم يُعيد المحادثة بلا رسائل — وهي فارغة عند الإنشاء.
+           * لكن الاستبدال الأعمى كان يُسقط `messages` فينهار العرض عند أول
+           * تكرار عليها. فنحتفظ بما هو موجود محليًا.
+           */
+          patch((s) => {
+            const existing = s.conversations.find((c) => c.id === local.id);
+            return {
+              ...s,
+              conversations: [
+                { ...saved, messages: saved.messages ?? existing?.messages ?? [] },
+                ...s.conversations.filter((c) => c.id !== local.id),
+              ],
+            };
+          });
+        } catch (e) {
+          errors.current?.((e as Error).message);
+        }
+        return local.id;
       },
+
       openChat(id: string) {
-        patch((s) => ({ ...s, activeId: id, view: 'chat', viewArg: null }));
+        patch((s) => ({ ...s, temporary: false, tempConv: null, activeId: id, view: 'chat', viewArg: null }));
       },
-      renameChat(id: string, title: string) {
+      closeChat() {
+        patch((s) => ({ ...s, activeId: null }));
+      },
+
+      async renameChat(id: string, title: string) {
         patchConversation(id, (c) => ({ ...c, title }));
+        try {
+          await req('PATCH', `/conversations/${id}`, { title });
+        } catch (e) {
+          errors.current?.((e as Error).message);
+        }
       },
-      deleteChat(id: string) {
+
+      async deleteChat(id: string) {
+        if (state.tempConv?.id === id) {
+          patch((s) => ({ ...s, tempConv: null, temporary: false }));
+          return;
+        }
         patch((s) => ({
           ...s,
           conversations: s.conversations.filter((c) => c.id !== id),
           activeId: s.activeId === id ? null : s.activeId,
-          tempConv: s.tempConv?.id === id ? null : s.tempConv,
         }));
-      },
-      togglePin(id: string) {
-        patchConversation(id, (c) => ({ ...c, pinned: !c.pinned }));
-      },
-      moveToProject(id: string, projectId: string | null) {
-        patchConversation(id, (c) => ({ ...c, projectId }));
+        try {
+          await req('DELETE', `/conversations/${id}`);
+        } catch (e) {
+          errors.current?.((e as Error).message);
+        }
       },
 
-      /* —— رسائل —— */
-      addMessage(convId: string, m: Omit<Message, 'id' | 'createdAt'>): string {
+      async togglePin(id: string) {
+        const cur = state.conversations.find((c) => c.id === id);
+        const pinned = !cur?.pinned;
+        patchConversation(id, (c) => ({ ...c, pinned }));
+        try {
+          await req('PATCH', `/conversations/${id}`, { pinned });
+        } catch (e) {
+          errors.current?.((e as Error).message);
+        }
+      },
+
+      async moveToProject(id: string, projectId: string | null) {
+        patchConversation(id, (c) => ({ ...c, projectId }));
+        try {
+          await req('PATCH', `/conversations/${id}`, { projectId });
+        } catch (e) {
+          errors.current?.((e as Error).message);
+        }
+      },
+
+      /* ————— الرسائل ————— */
+      async addMessage(convId: string, m: Omit<Message, 'id' | 'createdAt'>): Promise<string> {
         const id = uid('m');
+        const full: Message = { ...m, id, createdAt: Date.now() };
         patchConversation(convId, (c) => {
-          const msgs = [...c.messages, { ...m, id, createdAt: Date.now() }];
+          const msgs = [...c.messages, full];
           const firstUser = msgs.find((x) => x.role === 'user');
-          const title =
-            c.title === 'New chat' || c.title === 'Temporary chat'
-              ? titleFrom(firstUser?.content || '')
-              : c.title;
+          const t = c.title === 'New chat' || c.title === 'Temporary chat';
+          const title = t && firstUser ? firstUser.content.replace(/\s+/g, ' ').trim().slice(0, 42) : c.title;
           return { ...c, messages: msgs, title: c.temporary ? c.title : title, updatedAt: Date.now() };
         });
-        return id;
+
+        /* المحادثة المؤقتة تُنشأ على الخادم عند أول رسالة، وتُعلَّم مؤقتة */
+        if (state.tempConv?.id === convId) {
+          try {
+            await req('POST', '/conversations', { id: convId, title: 'Temporary chat', temporary: true });
+          } catch {
+            /* تُحفظ محليًا على الأقل */
+          }
+        }
+
+        try {
+          const saved = await req<Message>('POST', `/conversations/${convId}/messages`, {
+            id,
+            role: m.role,
+            content: m.content,
+            image: m.image,
+            model: m.model,
+          });
+          return saved?.id || id;
+        } catch (e) {
+          errors.current?.((e as Error).message);
+          return id;
+        }
       },
-      updateMessage: patchMessage,
+
       patchMessage,
-      removeMessagesFrom(convId: string, msgId: string) {
+
+      /** يُرسل النص المتراكم للخادم — يُستدعى دوريًا وعند الانتهاء */
+      async flushMessage(convId: string, msgId: string, m: Message) {
+        try {
+          await req('PATCH', `/conversations/${convId}/messages/${msgId}`, {
+            content: m.content,
+            reasoning: m.reasoning ?? null,
+            error: m.error ?? null,
+            stopped: !!m.stopped,
+            citations: m.citations ?? null,
+          });
+        } catch (e) {
+          errors.current?.((e as Error).message);
+        }
+      },
+
+      async removeMessagesFrom(convId: string, msgId: string) {
         patchConversation(convId, (c) => {
           const i = c.messages.findIndex((m) => m.id === msgId);
           return i < 0 ? c : { ...c, messages: c.messages.slice(0, i) };
         });
+        try {
+          await req('DELETE', `/conversations/${convId}/messages?from=${encodeURIComponent(msgId)}`);
+        } catch (e) {
+          errors.current?.((e as Error).message);
+        }
       },
 
-      /* —— مشاريع —— */
-      newProject(name: string) {
-        const p: Project = { id: uid('p'), name: name || 'New project', createdAt: Date.now() };
-        patch((s) => ({ ...s, projects: [...s.projects, p] }));
-        return p.id;
+      /* ————— المشاريع ————— */
+      async newProject(name: string): Promise<string> {
+        const id = uid('p');
+        const local: Project = { id, name: name || 'New project', createdAt: Date.now() };
+        patch((s) => ({ ...s, projects: [...s.projects, local] }));
+        try {
+          await req('POST', '/projects', { id, name: local.name });
+        } catch (e) {
+          errors.current?.((e as Error).message);
+        }
+        return id;
       },
-      renameProject(id: string, name: string) {
+
+      async renameProject(id: string, name: string) {
         patch((s) => ({ ...s, projects: s.projects.map((p) => (p.id === id ? { ...p, name } : p)) }));
+        try {
+          await req('PATCH', `/projects/${id}`, { name });
+        } catch (e) {
+          errors.current?.((e as Error).message);
+        }
       },
-      deleteProject(id: string) {
+
+      async deleteProject(id: string) {
         patch((s) => ({
           ...s,
           projects: s.projects.filter((p) => p.id !== id),
           conversations: s.conversations.map((c) => (c.projectId === id ? { ...c, projectId: null } : c)),
         }));
+        try {
+          await req('DELETE', `/projects/${id}`);
+        } catch (e) {
+          errors.current?.((e as Error).message);
+        }
       },
 
-      /* —— مكتبة —— */
-      addLibrary(items: Omit<LibraryItem, 'id' | 'createdAt'>[]) {
-        const add = items.map((it) => ({ ...it, id: uid('lib'), createdAt: Date.now() }));
-        patch((s) => ({ ...s, library: [...add, ...s.library] }));
-      },
-      removeLibrary(id: string) {
-        patch((s) => ({ ...s, library: s.library.filter((x) => x.id !== id) }));
+      /* ————— الملفات ————— */
+      async uploadFile(file: File | Blob, name: string, kind: 'image' | 'file') {
+        /* تُعرض فورًا بمصدر محلي، ثم يُستبدل برابط الخادم */
+        const localUrl = URL.createObjectURL(file);
+        const tempId = uid('f');
+        patch((s) => ({
+          ...s,
+          files: [
+            { id: tempId, name, size: file.size, kind, url: localUrl, createdAt: Date.now(), mime: file.type } as LibraryItem,
+            ...s.files,
+          ],
+        }));
+        try {
+          const r = await fetch(`${API}/files?name=${encodeURIComponent(name)}&kind=${kind}`, {
+            method: 'POST',
+            headers: { 'Content-Type': file.type || 'application/octet-stream' },
+            body: file,
+          });
+          const saved = (await r.json()) as LibraryItem;
+          patch((s) => ({ ...s, files: s.files.map((f) => (f.id === tempId ? saved : f)) }));
+          return saved;
+        } catch (e) {
+          errors.current?.((e as Error).message);
+          return null;
+        }
       },
 
-      /* —— الحساب والوضع —— */
+      async removeFile(id: string) {
+        patch((s) => ({ ...s, files: s.files.filter((f) => f.id !== id) }));
+        try {
+          await req('DELETE', `/files/${id}`);
+        } catch {
+          /* تُزال محليًا على الأقل */
+        }
+      },
+
+      /* ————— الحساب والوضع ————— */
       signIn(email = 'hello@interactionfaction.com') {
         patch((s) => ({ ...s, signedIn: true, email }));
+        try {
+          localStorage.setItem('gpt5.signedIn', '1');
+        } catch {
+          /* — */
+        }
       },
       signOut() {
         patch((s) => ({ ...s, signedIn: false }));
+        try {
+          localStorage.setItem('gpt5.signedIn', '0');
+        } catch {
+          /* — */
+        }
       },
       setTemporary(on: boolean) {
         patch((s) => ({ ...s, temporary: on, tempConv: on ? s.tempConv : null }));
@@ -301,16 +429,18 @@ export function useStore() {
         patch((s) => ({ ...s, temporary: false, tempConv: null, activeId: null }));
       },
 
-      /* —— تنقّل —— */
-      go(view: AppState['view'], arg: string | null = null) {
+      /* ————— تنقّل ————— */
+      go(view: 'chat' | 'library' | 'project' | 'image', arg: string | null = null) {
         patch((s) => ({ ...s, view, viewArg: arg }));
       },
-      clearAll() {
-        const s = seed();
-        setState({ ...s, conversations: [], projects: [], library: [] });
+      reload: load,
+
+      /** يستقبل دالة إبلاغ عن الأخطاء من الواجهة */
+      onError(fn: (m: string) => void) {
+        errors.current = fn;
       },
     }),
-    [patch, patchConversation],
+    [patch, patchConversation, patchMessage, state.conversations, state.model, state.tempConv, load],
   );
 
   return { state, active, ...api };

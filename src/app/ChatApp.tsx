@@ -60,11 +60,7 @@ export function ChatApp() {
   const conv = store.active;
   const isEmpty = !conv || conv.messages.length === 0;
 
-  useEffect(() => {
-    if (state.view !== 'chat' || !signedIn) return;
-    if (!conv) store.newChat();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.view, signedIn]);
+  /* لا ننشئ محادثة عند الإقلاع — تُنشأ عند أول رسالة. وإلا امتلأ الشريط بمحادثات فارغة. */
 
   useEffect(() => {
     if (stick && !isEmpty) bottomRef.current?.scrollIntoView({ block: 'end' });
@@ -88,28 +84,70 @@ export function ChatApp() {
         setSettingsOpen(true);
         return;
       }
-      const assistantId = store.addMessage(convId, { role: 'assistant', content: '', streaming: true, model: config.model });
+      const assistantId = await store.addMessage(convId, { role: 'assistant', content: '', streaming: true, model: config.model });
       const stream = new ChatStream();
       streamRef.current = stream;
       setStreaming(true);
 
+      /*
+       * البثّ يُجمَّع قبل الإرسال.
+       * إرسال كل حرف يعني مئات الطلبات في الرد الواحد — فالنص يُحدَّث محليًا
+       * فورًا، ويُرسل للخادم كل ٤٠٠ ملي ثانية وعند الانتهاء.
+       */
+      /*
+       * التجميع محلي لا من الحالة.
+       * قراءة `store.state` داخل هذا الإغلاق تعطي **لقطة قديمة** من لحظة
+       * إنشاء الدالة، فلا تُجد الرسالة أبدًا ولا يُحفظ شيء. فنجمع هنا.
+       */
+      let acc = '';
+      let accReasoning = '';
+      let final: { content: string; citations: ReturnType<typeof citationsFrom>; stopped: boolean } | null = null;
+      let flushTimer: number | null = null;
+
+      const flush = () => {
+        if (flushTimer) {
+          window.clearTimeout(flushTimer);
+          flushTimer = null;
+        }
+        void store.flushMessage(convId, assistantId, {
+          id: assistantId,
+          role: 'assistant',
+          createdAt: 0,
+          content: final?.content ?? acc,
+          reasoning: accReasoning || undefined,
+          citations: final?.citations,
+          stopped: final?.stopped,
+        } as Message);
+      };
+
       await new Promise<void>((resolve) => {
         void stream.send(config, history(msgs), {
-          onDelta: (d) =>
+          onDelta: (d) => {
+            acc += d.content || '';
+            accReasoning += d.reasoning || '';
             store.patchMessage(convId, assistantId, (m) => ({
               ...m,
               content: m.content + (d.content || ''),
               reasoning: (m.reasoning || '') + (d.reasoning || ''),
-            })),
+            }));
+            if (!flushTimer) flushTimer = window.setTimeout(flush, 400);
+          },
           onDone: ({ finish }) => {
-            store.patchMessage(convId, assistantId, (m) => {
-              const content = m.content.trim() || (m.reasoning ? '' : 'No response.');
-              return { ...m, streaming: false, stopped: finish === 'stopped', content, citations: citationsFrom(content) };
-            });
+            const content = acc.trim() || (accReasoning ? '' : 'No response.');
+            final = { content, citations: citationsFrom(content), stopped: finish === 'stopped' };
+            store.patchMessage(convId, assistantId, (m) => ({
+              ...m,
+              streaming: false,
+              stopped: final!.stopped,
+              content,
+              citations: final!.citations,
+            }));
+            flush();
             resolve();
           },
           onError: (e) => {
             store.patchMessage(convId, assistantId, (m) => ({ ...m, streaming: false, error: e.message }));
+            flush();
             resolve();
           },
         });
@@ -122,7 +160,7 @@ export function ChatApp() {
   );
 
   const send = useCallback(
-    (text?: string, image?: string) => {
+    async (text?: string, image?: string) => {
       const body = (text ?? input).trim();
       if (!body && !image) return;
       /* غير مسجَّل: لا إرسال — بل دعوة للدخول، كما في التصميم */
@@ -130,9 +168,9 @@ export function ChatApp() {
         setLoginOpen(true);
         return;
       }
-      const convId = conv?.id ?? store.newChat();
+      const convId = conv?.id ?? (await store.newChat());
       const base = conv?.id ? conv.messages : [];
-      store.addMessage(convId, { role: 'user', content: body, image });
+      void store.addMessage(convId, { role: 'user', content: body, image });
       setInput('');
       setStick(true);
       void run(convId, [...base, { id: 'tmp', role: 'user', content: body, createdAt: Date.now() }]);
@@ -148,27 +186,20 @@ export function ChatApp() {
   };
 
   const onAttach = async (files: File[]) => {
-    const imgs: Array<{ src: string; title: string; kind: 'image' | 'file' }> = [];
+    let firstImage: string | undefined;
     for (const f of files) {
-      if (f.type.startsWith('image/')) {
-        const src = await new Promise<string>((res) => {
-          const r = new FileReader();
-          r.onload = () => res(String(r.result));
-          r.readAsDataURL(f);
-        });
-        imgs.push({ src, title: f.name, kind: 'image' });
-      } else {
-        imgs.push({ src: '', title: f.name, kind: 'file' });
-      }
+      const kind = f.type.startsWith('image/') ? 'image' : 'file';
+      const saved = await store.uploadFile(f, f.name, kind);
+      if (kind === 'image' && saved?.url && !firstImage) firstImage = saved.url;
     }
-    store.addLibrary(imgs);
-    const first = imgs.find((i) => i.kind === 'image');
-    if (first) send(undefined, first.src);
+    if (firstImage) void send(undefined, firstImage);
   };
 
-  const pasteImage = (src: string) => {
-    store.addLibrary([{ src, title: 'Pasted image', kind: 'image' }]);
-    send(undefined, src);
+  const pasteImage = async (dataUrl: string) => {
+    /* نُحوّل data URL إلى Blob كي يُرفع كملف حقيقي لا نصًّا في قاعدة البيانات */
+    const blob = await (await fetch(dataUrl)).blob();
+    const saved = await store.uploadFile(blob, `pasted-${Date.now()}.png`, 'image');
+    void send(undefined, saved?.url ?? dataUrl);
   };
 
   useEffect(() => {
@@ -197,7 +228,7 @@ export function ChatApp() {
     <Composer
       value={input}
       onChange={setInput}
-      onSend={() => send()}
+      onSend={() => void send()}
       onStop={() => streamRef.current?.stop()}
       streaming={streaming}
       onAttach={(f) => void onAttach(f)}
@@ -326,10 +357,10 @@ export function ChatApp() {
               signedIn={signedIn}
               value={input}
               onChange={setInput}
-              onSend={() => send()}
+              onSend={() => void send()}
               onStop={() => streamRef.current?.stop()}
               streaming={streaming}
-              onSuggestion={(t) => send(t)}
+              onSuggestion={(t) => void send(t)}
               onAttach={(f) => void onAttach(f)}
               onPasteImage={pasteImage}
             />
