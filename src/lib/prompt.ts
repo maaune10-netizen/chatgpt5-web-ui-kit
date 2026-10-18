@@ -76,6 +76,11 @@ export const SYSTEM_PROMPT_PRESETS: Array<{ label: string; value: string }> = [
  */
 export const DEFAULT_PARAMS = {
   temperature: 1,
-  maxTokens: 8192,
+  /*
+   * من `models.ts` لا من رأسي. والحدّ الأقصى للنموذج ٣٨٤٬٠٠٠ — لكنّ ردًّا
+   * بهذا الطول يعني انتظارًا طويلًا وفاتورة كبيرة إن أخطأ النموذج في الاستمرار.
+   * فالافتراضي وسط معقول، والأقصى معروض في الإعدادات ليختاره من يشاء.
+   */
+  maxTokens: 32_768,
   topP: 1,
 } as const;

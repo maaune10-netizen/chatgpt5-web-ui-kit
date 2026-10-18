@@ -4,6 +4,7 @@ import { C, MENU_SHADOW } from '../lib/tokens';
 import type { Config } from '../lib/llm';
 import { listModels } from '../lib/llm';
 import { SYSTEM_PROMPT_PRESETS, DEFAULT_SYSTEM_PROMPT } from '../lib/prompt';
+import { limitsFor, isKnown } from '../lib/models';
 
 /* ————— محدّد النموذج — 113x36 بنصف قطر 8 من الترويسة ————— */
 export function ModelMenu({
@@ -95,6 +96,7 @@ export function SettingsModal({
 }) {
   const [draft, setDraft] = useState(config);
   const set = <K extends keyof Config>(k: K, v: Config[K]) => setDraft((d) => ({ ...d, [k]: v }));
+  const lim = limitsFor(draft.model);
   const [test, setTest] = useState<{ ok: boolean; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -250,14 +252,41 @@ export function SettingsModal({
               <input
                 type="number"
                 min={0}
-                step={256}
+                max={lim.maxTokens}
+                step={1024}
                 value={draft.maxTokens}
-                onChange={(e) => set('maxTokens', Number(e.target.value))}
+                onChange={(e) => set('maxTokens', Math.min(Number(e.target.value), lim.maxTokens))}
                 className="w-full rounded-lg px-2 py-1.5"
                 style={{ background: C.input, border: `1px solid ${C.line}`, color: C.text, fontSize: 13 }}
               />
-              <span style={{ fontSize: 10, color: C.dim }}>0 = provider default</span>
+              <span style={{ fontSize: 10, color: C.dim }}>
+                {isKnown(draft.model)
+                  ? `model max ${lim.maxTokens.toLocaleString()} · 0 = provider default`
+                  : '0 = provider default · model limits unknown'}
+              </span>
             </label>
+          </div>
+
+          {/*
+           * الأرقام الحقيقية من مخزن النماذج، لا مُقدَّرة.
+           * وكنت أعرض 8192 بثقة — والحدّ الفعلي أكبر منه ٤٧ مرّة.
+           */}
+          <div className="rounded-lg px-3 py-2.5" style={{ background: 'var(--c-hover)', fontSize: 11, lineHeight: '17px', color: C.muted }}>
+            <b style={{ color: C.text }}>{draft.model}</b>
+            {isKnown(draft.model) ? (
+              <>
+                {' '}· context {lim.contextWindow.toLocaleString()} tokens · accepts {lim.input.join(' + ')}
+                {lim.reasoning ? ' · produces reasoning' : ''}
+                <br />
+                cache read ${lim.cost.cacheRead}/M against ${lim.cost.input}/M for fresh input —{' '}
+                <b style={{ color: C.text }}>
+                  {lim.cost.cacheRead > 0 ? Math.round(lim.cost.input / lim.cost.cacheRead) + '× cheaper' : 'no caching'}
+                </b>
+                . Caching is prefix-based, so editing the system prompt discards it.
+              </>
+            ) : (
+              <> · limits unknown, sending a conservative {lim.maxTokens.toLocaleString()} token ceiling</>
+            )}
           </div>
 
           {/*

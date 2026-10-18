@@ -38,7 +38,7 @@ function loadEnv() {
     }
   }
   return {
-    baseUrl: out.VITE_LLM_BASE_URL || 'https://opencode.ai/zen/v1',
+    baseUrl: out.VITE_LLM_BASE_URL || 'https://opencode.ai/inference/go/v1',
     apiKey: out.VITE_LLM_API_KEY || '',
     model: out.VITE_LLM_MODEL || 'deepseek-v4.1-flash',
   };
@@ -75,6 +75,7 @@ db.exec(`
     role TEXT NOT NULL,
     content TEXT NOT NULL DEFAULT '',
     reasoning TEXT,
+    usage TEXT,
     citations TEXT,
     error TEXT,
     stopped INTEGER NOT NULL DEFAULT 0,
@@ -137,6 +138,40 @@ addColumn('conversations', 'sort_order', 'INTEGER NOT NULL DEFAULT 0');
   }
 })();
 
+/*
+ * ترويسات المزوّد.
+ *
+ * نقطة `inference/go/v1` ترفض الطلب بـ400 «Request is missing
+ * x-opencode-session» إن غابت هذه الترويسة. ونقطة `zen/v1` التي كنت
+ * أستعملها تُعيد نموذجين فقط وتقول «free tier can only be used from
+ * within OpenCode» — أي أنّ العنوان كان خطأً من البداية.
+ *
+ * والمعرّف يُثبَّت لكل محادثة، فيبقى الطلب منسوبًا إلى الجلسة نفسها
+ * بدل أن يتغيّر مع كل رسالة.
+ */
+const sessionFor = new Map();
+function sessionId(conversationId) {
+  const key = conversationId || 'default';
+  let sid = sessionFor.get(key);
+  if (!sid) {
+    sid = 'ses_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    sessionFor.set(key, sid);
+  }
+  return sid;
+}
+
+function upstreamHeaders(conversationId) {
+  return {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${env.apiKey}`,
+    'x-opencode-session': sessionId(conversationId),
+    'x-opencode-client': 'pi',
+  };
+}
+
+/* ترحيل: أعمدة أُضيفت بعد إنشاء الجداول الأولى */
+addColumn('messages', 'usage', 'TEXT');
+
 const log = (kind, detail) => {
   try {
     db.prepare('INSERT INTO events (at, kind, detail) VALUES (?, ?, ?)').run(
@@ -175,6 +210,8 @@ const msgOut = (r) => {
   role: r.role,
   content: r.content,
   reasoning: r.reasoning || undefined,
+  /* استهلاك الردّ — يُعاد ككائن لا كنصّ */
+  usage: r.usage ? JSON.parse(r.usage) : undefined,
   citations: r.citations ? JSON.parse(r.citations) : undefined,
   error: r.error || undefined,
   stopped: !!r.stopped,
@@ -373,6 +410,7 @@ const server = createServer(async (req, res) => {
             }
             if ('stopped' in b) { sets.push('stopped = ?'); vals.push(b.stopped ? 1 : 0); }
             if ('citations' in b) { sets.push('citations = ?'); vals.push(b.citations ? JSON.stringify(b.citations) : null); }
+            if ('usage' in b) { sets.push('usage = ?'); vals.push(b.usage ? JSON.stringify(b.usage) : null); }
             if (sets.length) {
               vals.push(seg[4]);
               db.prepare(`UPDATE messages SET ${sets.join(', ')} WHERE id = ?`).run(...vals);
@@ -510,7 +548,7 @@ const server = createServer(async (req, res) => {
     /* ===== النماذج ===== */
     if (path === '/api/models') {
       const r = await fetch(env.baseUrl.replace(/\/$/, '') + '/models', {
-        headers: { Authorization: `Bearer ${env.apiKey}` },
+        headers: upstreamHeaders(),
       });
       const text = await r.text();
       res.writeHead(r.status, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -525,7 +563,7 @@ const server = createServer(async (req, res) => {
 
       const up = await fetch(env.baseUrl.replace(/\/$/, '') + '/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.apiKey}` },
+        headers: upstreamHeaders(body.conversationId),
         body: JSON.stringify({ ...body, model, stream: true }),
       });
 

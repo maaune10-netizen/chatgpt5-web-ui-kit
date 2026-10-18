@@ -14,6 +14,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export type Role = 'user' | 'assistant' | 'system';
 
+/** استهلاك الردّ — يُخزَّن معه فيُعرف ثمنه لاحقًا */
+export interface MsgUsage {
+  prompt_tokens?: number;
+  completion_tokens?: number;
+  cache_read_input_tokens?: number;
+  prompt_tokens_details?: { cached_tokens?: number };
+  completion_tokens_details?: { reasoning_tokens?: number };
+}
+
 export interface Citation {
   title: string;
   url?: string;
@@ -32,6 +41,8 @@ export interface Message {
   citations?: Citation[];
   model?: string;
   image?: string;
+  /** استهلاك هذا الردّ من النموذج */
+  usage?: MsgUsage;
 }
 
 export interface Conversation {
@@ -349,6 +360,7 @@ export function useStore() {
             error: m.error ?? null,
             stopped: !!m.stopped,
             citations: m.citations ?? null,
+            usage: m.usage ?? null,
           });
         } catch (e) {
           errors.current?.((e as Error).message);

@@ -23,6 +23,12 @@ export interface Config {
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
+  /**
+   * النموذج يعلن `requiresReasoningContentOnAssistantMessages: true`.
+   * ولم يُخطئ حين حذفته في الاختبار — لكنّ إعادته هي المطلوب المعلَن،
+   * وهي تُحسّن تماسك الأدوار المتعدّدة.
+   */
+  reasoning_content?: string;
 }
 
 /**
@@ -129,7 +135,13 @@ export class ChatStream {
     this.ctrl.abort();
   }
 
-  async send(config: Config, messages: ChatMessage[], h: StreamHandlers): Promise<void> {
+  async send(
+    config: Config,
+    messages: ChatMessage[],
+    h: StreamHandlers,
+    /** يُثبَّت معرّف جلسة المزوّد عليه، فيبقى الطلب منسوبًا للمحادثة نفسها */
+    conversationId?: string,
+  ): Promise<void> {
     const url = `${config.baseUrl.replace(/\/$/, '')}/chat`;
 
     let res: Response;
@@ -139,6 +151,7 @@ export class ChatStream {
         signal: this.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          conversationId,
           model: config.model,
           /*
            * تعليمات النظام تُقدَّم أولًا — وهذا ما كان غائبًا كليًا.

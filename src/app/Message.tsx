@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Icon } from './Icon';
+import { cachedTokens, reasoningTokens, costOf, savings } from '../lib/models';
 import { Markdown } from './Markdown';
 import { C, FONT, T } from '../lib/tokens';
-import type { Message } from './store';
+import type { Message, MsgUsage } from './store';
 
 /**
  * رسالة واحدة.
@@ -10,6 +11,39 @@ import type { Message } from './store';
  * وصف الأزرار في التصميم: نسخ · إعجاب · عدم إعجاب · مشاركة · إعادة · المزيد
  * ثم المصادر. وهذا ترتيبها هنا حرفيًا.
  */
+/**
+ * سطر الاستهلاك — يظهر عند المرور بالرسالة، فيُعرف ثمن كل ردّ.
+ * ويعرض نسبة الكاش لأنّها الفرق بين فاتورة وفاتورة:
+ * قراءة الكاش ٠٫٠٠٣ مقابل ٠٫١٥ للإدخال الطازج — أرخص ٥٠ ضعفًا.
+ */
+function UsageLine({ usage, model }: { usage: MsgUsage; model: string }) {
+  const cached = cachedTokens(usage);
+  const prompt = usage.prompt_tokens ?? 0;
+  const out = usage.completion_tokens ?? 0;
+  const think = reasoningTokens(usage);
+  const cost = costOf(usage, model);
+  const saved = savings(usage, model);
+  const pct = prompt > 0 ? Math.round((cached / prompt) * 100) : 0;
+
+  return (
+    <div
+      className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 opacity-0 transition-opacity group-hover/row:opacity-100"
+      style={{ fontSize: 11, color: C.dim }}
+      title={`${prompt.toLocaleString()} input · ${cached.toLocaleString()} from cache · ${out.toLocaleString()} output (${think.toLocaleString()} reasoning)`}
+    >
+      <span>{prompt.toLocaleString()} in</span>
+      <span>{out.toLocaleString()} out</span>
+      {think > 0 && <span style={{ color: C.muted }}>{think.toLocaleString()} thinking</span>}
+      {cached > 0 && (
+        <span style={{ color: 'var(--c-ok)' }}>
+          {pct}% cached · {Math.round(saved * 100)}% saved
+        </span>
+      )}
+      {cost > 0 && <span>${cost < 0.001 ? cost.toFixed(5) : cost.toFixed(4)}</span>}
+    </div>
+  );
+}
+
 export function MessageRow({
   m,
   onCopy,
@@ -30,7 +64,7 @@ export function MessageRow({
 
   if (m.role === 'user') {
     return (
-      <div className="flex justify-end py-3">
+      <div className="group/row flex justify-end py-3">
         <div className="max-w-[75%]">
           {m.image && (
             <button type="button" onClick={() => onOpenImage?.(m.image!)} className="mb-2 block overflow-hidden rounded-2xl">
@@ -49,7 +83,7 @@ export function MessageRow({
   }
 
   return (
-    <div className="py-4" style={{ color: C.text }}>
+    <div className="group/row py-4" style={{ color: C.text }}>
       {/* التفكير — مطويّ، فالتفكير ليس جوابًا */}
       {m.reasoning ? <Reasoning text={m.reasoning} live={m.streaming} /> : null}
 
@@ -118,6 +152,13 @@ export function MessageRow({
           Stopped
         </p>
       )}
+
+      {/*
+       * سطر الاستهلاك — يظهر عند المرور بالرسالة فقط، فلا يُشوّش القراءة.
+       * ويعرض نسبة الكاش لأنّها الفرق بين فاتورة وفاتورة: قراءة الكاش
+       * ٠٫٠٠٣ مقابل ٠٫١٥ للإدخال الطازج.
+       */}
+      {m.usage && !m.streaming && <UsageLine usage={m.usage} model={m.model || ''} />}
     </div>
   );
 }

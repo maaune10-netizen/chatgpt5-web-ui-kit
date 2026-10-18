@@ -105,7 +105,13 @@ export function ChatApp({
 
   const history = useCallback(
     (messages: Message[]): ChatMessage[] =>
-      messages.filter((m) => !m.error && (m.content || '').trim()).map((m) => ({ role: m.role, content: m.content })),
+      messages
+        .filter((m) => !m.error && (m.content || '').trim())
+        .map((m) =>
+          m.role === 'assistant' && m.reasoning
+            ? { role: m.role, content: m.content, reasoning_content: m.reasoning }
+            : { role: m.role, content: m.content },
+        ),
     [],
   );
 
@@ -133,6 +139,12 @@ export function ChatApp({
       let acc = '';
       let accReasoning = '';
       let final: { content: string; citations: ReturnType<typeof citationsFrom>; stopped: boolean } | null = null;
+      /*
+       * الاستهلاك يُحفظ في متغيّر محليّ لا في الحالة.
+       * و`flush` يبني كائنًا من `acc` و`accReasoning`، فكان `usage` يسقط
+       * منه ولا يصل الخادم أبدًا — رغم أنّ الردّ يحمله.
+       */
+      let finalUsage: Message['usage'];
       let flushTimer: number | null = null;
 
       const flush = () => {
@@ -148,6 +160,7 @@ export function ChatApp({
           reasoning: accReasoning || undefined,
           citations: final?.citations,
           stopped: final?.stopped,
+          usage: finalUsage,
         } as Message);
       };
 
@@ -163,7 +176,8 @@ export function ChatApp({
             }));
             if (!flushTimer) flushTimer = window.setTimeout(flush, 400);
           },
-          onDone: ({ finish }) => {
+          onDone: ({ finish, usage }) => {
+            finalUsage = usage as Message['usage'];
             const content = acc.trim() || (accReasoning ? '' : 'No response.');
             final = { content, citations: citationsFrom(content), stopped: finish === 'stopped' };
             store.patchMessage(convId, assistantId, (m) => ({
@@ -172,6 +186,11 @@ export function ChatApp({
               stopped: final!.stopped,
               content,
               citations: final!.citations,
+              /*
+               * الاستهلاك يُخزَّن مع الرسالة: فيُعرف كم كلّف كل ردّ،
+               * وكم منه جاء من الكاش. والكاش أرخص ٥٠ ضعفًا، فهو ليس تفصيلًا.
+               */
+              usage: usage as Message['usage'],
             }));
             flush();
             resolve();
@@ -181,7 +200,7 @@ export function ChatApp({
             flush();
             resolve();
           },
-        });
+        }, convId);
       });
 
       streamRef.current = null;
