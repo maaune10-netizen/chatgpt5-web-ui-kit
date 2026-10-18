@@ -30,6 +30,7 @@ function Row({
   onClick,
   onMenu,
   onTogglePin,
+  external,
   muted,
   bold,
   renaming,
@@ -40,6 +41,8 @@ function Row({
   icon?: string;
   label: string;
   trailing?: string;
+  /** سهم «يفتح خارج الموقع» — أيقونة لا حرف، فالحرف يظهر إيموجي ملوّنًا */
+  external?: boolean;
   active?: boolean;
   pinned?: boolean;
   onClick?: () => void;
@@ -119,7 +122,9 @@ function Row({
         >
           {label}
         </span>
-        {trailing && !onMenu && !onTogglePin && !compact ? (
+        {external ? (
+          <Icon name="linkExternal" size={16} style={{ color: C.dim, flexShrink: 0 }} />
+        ) : trailing && !onMenu && !onTogglePin && !compact ? (
           <span style={{ fontSize: 12, color: C.dim, whiteSpace: 'nowrap' }}>{trailing}</span>
         ) : null}
       </button>
@@ -207,6 +212,7 @@ export function Sidebar({
   onUpgrade,
   onLogin,
   onShare,
+  onSettings,
   collapsed,
   onToggleCollapsed,
   width,
@@ -219,6 +225,7 @@ export function Sidebar({
   onUpgrade: () => void;
   onLogin: () => void;
   onShare: (id: string) => void;
+  onSettings: () => void;
   collapsed: boolean;
   onToggleCollapsed: () => void;
   width: number;
@@ -368,15 +375,35 @@ export function Sidebar({
           </button>
         </div>
 
+        {/*
+         * غير المسجَّل يرى قائمة مختلفة تمامًا — مقروءة من لقطة chatgpt.com:
+         * New chat · Images · Plugins · Deep research ·
+         * See plans and pricing ↗ · Help ↗ · Settings.
+         * ولا بحث ولا مكتبة ولا محادثة مؤقتة، لأنّها كلها تحتاج حسابًا.
+         */}
         <div className="px-1.5 pt-1">
-          <Row icon="create" label="New Chat" trailing="Ctrl + Shift + O" compact={compact} onClick={() => void store.newChat()} />
-          <Row icon="search" label="Search chats" onClick={onOpenSearch} />
-          <Row icon="images" label="Library" onClick={() => store.go('library')} />
-          <Row icon="temporaryChat" label="Temporary chat" onClick={() => void store.newChat(null, true)} />
+          {state.signedIn ? (
+            <>
+              <Row icon="create" label="New Chat" trailing="Ctrl + Shift + O" compact={compact} onClick={() => void store.newChat()} />
+              <Row icon="search" label="Search chats" onClick={onOpenSearch} />
+              <Row icon="images" label="Library" onClick={() => store.go('library')} />
+              <Row icon="temporaryChat" label="Temporary chat" onClick={() => void store.newChat(null, true)} />
+            </>
+          ) : (
+            <>
+              <Row icon="create" label="New chat" trailing="Ctrl + Shift + O" compact={compact} onClick={() => void store.newChat()} />
+              <Row icon="image" label="Images" onClick={() => store.go('library')} />
+              <Row icon="integration" label="Plugins" onClick={() => store.go('library')} />
+              <Row icon="research" label="Deep research" onClick={() => store.go('library')} />
+              <Row icon="billing" label="See plans and pricing" external onClick={onUpgrade} />
+              <Row icon="help" label="Help" external onClick={() => store.go('library')} />
+              <Row icon="settings" label="Settings" onClick={onSettings} />
+            </>
+          )}
         </div>
 
-        {/* المثبّتة — قسم مستقل في الأعلى */}
-        {pinned.length > 0 && (
+        {/* المثبّتة — قسم مستقل في الأعلى (ولا يظهر شيء منه لغير المسجَّل) */}
+        {state.signedIn && pinned.length > 0 && (
           <div className="px-1.5">
             <SectionLabel open={isOpen('pinned')} onToggle={() => toggle('pinned')}>
               Pinned
@@ -386,7 +413,7 @@ export function Sidebar({
         )}
 
         {/* المشاريع */}
-        <div className="px-1.5">
+        <div className="px-1.5" style={{ display: state.signedIn ? undefined : 'none' }}>
           <SectionLabel
             open={isOpen('projects')}
             onToggle={() => toggle('projects')}
@@ -419,8 +446,14 @@ export function Sidebar({
             ))}
         </div>
 
-        {/* المحادثات */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-2">
+        {/* حين لا حساب لا قسم يتمدّد، فهذا الفراغ يدفع التذييل إلى الأسفل */}
+        {!state.signedIn && <div className="min-h-0 flex-1" />}
+
+        {/* المحادثات — تختفي كليًا حين لا حساب، كما في الموقع */}
+        <div
+          className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-2"
+          style={{ display: state.signedIn ? undefined : 'none' }}
+        >
           <SectionLabel open={isOpen('chats')} onToggle={() => toggle('chats')}>
             Chats
           </SectionLabel>

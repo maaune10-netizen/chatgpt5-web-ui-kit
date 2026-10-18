@@ -269,22 +269,26 @@ export function ChatApp({
 
   return (
     <div className="flex h-full" style={{ background: C.body, color: C.text }}>
-      {/* الشريط الجانبي للمسجَّل فقط — الوضع غير المسجَّل بعرض كامل في التصميم */}
-      {signedIn && (
-        <Sidebar
-          store={store}
-          collapsed={collapsed}
-          width={sidebarW}
-          onWidth={setSidebarW}
-          overlay={narrow}
-          onToggleCollapsed={() => setCollapsed((v) => !v)}
-          onOpenSearch={() => setSearchOpen(true)}
-          onOpenAccount={setAccountAt}
-          onUpgrade={() => setUpgradeOpen(true)}
-          onLogin={() => setLoginOpen(true)}
-          onShare={(id) => setShareFor(id)}
-        />
-      )}
+      {/*
+       * الشريط يظهر في الوضعين. كنت أخفيه لغير المسجَّل اعتمادًا على شاشة
+       * Figma، لكن الموقع الحقيقي يُظهره بسبعة عناصر مختلفة:
+       * New chat · Images · Plugins · Deep research ·
+       * See plans and pricing ↗ · Help ↗ · Settings.
+       */}
+      <Sidebar
+        store={store}
+        collapsed={collapsed}
+        width={sidebarW}
+        onWidth={setSidebarW}
+        overlay={narrow}
+        onToggleCollapsed={() => setCollapsed((v) => !v)}
+        onOpenSearch={() => setSearchOpen(true)}
+        onOpenAccount={setAccountAt}
+        onUpgrade={() => setUpgradeOpen(true)}
+        onLogin={() => setLoginOpen(true)}
+        onShare={(id) => setShareFor(id)}
+        onSettings={() => setSettingsOpen(true)}
+      />
 
       {/* حاجب يُغلق الدرج بالنقر — على الضيّق فقط */}
       {narrow && !collapsed && (
