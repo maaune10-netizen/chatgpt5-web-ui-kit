@@ -136,13 +136,10 @@ export function Sidebar({
           />
         </div>
 
-        {/* GPTs */}
-        <div className="px-1.5">
-          <SectionLabel>GPTs</SectionLabel>
-          <Row icon="explore" label="Explore" onClick={() => store.newChat()} />
-          <Row icon="chatgpt" label="Example GPT 1" onClick={() => store.newChat()} />
-          <Row icon="chatgpt" label="Example GPT 2" onClick={() => store.newChat()} />
-        </div>
+        {/*
+          قسم GPTs أُزيل بطلب: Explore و Example GPT 1/2 عناصر قديمة لم تعد
+          في الواجهة الحديثة، ولا وظيفة لها هنا — فكانت صفوفًا تفتح محادثة فارغة.
+        */}
 
         {/* المشاريع */}
         <div className="px-1.5">
