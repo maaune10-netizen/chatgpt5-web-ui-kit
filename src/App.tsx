@@ -1,10 +1,21 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { ChatApp } from './app/ChatApp';
 import { DesignViewer } from './app/DesignViewer';
 import { preloadIcons } from './lib/icons';
 import { C } from './lib/tokens';
 
-type Mode = 'app' | 'design';
+/*
+ * المعرض يُحمَّل عند الطلب لا مع الإقلاع.
+ *
+ * فـ`@openuidev/react-ui` يضيف نحو ٢ ميجابايت إلى الحزمة — وثمن لا يدفعه
+ * من يريد محادثة. فلا يصل المتصفّح إلا من فتح `#openui`.
+ */
+const OpenUIGallery = lazy(() => import('./app/OpenUIGallery').then((m) => ({ default: m.OpenUIGallery })));
+
+type Mode = 'app' | 'design' | 'openui';
+
+/* العنوان هو المصدر: #design و#openui و#app */
+const modeFromHash = (h: string): Mode => (h === 'design' ? 'design' : h === 'openui' ? 'openui' : 'app');
 
 /**
  * غلاف التطبيق: وضعان.
@@ -27,7 +38,7 @@ export default function App() {
   const [devMode, setDevMode] = useState(
     () =>
       typeof location !== 'undefined' &&
-      (location.hash.includes('design') || new URLSearchParams(location.search).has('dev')),
+      (location.hash.includes('design') || location.hash.includes('openui') || new URLSearchParams(location.search).has('dev')),
   );
 
   const [theme, setTheme] = useState<'dark' | 'light' | 'auto'>(
@@ -56,10 +67,7 @@ export default function App() {
     return () => mq.removeEventListener('change', apply);
   }, [theme]);
 
-  const [mode, setMode] = useState<Mode>(() => {
-    const h = typeof location !== 'undefined' ? location.hash.replace('#', '') : '';
-    return h === 'design' ? 'design' : 'app';
-  });
+  const [mode, setMode] = useState<Mode>(() => modeFromHash(typeof location !== 'undefined' ? location.hash.replace('#', '') : ''));
 
   useEffect(() => {
     preloadIcons();
@@ -67,7 +75,7 @@ export default function App() {
 
   useEffect(() => {
     if (typeof location !== 'undefined') {
-      history.replaceState(null, '', mode === 'design' ? '#design' : '#app');
+      history.replaceState(null, '', '#' + mode);
     }
   }, [mode]);
 
@@ -78,14 +86,26 @@ export default function App() {
    * فمن يكتب #design بنفسه يبقى في التطبيق ولا يفهم لماذا لم يحدث شيء.
    */
   useEffect(() => {
-    const onHash = () => setMode(location.hash.replace('#', '') === 'design' ? 'design' : 'app');
+    const onHash = () => setMode(modeFromHash(location.hash.replace('#', '')));
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
   return (
     <div className="h-full" style={{ background: C.body, color: C.text }}>
-      {mode === 'app' ? <ChatApp theme={theme} onTheme={setTheme} /> : <DesignViewer />}
+      {mode === 'app' && <ChatApp theme={theme} onTheme={setTheme} />}
+      {mode === 'design' && <DesignViewer />}
+      {mode === 'openui' && (
+        <Suspense
+          fallback={
+            <div className="grid h-full place-items-center" style={{ color: C.muted, fontSize: 13 }}>
+              Loading OpenUI…
+            </div>
+          }
+        >
+          <OpenUIGallery onBack={() => setMode('app')} />
+        </Suspense>
+      )}
 
       {/*
        * مبدّل الشاشات المستخرجة — أثر تطويري، فلا يُعرض في واجهة عادية.
@@ -93,20 +113,32 @@ export default function App() {
        * والمسؤول عنه يجده. وكان ظاهرًا دائمًا في أسفل الشاشة.
        */}
       {devMode && (
-        <button
-          type="button"
-          onClick={() => setMode((m) => (m === 'app' ? 'design' : 'app'))}
-          title={mode === 'app' ? 'Show the extracted Figma screens' : 'Back to the working app'}
-          className="fixed bottom-3 end-3 z-[300] rounded-full px-3 py-1.5 text-xs transition-colors hover:bg-white/15"
-          style={{
-            background: 'rgba(255,255,255,0.10)',
-            border: `1px solid ${C.line}`,
-            color: C.muted,
-            backdropFilter: 'blur(6px)',
-          }}
+        <div
+          className="fixed bottom-3 end-14 z-[300] flex items-center gap-1 rounded-full p-1"
+          style={{ background: 'rgba(255,255,255,0.10)', border: `1px solid ${C.line}`, backdropFilter: 'blur(6px)' }}
         >
-          {mode === 'app' ? 'Design' : 'App'}
-        </button>
+          {(
+            [
+              ['app', 'App', 'The working chat app'],
+              ['design', 'Design', 'The 24 extracted Figma screens'],
+              ['openui', 'OpenUI', 'Every component of @openuidev/react-ui, rendered'],
+            ] as Array<[Mode, string, string]>
+          ).map(([m, label, title]) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMode(m)}
+              title={title}
+              className="rounded-full px-2.5 py-1 text-xs transition-colors hover:bg-white/15"
+              style={{
+                color: mode === m ? C.text : C.muted,
+                background: mode === m ? 'rgba(255,255,255,0.14)' : 'transparent',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );
