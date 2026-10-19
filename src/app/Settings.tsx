@@ -6,6 +6,7 @@ import { listModels } from '../lib/llm';
 import { SYSTEM_PROMPT_PRESETS, DEFAULT_SYSTEM_PROMPT } from '../lib/prompt';
 import { limitsFor, isKnown } from '../lib/models';
 import type { ReasoningEffort } from '../lib/llm';
+import { preloadGenUI } from './genui-shared';
 
 /* ————— محدّد النموذج — 113x36 بنصف قطر 8 من الترويسة ————— */
 export function ModelMenu({
@@ -182,7 +183,11 @@ export function SettingsModal({
                 <button
                   key={String(on)}
                   type="button"
-                  onClick={() => set('genui', on)}
+                  onClick={() => {
+                    set('genui', on);
+                    /* يُحمَّل الآن لا عند أوّل واجهة — فالتبديل إعلان نيّة */
+                    if (on) preloadGenUI();
+                  }}
                   className="rounded-lg px-3 py-1.5"
                   style={{
                     fontSize: 12,

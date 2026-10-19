@@ -8,7 +8,7 @@ import { AccountMenu } from './AccountMenu';
 import { ModelMenu, SettingsModal } from './Settings';
 import { LoginModal, SearchModal, ShareModal, UpgradeModal } from './Modals';
 import { Library, ImageViewer, FileViewer, ProjectPage } from './Library';
-import { GenUIContext, GenUIPanel } from './genui-shared';
+import { GenUIContext, GenUIPanel, preloadGenUI } from './genui-shared';
 import { useStore, type Citation, type LibraryItem, type Message } from './store';
 import { C, L } from '../lib/tokens';
 import { ChatStream, loadConfig, saveConfig, isConfigured, type Config, type ChatMessage } from '../lib/llm';
@@ -231,6 +231,12 @@ export function ChatApp({
     async (text?: string, image?: string) => {
       const body = (text ?? input).trim();
       if (!body && !image) return;
+      /*
+       * ابدأ تحميل حزمة العرض الآن، لا حين تصل الواجهة.
+       * النموذج يفكّر ٥ ثوانٍ، والحزمة ١٢ ميجابايت في التطوير — فتحميلها
+       * في هذه الثواني يجعلها جاهزة وقت الحاجة بدل أن تنتظر بعد الجواب.
+       */
+      if (config.genui) preloadGenUI();
       /* غير مسجَّل: لا إرسال — بل دعوة للدخول، كما في التصميم */
       if (!signedIn) {
         setLoginOpen(true);

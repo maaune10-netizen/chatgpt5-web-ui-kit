@@ -208,6 +208,36 @@ clicked button starts a real turn.
 Keep thinking on for this feature. It is the difference between 96% and 70%, and
 it is what pays for the argument order.
 
+## Speed: where the time actually goes
+
+The first version felt slow. Measured, the wait was in two places and only one
+of them was the model.
+
+**The model, 3–6s, and it does not move.** `reasoning_effort: low` was no faster
+than `auto` (6.5s vs 6.5s) even though it produced 15,212 reasoning tokens
+against 22,006 — the wall clock is dominated by the program it writes, not by the
+thinking. `off` is genuinely 2× faster (2.9s) and costs 25–30% of responses
+(19/27 without the rules, 22/27 with them, against 26–27/27 with thinking on).
+So this part is a quality/speed trade the user makes, not something to tune away.
+
+**The renderer, which was ~1s of pure dead wait.** `@openuidev/react-ui` is
+**12 MB in dev** (2 MB in production) and it was being fetched *after* the answer
+arrived, so the card sat on "Loading the UI renderer…" while the user had already
+read the prose. The model spends 3–6s thinking; the chunk fits inside that
+window with room to spare.
+
+`preloadGenUI()` now fires when the message is sent (and when the toggle is
+switched on), so the fetch runs in parallel with generation:
+
+| | before | after |
+|---|---|---|
+| chunk requested | after the answer | **+1.1s after send** |
+| chunk transfer | — | 967 ms (12 MB, dev) |
+| UI visible relative to the answer | **~+1,000 ms after** | **162 ms before** |
+
+The last line is the one that matters: the interface now draws while the answer
+is still streaming, so there is nothing left to wait for once the prose ends.
+
 ### Still open
 
 The thinking counter and the capability-check rule from the section above are not

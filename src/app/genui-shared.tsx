@@ -30,3 +30,23 @@ export const isGenUILang = (lang?: string) => !!lang && LANGS.has(lang.toLowerCa
 
 export const GenUIBlock = lazy(() => import('./GenUI').then((m) => ({ default: m.GenUIBlock })));
 export const GenUIPanel = lazy(() => import('./GenUI').then((m) => ({ default: m.GenUIPanel })));
+
+let preloaded = false;
+
+/**
+ * يبدأ تحميل الحزمة الثقيلة **قبل** أن يحتاجها.
+ *
+ * وهي ١٢ ميجابايت في التطوير (٢ في الإنتاج). وكانت تُطلب بعد وصول الردّ،
+ * فيبقى المستخدم أمام «Loading the UI renderer…» ثانيةً أو أكثر بعد أن يكون
+ * الجواب قد وصل أصلًا. والنموذج يفكّر ٥ ثوانٍ — وهي وقت يكفي لتحميلها كلّها.
+ *
+ * فتُنادى عند الإرسال (وعند تشغيل الخيار في الإعدادات)، فتصير جاهزة وقت الحاجة.
+ */
+export function preloadGenUI(): void {
+  if (preloaded) return;
+  preloaded = true;
+  void import('./GenUI').catch(() => {
+    /* الفشل لا يُعلَّم كمحمَّل، فيُعاد المحاولة عند الحاجة الفعلية */
+    preloaded = false;
+  });
+}
