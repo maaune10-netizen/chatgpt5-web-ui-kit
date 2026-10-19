@@ -7,8 +7,8 @@ import { MessageRow } from './Message';
 import { AccountMenu } from './AccountMenu';
 import { ModelMenu, SettingsModal } from './Settings';
 import { LoginModal, SearchModal, ShareModal, UpgradeModal } from './Modals';
-import { Library, ImageViewer, ProjectPage } from './Library';
-import { useStore, type Citation, type Message } from './store';
+import { Library, ImageViewer, FileViewer, ProjectPage } from './Library';
+import { useStore, type Citation, type LibraryItem, type Message } from './store';
 import { C, L } from '../lib/tokens';
 import { ChatStream, loadConfig, saveConfig, isConfigured, type Config, type ChatMessage } from '../lib/llm';
 import { exhaustedByThinking, type Usage } from '../lib/models';
@@ -83,6 +83,7 @@ export function ChatApp({
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [viewer, setViewer] = useState<{ src: string; title: string } | null>(null);
+  const [fileViewer, setFileViewer] = useState<LibraryItem | null>(null);
   const [config, setConfig] = useState<Config>(loadConfig);
   const streamRef = useRef<ChatStream | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -259,6 +260,20 @@ export function ChatApp({
     if (firstImage) void send(undefined, firstImage);
   };
 
+  /*
+   * النصّ الملصوق الطويل يُحفظ ملفًّا في المكتبة.
+   *
+   * والاسم يشتقّ من أوّل كلماته لا من طابع زمني: فـ«pasted-1730...txt»
+   * لا يقول شيئًا، و«Coffee shop names ideas.txt» يُعرف من قائمته.
+   */
+  const attachText = async (text: string) => {
+    const words = text.replace(/\s+/g, ' ').trim().split(' ').slice(0, 6).join(' ');
+    const base = (words || 'Pasted text').replace(/[\\/:*?"<>|]/g, '').slice(0, 60).trim();
+    const name = `${base || 'Pasted text'}${text.length > 200 ? '' : ' '} — ${text.length.toLocaleString()} chars.txt`;
+    const blob = new Blob([text], { type: 'text/plain' });
+    await store.uploadFile(blob, name, 'file');
+  };
+
   const pasteImage = async (dataUrl: string) => {
     /* نُحوّل data URL إلى Blob كي يُرفع كملف حقيقي لا نصًّا في قاعدة البيانات */
     const blob = await (await fetch(dataUrl)).blob();
@@ -296,6 +311,7 @@ export function ChatApp({
       onStop={() => streamRef.current?.stop()}
       streaming={streaming}
       onAttach={(f) => void onAttach(f)}
+      onAttachText={(t) => void attachText(t)}
       onPasteImage={pasteImage}
     />
   );
@@ -425,7 +441,7 @@ export function ChatApp({
         </header>
 
         {state.view === 'library' ? (
-          <Library store={store} onOpenImage={(src, title) => setViewer({ src, title })} />
+          <Library store={store} onOpenImage={(src, title) => setViewer({ src, title })} onOpenFile={(it) => setFileViewer(it)} />
         ) : state.view === 'project' && state.viewArg ? (
           <ProjectPage store={store} projectId={state.viewArg} onOpenChat={(id) => store.openChat(id)} />
         ) : isEmpty ? (
@@ -439,6 +455,7 @@ export function ChatApp({
               streaming={streaming}
               onSuggestion={(t) => void send(t)}
               onAttach={(f) => void onAttach(f)}
+              onAttachText={(t) => void attachText(t)}
               onPasteImage={pasteImage}
             />
             <div className="shrink-0 px-4 pb-3 text-center" style={{ fontSize: 12, color: C.muted, lineHeight: '16px' }}>
@@ -543,6 +560,7 @@ export function ChatApp({
         />
       )}
       {viewer && <ImageViewer src={viewer.src} title={viewer.title} onClose={() => setViewer(null)} />}
+      {fileViewer && <FileViewer key={fileViewer.id} item={fileViewer} onClose={() => setFileViewer(null)} />}
     </div>
   );
 }

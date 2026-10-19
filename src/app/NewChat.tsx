@@ -31,6 +31,7 @@ export function NewChat({
   streaming,
   onSuggestion,
   onAttach,
+  onAttachText,
   onPasteImage,
 }: {
   signedIn: boolean;
@@ -41,6 +42,7 @@ export function NewChat({
   streaming: boolean;
   onSuggestion: (text: string) => void;
   onAttach?: (files: File[]) => void;
+  onAttachText?: (text: string) => void;
   onPasteImage?: (src: string) => void;
 }) {
   return (
@@ -73,6 +75,7 @@ export function NewChat({
               placeholder="Ask ChatGPT"
               tall={!signedIn}
               onAttach={onAttach}
+              onAttachText={onAttachText}
               onPasteImage={onPasteImage}
               showDisclaimer={false}
             />

@@ -24,6 +24,7 @@ export function Composer({
   disabled,
   placeholder = 'Ask ChatGPT',
   onAttach,
+  onAttachText,
   onPasteImage,
   tall,
   showDisclaimer = true,
@@ -36,6 +37,11 @@ export function Composer({
   disabled?: boolean;
   placeholder?: string;
   onAttach?: (files: File[]) => void;
+  /**
+   * نصّ طويل لُصق — يُبلَّغ ليُحفظ في «Files» بالمكتبة.
+   * وكان يبقى في الصندوق وحده ولا يُسجَّل في أيّ مكان.
+   */
+  onAttachText?: (text: string) => void;
   onPasteImage?: (dataUrl: string) => void;
   /** الوضع غير المسجَّل: 768x102 لا 56 — من New Chat - Logged Out */
   tall?: boolean;
@@ -195,6 +201,7 @@ export function Composer({
               e.preventDefault();
               setLongText(text);
               onChange('');
+              onAttachText?.(text);
             }
           }}
           rows={1}
