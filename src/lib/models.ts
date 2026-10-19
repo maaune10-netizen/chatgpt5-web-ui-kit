@@ -101,12 +101,34 @@ export function costOf(u: Usage | undefined, model: string): number {
 }
 
 /**
- * نسبة ما وُفِّر بالكاش.
- * وهو ليس تفصيلًا: قراءة الكاش ٠٫٠٠٣ مقابل ٠٫١٥ للإدخال — **أرخص ٥٠ ضعفًا**.
+ * نسبة ما وُفِّر بالكاش **على الإدخال وحده**.
+ *
+ * وكانت تُحسب على الكلفة كلها، فتظهر «٦٧٪ مخزَّن · ٠٪ موفَّر» — وهي صحيحة
+ * حسابيًّا وكاذبة معنويًّا: الإخراج ٢٨٬٣٩١ توكن يغرق توفير الإدخال (٣٨٢ توكن)
+ * فيصير التوفير صفرًا بعد التقريب.
+ *
+ * والكاش لا يمسّ الإخراج أصلًا — فقياسه على الإدخال هو القياس الصحيح.
  */
 export function savings(u: Usage | undefined, model: string): number {
   if (!u) return 0;
-  const full = costOf({ ...u, prompt_tokens_details: { cached_tokens: 0 }, cache_read_input_tokens: 0 }, model);
-  const real = costOf(u, model);
+  const l = limitsFor(model);
+  const prompt = u.prompt_tokens ?? 0;
+  const cached = cachedTokens(u);
+  if (prompt <= 0 || cached <= 0 || l.cost.input <= 0) return 0;
+  const full = prompt * l.cost.input;
+  const real = (prompt - cached) * l.cost.input + cached * l.cost.cacheRead;
   return full > 0 ? 1 - real / full : 0;
+}
+
+/**
+ * هل استُهلك حدّ الإخراج في التفكير وحده؟
+ *
+ * يحدث فعلًا: `28,391 out` كلها `thinking` وصفر حرف جواب. والردّ يصل فارغًا
+ * بلا خطأ، فيبدو كأنّ شيئًا لم يحدث.
+ */
+export function exhaustedByThinking(u: Usage | undefined): boolean {
+  if (!u) return false;
+  const out = u.completion_tokens ?? 0;
+  const think = reasoningTokens(u);
+  return out > 0 && think > 0 && think >= out * 0.98;
 }

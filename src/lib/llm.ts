@@ -18,7 +18,22 @@ export interface Config {
   /** 0 = افتراضي المزوّد */
   maxTokens: number;
   topP: number;
+  /**
+   * جهد التفكير — وهذا ما كان غائبًا فصار النموذج يفكّر بلا حدّ.
+   *
+   * مقيس على «أعطني أسماء مقهى»:
+   *   auto     → 8385 حرف تفكير · أول جواب بعد 34.4ث
+   *   low      → 5355 حرفًا      · أول جواب بعد 10.5ث
+   *   high     → 13232 حرفًا     · أول جواب بعد 55.6ث
+   *   off      → صفر تفكير       · أول جواب بعد  1.0ث
+   *
+   * و`off` يعمل بـ`thinking: {type:'disabled'}` رغم أنّ خريطة النموذج
+   * تقول `off: null` — أي أنّها تُعلن عدم الدعم ويقبله الخادم فعلًا.
+   */
+  reasoningEffort: ReasoningEffort;
 }
+
+export type ReasoningEffort = 'auto' | 'off' | 'low' | 'high' | 'max';
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
@@ -68,6 +83,7 @@ export const DEFAULT_CONFIG: Config = {
   temperature: DEFAULT_PARAMS.temperature,
   maxTokens: DEFAULT_PARAMS.maxTokens,
   topP: DEFAULT_PARAMS.topP,
+  reasoningEffort: 'auto',
 };
 
 /** الإعداد محفوظ في المتصفح، والافتراضي من متغيرات البيئة */
@@ -95,6 +111,7 @@ export function loadConfig(): Config {
       temperature: typeof saved.temperature === 'number' ? saved.temperature : DEFAULT_CONFIG.temperature,
       maxTokens: typeof saved.maxTokens === 'number' ? saved.maxTokens : DEFAULT_CONFIG.maxTokens,
       topP: typeof saved.topP === 'number' ? saved.topP : DEFAULT_CONFIG.topP,
+      reasoningEffort: (saved.reasoningEffort as ReasoningEffort) || DEFAULT_CONFIG.reasoningEffort,
     };
   } catch {
     return { ...DEFAULT_CONFIG };
@@ -164,6 +181,16 @@ export class ChatStream {
           stream_options: { include_usage: true },
           temperature: config.temperature,
           top_p: config.topP,
+          /*
+           * جهد التفكير. و`auto` لا ترسل شيئًا فيبقى القرار للمزوّد.
+           * و`off` تُرسل `thinking` لا `reasoning_effort` — وهو ما يقبله
+           * هذا النموذج فعلًا، وقد قِسته.
+           */
+          ...(config.reasoningEffort === 'off'
+            ? { thinking: { type: 'disabled' } }
+            : config.reasoningEffort === 'auto'
+              ? {}
+              : { reasoning_effort: config.reasoningEffort }),
           /* 0 تعني «اتركه للمزوّد» ولا تُرسل حقلًا صفريًّا يُشلّ الردّ */
           ...(config.maxTokens > 0 ? { max_tokens: config.maxTokens } : {}),
         }),

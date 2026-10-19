@@ -3,6 +3,14 @@ import { Icon } from './Icon';
 import { C, FONT, INPUT_SHADOW, L } from '../lib/tokens';
 
 /**
+ * حدّ ما يُحوَّل إلى مرفق. أعلاه لا يدخل الصندوق.
+ *
+ * والقيمة اختيار: طويلة بما يكفي ألّا تتحوّل فقرة عادية إلى مرفق، وقصيرة
+ * بما يكفي ألّا يبتلع نصٌّ ضخم الصندوق. وChatGPT يحوّل عند حدٍّ قريب من هذا.
+ */
+const LONG_PASTE = 1000;
+
+/**
  * صندوق الإدخال — 768x56 بنصف قطر 28، من Prompt Input Field.
  *
  * ويكبر مع النص بدل أن يُمرَّر داخليًا، كما في ChatGPT.
@@ -22,7 +30,7 @@ export function Composer({
 }: {
   value: string;
   onChange: (v: string) => void;
-  onSend: () => void;
+  onSend: (text?: string) => void;
   onStop: () => void;
   streaming: boolean;
   disabled?: boolean;
@@ -36,6 +44,20 @@ export function Composer({
   const ref = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
+  /*
+   * النصّ الطويل الملصوق لا يدخل الصندوق بل يصير «مرفقًا» فوقه.
+   *
+   * وهذا ما يفعله ChatGPT فعلًا — مقروء من لقطة المستخدم:
+   *   ┌──────────────────────────────┐
+   *   │ ...s for a tea shop $  [📄][×]│
+   *   │ إظهار في حقل النص ›           │
+   *   └──────────────────────────────┘
+   * ومربّع الكتابة يبقى فارغًا.
+   *
+   * وفائدته أنّ الصندوق لا يتضخّم بآلاف الأسطر، ويبقى النصّ ظاهرًا كمرفق
+   * يُحذف أو يُعاد إلى الحقل بضغطة.
+   */
+  const [longText, setLongText] = useState<string | null>(null);
 
   /* يكبر حتى 200px ثم يُمرَّر */
   useEffect(() => {
@@ -45,12 +67,14 @@ export function Composer({
     el.style.height = Math.min(200, Math.max(tall ? 78 : L.inputH - 16, el.scrollHeight)) + 'px';
   }, [value, tall]);
 
-  const canSend = value.trim().length > 0 && !streaming && !disabled;
+  /* المرفق النصّي يُرسل مع ما في الصندوق، والمرفق وحده يكفي للإرسال */
+  const outgoing = [longText, value].filter((x) => x && x.trim()).join('\n\n');
+  const canSend = outgoing.trim().length > 0 && !streaming && !disabled;
 
   return (
     <div className="mx-auto w-full" style={{ maxWidth: L.inputW }}>
       <div
-        className="flex items-end gap-2 px-3 transition-shadow"
+        className="flex flex-col px-3 transition-shadow"
         style={{
           background: C.input,
           borderRadius: L.inputRadius,
@@ -74,6 +98,51 @@ export function Composer({
           boxShadow: focused ? INPUT_SHADOW + ', 0 0 0 1px var(--c-line)' : INPUT_SHADOW,
         }}
       >
+        {/* المرفق النصّي — فوق الصندوق، كما في اللقطة */}
+        {longText && (
+          <div className="flex justify-end pt-2">
+            <div
+              className="relative max-w-[60%] rounded-2xl px-3 py-2 pe-10"
+              style={{ background: C.raised, border: `1px solid ${C.line}` }}
+            >
+              <button
+                type="button"
+                title="Remove"
+                aria-label="Remove attachment"
+                onClick={() => setLongText(null)}
+                className="absolute end-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full"
+                style={{ background: 'var(--c-active)' }}
+              >
+                <Icon name="close" size={12} />
+              </button>
+              <div className="flex items-center gap-2">
+                <Icon name="document" size={18} style={{ color: C.muted, flexShrink: 0 }} />
+                <span
+                  dir="auto"
+                  className="truncate"
+                  style={{ fontSize: 13, color: C.text, maxWidth: 220 }}
+                >
+                  {'…' + longText.replace(/\s+/g, ' ').trim().slice(-40)}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onChange(value.trim() ? longText + '\n\n' + value : longText);
+                  setLongText(null);
+                  ref.current?.focus();
+                }}
+                className="mt-0.5 flex items-center gap-1 hover:underline"
+                style={{ fontSize: 12, color: C.muted }}
+              >
+                Show in text field
+                <Icon name="chevronRight" size={12} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-end gap-2">
         <button
           type="button"
           title="Add photos & files"
@@ -103,17 +172,30 @@ export function Composer({
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
               e.preventDefault();
-              if (canSend) onSend();
+              if (canSend) {
+                onSend(outgoing);
+                setLongText(null);
+              }
             }
           }}
           onPaste={(e) => {
             const img = Array.from(e.clipboardData?.items || []).find((i) => i.type.startsWith('image/'));
-            if (!img) return;
-            const f = img.getAsFile();
-            if (!f) return;
-            const r = new FileReader();
-            r.onload = () => onPasteImage?.(String(r.result));
-            r.readAsDataURL(f);
+            if (img) {
+              const f = img.getAsFile();
+              if (f) {
+                const r = new FileReader();
+                r.onload = () => onPasteImage?.(String(r.result));
+                r.readAsDataURL(f);
+                return;
+              }
+            }
+            /* نصّ طويل → مرفق لا محتوى صندوق */
+            const text = e.clipboardData.getData('text');
+            if (text.length > LONG_PASTE) {
+              e.preventDefault();
+              setLongText(text);
+              onChange('');
+            }
           }}
           rows={1}
           placeholder={placeholder}
@@ -156,7 +238,14 @@ export function Composer({
           <button
             type="button"
             title="Use voice mode"
-            onClick={canSend ? onSend : undefined}
+            onClick={
+              canSend
+                ? () => {
+                    onSend(outgoing);
+                    setLongText(null);
+                  }
+                : undefined
+            }
             disabled={!canSend}
             className="grid h-9 w-9 shrink-0 place-items-center self-end rounded-full transition-colors"
             style={{
@@ -171,6 +260,7 @@ export function Composer({
             )}
           </button>
         )}
+        </div>
       </div>
 
       {showDisclaimer && (

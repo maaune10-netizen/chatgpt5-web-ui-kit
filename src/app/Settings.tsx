@@ -5,6 +5,7 @@ import type { Config } from '../lib/llm';
 import { listModels } from '../lib/llm';
 import { SYSTEM_PROMPT_PRESETS, DEFAULT_SYSTEM_PROMPT } from '../lib/prompt';
 import { limitsFor, isKnown } from '../lib/models';
+import type { ReasoningEffort } from '../lib/llm';
 
 /* ————— محدّد النموذج — 113x36 بنصف قطر 8 من الترويسة ————— */
 export function ModelMenu({
@@ -208,6 +209,50 @@ export function SettingsModal({
                 ? `${draft.systemPrompt.length} characters sent as one system message before the conversation.`
                 : 'No system message is sent — the model receives the conversation alone.'}
               {draft.systemPrompt === DEFAULT_SYSTEM_PROMPT ? ' (default)' : ''}
+            </p>
+          </div>
+
+          {/*
+           * ————— جهد التفكير —————
+           * كان غائبًا فصار النموذج يفكّر بلا حدّ: ٨٣٨٥ حرفًا في «أعطني أسماء
+           * مقهى»، وأول جواب بعد ٣٤ ثانية. والأسوأ: قد يستهلك الحدّ كلّه
+           * تفكيرًا فلا يبقى للجواب شيء.
+           */}
+          <div>
+            <p className="mb-2" style={{ fontSize: 13, fontWeight: 600 }}>
+              Thinking effort
+            </p>
+            <div className="flex gap-2">
+              {(
+                [
+                  ['auto', 'Auto', 'provider default'],
+                  ['off', 'Off', 'no reasoning at all'],
+                  ['low', 'Low', 'fastest with thinking'],
+                  ['high', 'High', 'slower, more thorough'],
+                  ['max', 'Max', 'slowest'],
+                ] as Array<[ReasoningEffort, string, string]>
+              ).map(([v, label, hint]) => (
+                <button
+                  key={v}
+                  type="button"
+                  title={hint}
+                  onClick={() => set('reasoningEffort', v)}
+                  className="flex-1 rounded-lg py-2 transition-colors"
+                  style={{
+                    fontSize: 13,
+                    background: draft.reasoningEffort === v ? 'var(--c-text)' : 'var(--c-hover)',
+                    color: draft.reasoningEffort === v ? 'var(--c-body)' : 'var(--c-text)',
+                    border: `1px solid ${draft.reasoningEffort === v ? 'transparent' : 'var(--c-line)'}`,
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1.5" style={{ fontSize: 11, lineHeight: '16px', color: C.dim }}>
+              Measured on “brainstorm names for a coffee shop”: Auto waited 34s before the first
+              visible word, Low 10s, Off under a second. Turning it off also stops reasoning from
+              consuming the output budget, which is what leaves a reply empty.
             </p>
           </div>
 

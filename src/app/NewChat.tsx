@@ -36,7 +36,7 @@ export function NewChat({
   signedIn: boolean;
   value: string;
   onChange: (v: string) => void;
-  onSend: () => void;
+  onSend: (text?: string) => void;
   onStop: () => void;
   streaming: boolean;
   onSuggestion: (text: string) => void;

@@ -11,6 +11,7 @@ import { Library, ImageViewer, ProjectPage } from './Library';
 import { useStore, type Citation, type Message } from './store';
 import { C, L } from '../lib/tokens';
 import { ChatStream, loadConfig, saveConfig, isConfigured, type Config, type ChatMessage } from '../lib/llm';
+import { exhaustedByThinking, type Usage } from '../lib/models';
 
 /**
  * يستخرج المصادر من نصّ الرد.
@@ -178,7 +179,20 @@ export function ChatApp({
           },
           onDone: ({ finish, usage }) => {
             finalUsage = usage as Message['usage'];
-            const content = acc.trim() || (accReasoning ? '' : 'No response.');
+            /*
+             * الردّ الفارغ له سببان مختلفان، ورسالة واحدة لهما مُضلِّلة:
+             *   • التفكير استهلك الحدّ كلّه — فيُقال ذلك ويُقترح العلاج
+             *   • لا تفكير ولا نصّ — فالمشكلة في المزوّد
+             */
+            const spent = exhaustedByThinking(usage as Usage | undefined);
+            const content =
+              acc.trim() ||
+              (spent
+                ? 'Thinking used the entire output budget, so no answer was written. ' +
+                  'Raise Max output tokens, or set Thinking effort to Low or Off.'
+                : accReasoning
+                  ? ''
+                  : 'No response.');
             final = { content, citations: citationsFrom(content), stopped: finish === 'stopped' };
             store.patchMessage(convId, assistantId, (m) => ({
               ...m,
@@ -278,7 +292,7 @@ export function ChatApp({
     <Composer
       value={input}
       onChange={setInput}
-      onSend={() => void send()}
+      onSend={(t) => void send(t)}
       onStop={() => streamRef.current?.stop()}
       streaming={streaming}
       onAttach={(f) => void onAttach(f)}
@@ -420,7 +434,7 @@ export function ChatApp({
               signedIn={signedIn}
               value={input}
               onChange={setInput}
-              onSend={() => void send()}
+              onSend={(t) => void send(t)}
               onStop={() => streamRef.current?.stop()}
               streaming={streaming}
               onSuggestion={(t) => void send(t)}
