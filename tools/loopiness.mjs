@@ -20,8 +20,12 @@ export function loopiness(text) {
   let run = 1;
   let maxLineRun = 1;
   for (let i = 1; i < lines.length; i++) {
-    if (lines[i] && lines[i] === lines[i - 1]) ((run += 1), (maxLineRun = Math.max(maxLineRun, run)));
-    else run = 1;
+    if (lines[i] && lines[i] === lines[i - 1]) {
+      run += 1;
+      maxLineRun = Math.max(maxLineRun, run);
+    } else {
+      run = 1;
+    }
   }
 
   const sentences = text
@@ -35,7 +39,10 @@ export function loopiness(text) {
     for (let i = k; i < sentences.length; i++) {
       if (sentences[i] === sentences[i - k]) {
         streak[i] = streak[i - k] + 1;
-        if (streak[i] > maxPeriodRun) ((maxPeriodRun = streak[i]), (period = k));
+        if (streak[i] > maxPeriodRun) {
+          maxPeriodRun = streak[i];
+          period = k;
+        }
       }
     }
   }
@@ -48,7 +55,12 @@ export function loopiness(text) {
   }
   let topShingle = 0;
   let worstShingle = '';
-  for (const [k, n] of counts) if (n > topShingle) ((topShingle = n), (worstShingle = k));
+  for (const [k, n] of counts) {
+    if (n > topShingle) {
+      topShingle = n;
+      worstShingle = k;
+    }
+  }
 
   return { maxLineRun, maxPeriodRun, period, topShingle, worstShingle, sentences: sentences.length };
 }
