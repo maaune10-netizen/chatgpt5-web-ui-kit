@@ -7,7 +7,13 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "suite": "node tools/prompt-suite.mjs",
+    "suite:genui": "node tools/prompt-suite.mjs --genui --max-tokens 16384",
+    "genui:prompt": "node tools/openui-prompt.mjs",
+    "openui:inspect": "node tools/openui-inspect.mjs",
+    "openui:eval": "node tools/openui-eval.mjs --effort auto --fix-rules",
+    "openui:loop": "node tools/loop-probe.mjs"
   },
   "dependencies": {
     "@openuidev/react-lang": "^1.0.1",
