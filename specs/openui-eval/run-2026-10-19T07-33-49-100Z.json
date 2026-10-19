@@ -1,0 +1,1471 @@
+{
+ "at": "2026-10-19T07:34:33.810Z",
+ "model": "deepseek-v4.1-flash",
+ "effort": "auto",
+ "maxTokens": 32768,
+ "systemPromptChars": 30225,
+ "results": [
+  {
+   "id": "sales-quarter",
+   "kind": "ui",
+   "prompt": "Show me quarterly sales for a coffee roastery in Riyadh.",
+   "ms": 5884,
+   "ttft": 1213,
+   "contentChars": 2657,
+   "reasoningChars": 1806,
+   "usage": {
+    "prompt_tokens": 7729,
+    "completion_tokens": 1373,
+    "total_tokens": 9102,
+    "prompt_tokens_details": {
+     "cached_tokens": 7168
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 550
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 30
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 2,
+    "worstShingle": "null, \"sm\", \"success\")], null, \"column\",",
+    "sentences": 2
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user wants a quarterly",
+    "sentences": 28
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 110,
+   "startsWithRoot": false,
+   "content": "I'll create a quarterly sales dashboard for a Riyadh coffee roastery with KPIs, charts, and a breakdown table.\n\n```openui-lang\nroot = Stack([pageHeader, kpiRow, chartsCard, breakdownCard, mixCard], \"column\", \"l\")\n\npageHeader = Stack([title, subtitle], \"column\", \"xs\")\ntitle = TextContent(\"# ☕ Riyadh Coffee Roastery — Quarterly Sales\", \"large-heavy\")\nsubtitle = TextContent(\"Full-year performance across four quarters · All figures in SAR\", \"small\")\n\nkpiRow = Stack([kpiRevenue, kpiOrders, kpiAOV, kpiGrowth], \"row\", \"m\", \"stretch\", \"start\", true)\n\nkpiRevenue = Card([TextContent(\"Annual Revenue\", \"small\"), TextContent(\"SAR 1,501,000\", \"large-heavy\"), Tag(\"+67% Q4 vs Q1\", null, \"sm\", \"success\")], null, \"column\", \"s\")\nkpiOrders = Card([TextContent(\"Total Orders\", \"small\"), TextContent(\"38,400\", \"large-heavy\"), Tag(\"+20% QoQ in Q4\", null, \"sm\", \"success\")], null, \"column\", \"s\")\nkpiAOV = Card([TextContent(\"Avg Order Value\", \"small\"), TextContent(\"SAR 39\", \"large-heavy\"), Tag(\"Steady\", null, \"sm\", \"neutral\")], null, \"column\", \"s\")\nkpiGrowth = Card([TextContent(\"Best Quarter\", \"small\"), TextContent(\"Q4 · SAR 476k\", \"large-heavy\"), Tag(\"Peak\", null, \"sm\", \"info\")], null, \"column\", \"s\")\n\nchartsCard = Card([CardHeader(\"Quarterly Revenue Trend\", \"Q1–Q4 sales in SAR\"), revenueTabs], null, \"column\", \"m\")\n\nrevenueTabs = Tabs([barTab, lineTab, ordersTab])\n\nbarTab = TabItem(\"bar\", \"Bar\", [BarChart(labels, [revenueSeries], \"grouped\", \"Quarter\", \"Revenue (SAR)\", 320)])\nlineTab = TabItem(\"line\", \"Line\", [LineChart(labels, [revenueSeries], \"natural\", \"Quarter\", \"Revenue (SAR)\", 320)])\nordersTab = TabItem(\"orders\", \"Orders\", [BarChart(labels, [ordersSeries], \"grouped\", \"Quarter\", \"Orders\", 320)])\n\nlabels = [\"Q1\", \"Q2\", \"Q3\", \"Q4\"]\nrevenueSeries = Series(\"Revenue (SAR)\", revenueValues)\nordersSeries = Series(\"Orders\", orderValues)\nrevenueValues = [285000, 342000, 398000, 476000]\norderValues = [7500, 8900, 10200, 11800]\n\nbreakdownCard = Card([CardHeader(\"Quarterly Breakdown\", \"Revenue, orders and quarter-over-quarter growth\"), breakdownTable], null, \"column\", \"m\")\n\nbreakdownTable = Table([quarterCol, revenueCol, ordersCol, growthCol])\nquarterCol = Col(\"Quarter\", labels)\nrevenueCol = Col(\"Revenue (SAR)\", revenueValues, \"number\")\nordersCol = Col(\"Orders\", orderValues, \"number\")\ngrowthCol = Col(\"QoQ Growth\", growthLabels)\n\ngrowthLabels = [\"—\", \"+20.0%\", \"+16.4%\", \"+19.6%\"]\n\nmixCard = Card([CardHeader(\"Product Mix\", \"Share of annual revenue\"), mixChart], null, \"column\", \"m\")\n\nmixChart = PieChart(mixLabels, mixValues, \"donut\")\nmixLabels = [\"Roasted Beans\", \"Beverages\", \"Pastries\", \"Merchandise\"]\nmixValues = [675450, 450300, 225150, 150100]\n```",
+   "reasoning": "The user wants a quarterly sales dashboard for a coffee roastery in Riyadh. Let me create a nice UI with charts, KPIs, and a table.\n\nLet me build this with openui-lang. Start with root = Stack(...).\n\nLet me design:\n- Header\n- KPI cards (total revenue, cups sold, avg order, growth)\n- Line/bar chart of quarterly sales\n- Table of quarterly breakdown\n- Maybe pie chart of product mix\n\nLet me create data. Quarters Q1-Q4. Coffee roastery in Riyadh.\n\nRevenue in SAR.\n\nLet me make realistic numbers:\nQ1: 285,000 SAR\nQ2: 342,000 SAR\nQ3: 398,000 SAR\nQ4: 476,000 SAR\n\nLet me build the layout.\n\nI'll use inline data arrays directly in components.\n\nLet me write:\n\nroot = Stack([header, kpiRow, chartCard, tableCard], \"column\", \"l\")\n\nActually let me structure with references.\n\nLet me define:\n- labels = [\"Q1\", \"Q2\", \"Q3\", \"Q4\"]\n- revenue series\n\nLet me use BarChart and LineChart in Tabs.\n\nKPIs: Total annual revenue = 285+342+398+476 = 1,501,000 SAR. Growth Q4 vs Q1.\n\nLet me compute: Q4 476 vs Q1 285 → +67% YoY-ish. Let me just show growth numbers.\n\nLet me write the code.\n\nTotal revenue: 1,501,000 SAR\nCups sold: let's say 125,400\nAvg order value: 38 SAR\nTop quarter: Q4\n\nLet me create charts.\n\nRevenue: [285000, 342000, 398000, 476000]\nOrders: [7500, 8900, 10200, 11800]\n\nLet me build pie for product mix: Beans 45%, Beverages 30%, Pastries 15%, Merch 10%.\n\nLet me write everything now.\n\nI'll structure KPIs as cards in a row with wrap.\n\nLet me define each KPI card.\n\nI'll write final code.\n\nFor the table, columns quarter, revenue, orders, growth.\n\nLet me compute growth per quarter:\nQ1: -\nQ2: +20% (342/285)\nQ3: +16% (398/342)\nQ4: +20% (476/398)\n\nLet me build.\n\nTable with Col. Use Col(\"Quarter\", labels), Col(\"Revenue (SAR)\", revenue, \"number\"), Col(\"Orders\", orders, \"number\").\n\nLet me write the full thing."
+  },
+  {
+   "id": "crm-compare",
+   "kind": "ui",
+   "prompt": "Compare three CRM tools in a table: HubSpot, Pipedrive and Attio.",
+   "ms": 5820,
+   "ttft": 1578,
+   "contentChars": 1157,
+   "reasoningChars": 3078,
+   "usage": {
+    "prompt_tokens": 7733,
+    "completion_tokens": 1129,
+    "total_tokens": 8862,
+    "prompt_tokens_details": {
+     "cached_tokens": 7040
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 797
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 8
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's a side-by-side comparison of",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 3,
+    "worstShingle": "per seat - Free tier:",
+    "sentences": 26
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 124,
+   "startsWithRoot": false,
+   "content": "Here's a side-by-side comparison of HubSpot, Pipedrive, and Attio across the dimensions that matter most when picking a CRM:\n\n```openui-lang\nroot = Stack([compareCard])\ncompareCard = Card([compareHeader, comparisonTable], \"card\", \"column\", \"m\")\ncompareHeader = CardHeader(\"CRM Comparison\", \"HubSpot vs Pipedrive vs Attio\")\ncomparisonTable = Table([featureCol, hubspotCol, pipedriveCol, attioCol])\nfeatureCol = Col(\"Feature\", [\"Best for\", \"Starting price\", \"Free tier\", \"Ease of use\", \"Sales pipeline\", \"Marketing tools\", \"Customization\", \"Data model flexibility\", \"Integrations\"])\nhubspotCol = Col(\"HubSpot\", [\"All-in-one marketing + sales\", \"Free; paid from ~$20/seat/mo\", \"Yes (generous)\", \"Excellent\", \"Strong\", \"Excellent\", \"Good (highest on Enterprise)\", \"Moderate\", \"1,500+ apps\"])\npipedriveCol = Col(\"Pipedrive\", [\"Sales-first pipeline management\", \"~$14/seat/mo\", \"No (trial only)\", \"Excellent\", \"Excellent\", \"Limited\", \"Good\", \"Moderate\", \"400+ apps\"])\nattioCol = Col(\"Attio\", [\"Flexible, data-driven CRM\", \"Free; paid from ~$29/seat/mo\", \"Yes\", \"Good (some learning curve)\", \"Good\", \"Minimal\", \"Excellent\", \"Excellent\", \"100+ apps (growing)\"])\n```",
+   "reasoning": "The user wants a comparison of three CRM tools in a table: HubSpot, Pipedrive, and Attio. Let me create a comparison table with openui-lang.\n\nLet me build a table comparing these three CRMs across features like pricing, best for, key features, ease of use, etc.\n\nTable is column-oriented. Let me structure it. For a comparison of 3 tools, I could put the feature as rows... but Table is column-oriented with Col(label, data, type).\n\nLet me think about structure. I want rows to be features and columns to be tools, OR rows to be tools and columns to be features.\n\nGiven Table is column-oriented, each Col is a column. Let me make:\n- Col(\"Feature\", [...feature names...])\n- Col(\"HubSpot\", [...])\n- Col(\"Pipedrive\", [...])\n- Col(\"Attio\", [...])\n\nThat works well — features as rows.\n\nLet me build it.\n\nFeatures:\n- Best for\n- Starting price\n- Free tier\n- Ease of use\n- Sales pipeline\n- Marketing tools\n- Customization\n- Data model flexibility\n- Integrations\n\nLet me fill in reasonable values.\n\nHubSpot:\n- Best for: All-in-one inbound marketing + CRM\n- Starting price: Free tier; paid from ~$20/mo per seat\n- Free tier: Yes (generous)\n- Ease of use: Excellent\n- Sales pipeline: Strong\n- Marketing tools: Excellent\n- Customization: Good (Enterprise)\n- Data model flexibility: Moderate\n- Integrations: Huge marketplace (1,500+)\n\nPipedrive:\n- Best for: Sales-focused pipeline management\n- Starting price: ~$14/mo per seat\n- Free tier: No (trial only)\n- Ease of use: Excellent\n- Sales pipeline: Excellent\n- Marketing tools: Limited\n- Customization: Good\n- Data model flexibility: Moderate\n- Integrations: 400+\n\nAttio:\n- Best for: Modern, customizable data-driven CRM\n- Starting price: Free tier; paid from ~$29/mo per seat\n- Free tier: Yes\n- Ease of use: Good (learning curve)\n- Sales pipeline: Good\n- Marketing tools: Minimal\n- Customization: Excellent (flexible data model)\n- Data model flexibility: Excellent\n- Integrations: 100+ (growing)\n\nLet me build the table.\n\nI'll also maybe add a Callout or header. Let me keep it clean — a Card with CardHeader and Table.\n\nLet me write the code.\n\nroot = Stack([card])\ncard = Card([CardHeader(\"CRM Comparison\", \"HubSpot vs Pipedrive vs Attio\"), comparisonTable], \"card\", \"column\", \"m\")\ncomparisonTable = Table([featureCol, hubspotCol, pipedriveCol, attioCol])\n\nWait — Table is a component, and it should be a child of Card. But Col components go inside Table's array. Let me define cols as references.\n\nfeatureCol = Col(\"Feature\", [\"Best for\", \"Starting price\", \"Free tier\", \"Ease of use\", \"Sales pipeline\", \"Marketing tools\", \"Customization\", \"Data model flexibility\", \"Integrations\"])\nhubspotCol = Col(\"HubSpot\", [...])\npipedriveCol = Col(\"Pipedrive\", [...])\nattioCol = Col(\"Attio\", [...])\n\nThen comparisonTable = Table([featureCol, hubspotCol, pipedriveCol, attioCol])\n\nNote Table's columns arg type is Col[]. Good.\n\nLet me verify the Card signature. Card(children, variant?, direction?, gap?, ...). So Card([CardHeader(...), comparisonTable], \"card\", \"column\", \"m\"). Good.\n\nActually CardHeader is fine as a child of Card.\n\nLet me write it."
+  },
+  {
+   "id": "newsletter-form",
+   "kind": "ui",
+   "prompt": "Build a signup form for a weekly newsletter.",
+   "ms": 8748,
+   "ttft": 1245,
+   "contentChars": 2129,
+   "reasoningChars": 5226,
+   "usage": {
+    "prompt_tokens": 7725,
+    "completion_tokens": 1828,
+    "total_tokens": 9553,
+    "prompt_tokens_details": {
+     "cached_tokens": 7040
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 1282
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 21
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's a clean newsletter signup",
+    "sentences": 3
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 2,
+    "worstShingle": "Input(\"email\", \"jane@example.com\", \"email\", {required: true,",
+    "sentences": 55
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 316,
+   "startsWithRoot": false,
+   "content": "Here's a clean newsletter signup form with a hero, topics selection, and consent.\n\n```openui-lang\nroot = Stack([heroCard, formCard], \"column\", \"l\")\n\nheroCard = Card([heroHeader, TagBlock([\"Every Friday\", \"No spam\", \"Free\"], \"md\")], null, \"column\", \"m\")\nheroHeader = CardHeader(\"The Weekly Edit\", \"One email every Friday with the best reads, tools, and ideas.\")\n\nformCard = Card([formHeader, signupForm], null, \"column\", \"m\")\nformHeader = InlineHeader(\"Join 12,000+ readers\", \"Fill in your details to get the next issue.\")\n\nsignupForm = Form(\"newsletter\", formButtons, [nameField, emailField, topicsField, consentField])\n\nnameField = FormControl(\"First name\", nameInput)\nnameInput = Input(\"firstName\", \"Jane\", \"text\", {required: true, minLength: 1})\n\nemailField = FormControl(\"Email address\", emailInput, \"We'll send your first issue this Friday.\")\nemailInput = Input(\"email\", \"jane@example.com\", \"email\", {required: true, email: true})\n\ntopicsField = FormControl(\"Topics you care about\", topicsGroup, \"Pick as many as you like.\")\ntopicsGroup = CheckBoxGroup(\"topics\", [topicProduct, topicDesign, topicEngineering])\ntopicProduct = CheckBoxItem(\"Product\", \"Launches, features, and roadmap\", \"product\", true)\ntopicDesign = CheckBoxItem(\"Design\", \"UX, visual craft, and trends\", \"design\", false)\ntopicEngineering = CheckBoxItem(\"Engineering\", \"Tools, architecture, and tips\", \"engineering\", false)\n\nconsentField = FormControl(\"Consent\", consentGroup)\nconsentGroup = CheckBoxGroup(\"consent\", [consentItem], {required: true})\nconsentItem = CheckBoxItem(\"I agree to receive the weekly email\", \"You can unsubscribe anytime.\", \"consent\", true)\n\nformButtons = Buttons([subscribeBtn, skipBtn])\nsubscribeBtn = Button(\"Subscribe\", @ToAssistant(\"Please subscribe me to the weekly newsletter\"), \"primary\", \"normal\", \"large\")\nskipBtn = Button(\"Maybe later\", @ToAssistant(\"Not right now, thanks\"), \"tertiary\")\n```\n\nThis gives you a focused signup flow: a promo header card, a validated email/name form, a multi-select of topics, a required consent checkbox, and two actions. Want me to add a frequency picker or a \"what's inside\" preview section?",
+   "reasoning": "The user wants a signup form for a weekly newsletter. Let me build a nice form with openui-lang. I need root = Stack(...) first, then component definitions.\n\nLet me plan:\n- Header / hero card with title\n- Form with fields: name (Input), email (Input email), maybe interests (Chips or CheckBoxGroup), frequency maybe not since it's weekly, newsletter topics (Chips multiple), consent checkbox.\n- Buttons: Subscribe (primary), maybe secondary.\n\nLet me build fields as separate references, form with buttons.\n\nLet me write:\n\nroot = Stack([hero, formCard], \"column\", \"l\")\nhero = Card([CardHeader(\"Weekly Newsletter\", \"Get the best stories delivered every week\"), ...])\nformCard = Card([Form(\"newsletter\", buttons, [nameField, emailField, topicsField, consentField])])\n...\n\nLet me define fields:\nnameField = FormControl(\"First name\", Input(\"firstName\", \"Jane\", \"text\", {required: true}))\nemailField = FormControl(\"Email address\", Input(\"email\", \"jane@example.com\", \"email\", {required: true, email: true}))\ntopicsField = FormControl(\"Topics you care about\", CheckBoxGroup(\"topics\", [topicProduct, topicDesign, topicEng]), \"Pick as many as you like\")\ntopicProduct = CheckBoxItem(\"Product\", \"Launches and updates\", \"product\", true)\n...\nconsentField = FormControl(\"\", CheckBoxGroup(\"consent\", [consentItem]), \"I agree to receive the weekly email\")\nconsentItem = CheckBoxItem(\"Subscribe\", \"\", \"consent\", true)\n\nbuttons = Buttons([subscribeBtn, trustBtn])\nsubscribeBtn = Button(\"Subscribe\", Action([@Set($showSuccess, true)]), \"primary\")... but @Set requires a binding variable. Actually @Set is used elsewhere. The steps available are @ToAssistant and @OpenUrl only per section. So use @ToAssistant naturally. Buttons without action send label to assistant. So subscribeBtn = Button(\"Subscribe\", @ToAssistant(\"Subscribe me to the weekly newsletter\"), \"primary\").\n\nActually the example uses @Set($showSuccess, true) in save action for toast. But the available steps list only @ToAssistant and @OpenUrl. Hmm the instructions mention @Set in examples. I'll keep it simple with @ToAssistant.\n\nLet me include a Callout for a success? That requires $showSuccess binding. I'll skip to keep clean, but could include info callout.\n\nLet me design nicely with a hero.\n\nI'll use Chips for topics maybe single select for weekly? Newsletter is weekly fixed. Let's use CheckBoxGroup for interests.\n\nAlso add a preview card of what's inside? Let's keep it focused: hero + form + maybe bullet list of benefits.\n\nLet me produce. Note Form signature: Form(name, buttons, fields?). Good.\n\nI'll add a small benefits ContentCard row of tags maybe. Keep moderate.\n\nLet me write final.\n\nroot = Stack([heroCard, formCard], \"column\", \"l\")\n\nheroCard = Card([heroHeader, TagBlock([\"Every Friday\", \"No spam\", \"Free\"], \"md\")], null, \"column\", \"m\")\nheroHeader = CardHeader(\"The Weekly Edit\", \"One email every Friday with the best reads, tools, and ideas.\")\n\nformCard = Card([formHeader, signupForm], null, \"column\", \"m\")\nformHeader = InlineHeader(\"Join 12,000+ readers\", \"Enter your details below.\")\nsignupForm = Form(\"newsletter\", formButtons, [nameField, emailField, topicsField, consentField])\n\nformButtons = Buttons([subscribeBtn, skipBtn])\nsubscribeBtn = Button(\"Subscribe\", @ToAssistant(\"Please subscribe me to the weekly newsletter\"), \"primary\", \"normal\", \"large\")\nskipBtn = Button(\"Maybe later\", ...) tertiary. Actually skip could be secondary. Use variant \"tertiary\".\n\nHmm Button signature: Button(label, action?, variant?, type?, size?). Good.\n\nFields:\nnameField = FormControl(\"First name\", nameInput)\nnameInput = Input(\"firstName\", \"Jane\", \"text\", {required: true, minLength: 1})\nHmm rules object. {required: true}. Good.\n\nemailField = FormControl(\"Email address\", emailInput, \"We'll send your first issue this Friday.\")\nemailInput = Input(\"email\", \"jane@example.com\", \"email\", {required: true, email: true})\n\ntopicsField = FormControl(\"Topics you care about\", topicsGroup, \"Pick as many as you like\")\ntopicsGroup = CheckBoxGroup(\"topics\", [topicProduct, topicDesign, topicEngineering])\n\ntopicProduct = CheckBoxItem(\"Product\", \"Launches, features, and roadmap\", \"product\", true)\ntopicDesign = CheckBoxItem(\"Design\", \"UX, visual craft, and trends\", \"design\", false)\ntopicEngineering = CheckBoxItem(\"Engineering\", \"Tools, architecture, and tips\", \"engineering\", false)\n\nconsentField = FormControl(\"\", consentGroup)\nconsentGroup = CheckBoxGroup(\"consent\", [consentItem], {required: true})\nconsentItem = CheckBoxItem(\"I agree to receive the weekly email\", \"Unsubscribe anytime.\", \"consent\", true)\n\nWait CheckBoxGroup signature: CheckBoxGroup(name, items, rules?, value?). So rules is 3rd arg. Good.\n\nFor consentField label empty string might look odd but fine.\n\nThat looks good. Let me verify all refs reachable: root -> heroCard, formCard. heroCard -> heroHeader, TagBlock inline (fine, inline string array). formCard -> formHeader, signupForm. signupForm -> formButtons, nameField, emailField, topicsField, consentField. formButtons -> subscribeBtn, skipBtn. fields -> inputs. topicsField -> topicsGroup -> topics. consentField -> consentGroup -> consentItem.\n\nAll good. Ensure no inline colon syntax. Rules objects use {required: true} fine.\n\nI'll write it."
+  },
+  {
+   "id": "tickets-priority",
+   "kind": "ui",
+   "prompt": "Show my open support tickets grouped by priority.",
+   "ms": 20057,
+   "ttft": 6665,
+   "contentChars": 3827,
+   "reasoningChars": 10248,
+   "usage": {
+    "prompt_tokens": 7724,
+    "completion_tokens": 3935,
+    "total_tokens": 11659,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 2765
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 18
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 4,
+    "worstShingle": "\"row\", \"s\", \"center\", \"between\"), TextContent(\"\"",
+    "sentences": 4
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 2,
+    "worstShingle": "open support tickets grouped by",
+    "sentences": 141
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 281,
+   "startsWithRoot": false,
+   "content": "```openui-lang\nroot = Stack([header, kpiRow, chartCard, groupedCard], \"column\", \"l\")\nheader = InlineHeader(\"Open Support Tickets\", \"9 open tickets grouped by priority\")\nkpiRow = Stack([highKpi, medKpi, lowKpi, totalKpi], \"row\", \"m\", \"stretch\", \"start\", true)\nhighKpi = Card([Stack([TextContent(\"High priority\", \"small-heavy\"), Tag(\"Urgent\", null, \"sm\", \"danger\")], \"row\", \"s\", \"center\", \"between\"), TextContent(\"\" + @Count(highTickets), \"large-heavy\"), TextContent(\"Needs attention now\", \"small\")])\nmedKpi = Card([Stack([TextContent(\"Medium priority\", \"small-heavy\"), Tag(\"Normal\", null, \"sm\", \"warning\")], \"row\", \"s\", \"center\", \"between\"), TextContent(\"\" + @Count(medTickets), \"large-heavy\"), TextContent(\"Monitor this week\", \"small\")])\nlowKpi = Card([Stack([TextContent(\"Low priority\", \"small-heavy\"), Tag(\"Low\", null, \"sm\", \"neutral\")], \"row\", \"s\", \"center\", \"between\"), TextContent(\"\" + @Count(lowTickets), \"large-heavy\"), TextContent(\"When time allows\", \"small\")])\ntotalKpi = Card([Stack([TextContent(\"Total open\", \"small-heavy\"), Tag(\"All\", null, \"sm\", \"info\")], \"row\", \"s\", \"center\", \"between\"), TextContent(\"\" + @Count(tickets.rows), \"large-heavy\"), TextContent(\"Across all priorities\", \"small\")])\nchartCard = Card([CardHeader(\"Distribution by priority\", \"Share of open tickets\"), PieChart([\"High\", \"Medium\", \"Low\"], [@Count(highTickets), @Count(medTickets), @Count(lowTickets)], \"donut\")])\ngroupedCard = Card([CardHeader(\"Tickets by priority\", \"Filter by priority to focus your queue\"), tabs])\ntabs = Tabs([TabItem(\"all\", \"All\", [allTable]), TabItem(\"high\", \"High\", [highTable]), TabItem(\"medium\", \"Medium\", [medTable]), TabItem(\"low\", \"Low\", [lowTable])])\nallTable = Table([Col(\"ID\", tickets.rows.id), Col(\"Subject\", tickets.rows.subject), Col(\"Priority\", @Each(tickets.rows, \"t\", Tag(t.priority, null, \"sm\", t.priority == \"high\" ? \"danger\" : t.priority == \"medium\" ? \"warning\" : \"neutral\"))), Col(\"Assignee\", tickets.rows.assignee), Col(\"Age\", tickets.rows.age)])\nhighTable = Table([Col(\"ID\", highTickets.id), Col(\"Subject\", highTickets.subject), Col(\"Assignee\", highTickets.assignee), Col(\"Age\", highTickets.age)])\nmedTable = Table([Col(\"ID\", medTickets.id), Col(\"Subject\", medTickets.subject), Col(\"Assignee\", medTickets.assignee), Col(\"Age\", medTickets.age)])\nlowTable = Table([Col(\"ID\", lowTickets.id), Col(\"Subject\", lowTickets.subject), Col(\"Assignee\", lowTickets.assignee), Col(\"Age\", lowTickets.age)])\nhighTickets = @Filter(tickets.rows, \"priority\", \"==\", \"high\")\nmedTickets = @Filter(tickets.rows, \"priority\", \"==\", \"medium\")\nlowTickets = @Filter(tickets.rows, \"priority\", \"==\", \"low\")\ntickets = {rows: [{id: \"TK-1042\", subject: \"Login fails on mobile app\", priority: \"high\", assignee: \"Priya\", age: \"2d\"}, {id: \"TK-1043\", subject: \"Payment gateway timeout\", priority: \"high\", assignee: \"Marco\", age: \"1d\"}, {id: \"TK-1044\", subject: \"Data export missing rows\", priority: \"high\", assignee: \"Priya\", age: \"4h\"}, {id: \"TK-1045\", subject: \"Dashboard slow to load\", priority: \"medium\", assignee: \"Sara\", age: \"3d\"}, {id: \"TK-1046\", subject: \"Email notifications delayed\", priority: \"medium\", assignee: \"Marco\", age: \"2d\"}, {id: \"TK-1047\", subject: \"API rate limit questions\", priority: \"medium\", assignee: \"Sara\", age: \"5d\"}, {id: \"TK-1048\", subject: \"Typo in settings page\", priority: \"low\", assignee: \"Priya\", age: \"6d\"}, {id: \"TK-1049\", subject: \"Feature request: dark mode\", priority: \"low\", assignee: \"Sara\", age: \"8d\"}, {id: \"TK-1050\", subject: \"Update billing address\", priority: \"low\", assignee: \"Marco\", age: \"9d\"}]}\n```\n\nHere's your open ticket queue grouped by priority — KPI cards up top for a quick count, a donut chart showing the split, and tabs so you can drill into High, Medium, or Low priority tickets. The data shown is sample data; connect it to your actual ticketing source to make it live.",
+   "reasoning": "The user wants to see their open support tickets grouped by priority. I don't have actual data — but I should create a UI. Let me build a dashboard showing open support tickets grouped by priority.\n\nSince I don't have real data, I'll create sample/representative data structure. Let me think about what makes sense.\n\nI'll create a dashboard with:\n- Header\n- KPI cards showing counts by priority\n- A chart (pie/donut) showing distribution\n- A table of tickets grouped by priority\n\nLet me build this. I'll use sample data with a `tickets` object containing rows.\n\nLet me structure it:\n\n```\nroot = Stack([header, kpis, distribution, ticketTable], \"column\", \"l\")\n```\n\nData: I'll create a tickets variable with rows array.\n\nLet me define data first (but hoisting means order doesn't strictly matter, but streaming prefers root first).\n\nLet me build with sample data:\n\ntickets = {rows: [...]}\n\nEach ticket: id, subject, priority, status, assignee, created, requester.\n\nActually, since these are \"open\" tickets, status is open for all. Grouped by priority: high, medium, low.\n\nLet me create the data. I'll make ~10 tickets.\n\nKPIs: counts by priority using @Count(@Filter(...)).\n\nDistribution: PieChart/Donut with counts.\n\nTable: columns for ID, Subject, Priority (tag), Assignee, Age. But grouped by priority... I could sort by priority. Or use Tabs per priority.\n\n\"grouped by priority\" — I'll use Tabs with a tab per priority, each showing a table of that priority's tickets. Plus an \"All\" tab maybe. That's a nice grouping.\n\nActually let me do Tabs: All, High, Medium, Low. Each tab shows a filtered table.\n\nLet me use @Filter with the priority value.\n\nLet me write it.\n\nFor filtering, @Filter(data.rows, \"priority\", \"==\", \"high\").\n\nLet me define filtered variables? Actually @Filter can be used inline in TabItem content. But Table Col needs arrays. Let me just inline.\n\nLet me build tables per priority. That's a lot of repetition. Let me define a table for each priority using filtered arrays.\n\nHmm, but each Table needs Col definitions. Let me create them.\n\nActually, to keep it cleaner, let me use Tabs and within each tab a Table built from filtered data.\n\nLet me define:\nhighTickets = @Filter(tickets.rows, \"priority\", \"==\", \"high\")\nmedTickets = @Filter(tickets.rows, \"priority\", \"==\", \"medium\")\nlowTickets = @Filter(tickets.rows, \"priority\", \"==\", \"low\")\n\nThen build tables.\n\nBut Table is column-oriented. Col(\"ID\", highTickets.id, \"string\"), etc.\n\nLet me define a helper... no, can't define functions. I'll just write each table.\n\nLet me create the tables:\n\nhighTable = Table([idCol, subjCol, ...]) — but the Col data must reference the filtered array. So I need separate Cols per table. This is verbose. Let me just do it inline in each TabItem.\n\nActually let me reconsider — maybe simpler: one table sorted by priority with a priority tag column, plus the donut chart and KPI cards. But \"grouped by priority\" strongly suggests grouping.\n\nI'll go with Tabs approach but keep tables compact. Let me write inline.\n\nLet me define data.\n\ntickets = {rows: [\n  {id: \"TK-1042\", subject: \"Login fails on mobile app\", priority: \"high\", assignee: \"Priya\", requester: \"Acme Corp\", age: \"2d\"},\n  {id: \"TK-1043\", subject: \"Payment gateway timeout\", priority: \"high\", assignee: \"Marco\", requester: \"Globex\", age: \"1d\"},\n  {id: \"TK-1044\", subject: \"Data export missing rows\", priority: \"high\", assignee: \"Priya\", requester: \"Initech\", age: \"4h\"},\n  {id: \"TK-1045\", subject: \"Dashboard slow to load\", priority: \"medium\", assignee: \"Sara\", requester: \"Umbrella\", age: \"3d\"},\n  {id: \"TK-1046\", subject: \"Email notifications delayed\", priority: \"medium\", assignee: \"Marco\", requester: \"Hooli\", age: \"2d\"},\n  {id: \"TK-1047\", subject: \"API rate limit questions\", priority: \"medium\", assignee: \"Sara\", requester: \"Vehement\", age: \"5d\"},\n  {id: \"TK-1048\", subject: \"Typo in settings page\", priority: \"low\", assignee: \"Priya\", requester: \"Soylent\", age: \"6d\"},\n  {id: \"TK-1049\", subject: \"Feature request: dark mode\", priority: \"low\", assignee: \"Sara\", requester: \"Massive\", age: \"8d\"},\n  {id: \"TK-1050\", subject: \"Update billing address\", priority: \"low\", assignee: \"Marco\", requester: \"Pied Piper\", age: \"9d\"},\n]}\n\nNow KPIs: high count = 3, medium = 3, low = 3.\n\nDistribution donut: labels [\"High\",\"Medium\",\"Low\"], values [counts].\n\nLet me write the code.\n\nFor the Tag in table, use @Each(filtered, \"t\", Tag(t.priority, null, \"sm\", ...)). But priority is same per tab, so simpler to just show assignee, subject etc. But I'll show priority tag anyway.\n\nActually since each tab is one priority, showing priority column is redundant but fine.\n\nLet me build tables with columns: ID, Subject, Assignee, Age. And an action column maybe. Let me keep it simple: ID, Subject, Assignee, Age.\n\nFor grouping visual, each TabItem is a priority.\n\nLet me write:\n\nroot = Stack([header, kpiRow, chartCard, groupedCard], \"column\", \"l\")\n\nheader = InlineHeader(\"Open Support Tickets\", \"Grouped by priority — 9 open tickets\")\n\nWait InlineHeader(heading, description). Good.\n\nkpiRow = Stack([highKpi, medKpi, lowKpi, totalKpi], \"row\", \"m\")\n\nEach KPI card:\nhighKpi = Card([TextContent(\"High priority\", \"small\"), TextContent(\"\" + @Count(highTickets), \"large-heavy\"), Text(\"danger-ish\")])\n\nHmm, TextContent for label and count. Add a small caption.\n\nLet me do:\nhighKpi = Card([TextContent(\"High\", \"small-heavy\"), TextContent(\"\" + @Count(highTickets), \"large-heavy\")])\n\nI'll add Tag for color. Actually Card with TextContent label + big number. Let me include a colored Tag.\n\nLet me make KPI cards nice:\nhighKpi = Card([Stack([TextContent(\"High priority\",\"small-heavy\"), Tag(\"Urgent\", null, \"sm\", \"danger\")], \"row\", \"s\", \"center\", \"between\"), TextContent(\"\" + @Count(highTickets), \"large-heavy\"), TextContent(\"Needs attention now\", \"small\")])\n\nThat's good.\n\nSimilarly medium and low.\n\ntotalKpi = Card([...total count...]).\n\nchartCard = Card([CardHeader(\"Distribution by priority\", \"Share of open tickets\"), PieChart([\"High\",\"Medium\",\"Low\"], [@Count(highTickets), @Count(medTickets), @Count(lowTickets)], \"donut\")])\n\ngroupedCard = Card([CardHeader(\"Tickets by priority\"), Tabs([...])])\n\nTabs items: TabItem(\"all\",\"All (9)\", [allTable]), TabItem(\"high\",\"High (3)\", [highTable]), ...\n\nActually can I put dynamic count in trigger string? TabItem(value, trigger, content). trigger is a string. I could do \"High (\" + @Count(highTickets) + \")\". Not sure string concatenation works with @Count. Let me just use static labels to be safe: \"High\", \"Medium\", \"Low\", \"All\".\n\nNow tables. Let me define allTable, highTable, medTable, lowTable.\n\nallTable = Table([allIdCol, allSubjCol, allPrioCol, allAssignCol, allAgeCol])\n\nHmm this is a lot of variables. Let me instead build tables inline within TabItem content arrays, referencing filtered arrays directly.\n\nTabItem content is an array of components. Table is a component. So:\n\nTabItem(\"high\", \"High\", [Table([Col(\"ID\", highTickets.id), Col(\"Subject\", highTickets.subject), Col(\"Assignee\", highTickets.assignee), Col(\"Age\", highTickets.age)])])\n\nBut wait — does data.rows.fieldName pluck work on a filtered result? @Filter returns rows array. highTickets = @Filter(tickets.rows,...). Then highTickets.id should pluck. Yes, per examples \"use sorted.fieldName for Col data\". Good.\n\nFor priority column with tag: Col(\"Priority\", @Each(highTickets, \"t\", Tag(t.priority, null, \"sm\", t.priority == \"high\" ? \"danger\" : t.priority == \"medium\" ? \"warning\" : \"neutral\")))\n\nLet me include that in the all tab; for specific tabs the priority is uniform, so I can skip or keep. I'll keep it in all tab.\n\nLet me write inline tables. That's verbose but fine.\n\nActually, to reduce repetition and improve streaming, let me define the filtered arrays and then inline tables in TabItems.\n\nLet me write it all out.\n\nLet me define the priority color mapping inline.\n\nFor the \"all\" tab, I want tickets sorted by priority maybe. @Sort? Sort by priority string would give alphabetical: high, low, medium. Not ideal. I'll just leave order.\n\nLet me finalize the code.\n\nLet me double check Card signature: Card(children, variant?, direction?, gap?, align?, justify?, wrap?). For KPI card with a row inside I used a nested Stack, good.\n\nFor kpiRow using Stack direction row.\n\nLet me write.\n\nOne concern: TextContent count uses \"\" + @Count(...). Good pattern from examples.\n\nLet me write the final code.\n\nActually for the KPI top row I used Stack inside Card. Fine.\n\nLet me also add a callout maybe. Not necessary.\n\nLet me produce.\n\nVariables:\n- root\n- header\n- kpiRow\n- highKpi, medKpi, lowKpi, totalKpi\n- chartCard\n- groupedCard\n- tabs\n- allTable, highTable, medTable, lowTable\n- tickets\n- highTickets, medTickets, lowTickets\n\nAll must be reachable. Let me ensure each is referenced.\n\nroot references header, kpiRow, chartCard, groupedCard.\nkpiRow references highKpi, medKpi, lowKpi, totalKpi.\nchartCard references highTickets, medTickets, lowTickets (via @Count). And PieChart inline.\ngroupedCard references tabs.\ntabs references allTable, highTable, medTable, lowTable.\nTables reference highTickets etc.\nhighTickets references tickets.\n\nGood, all reachable.\n\nLet me write tables.\n\nallTable = Table([Col(\"ID\", tickets.rows.id), Col(\"Subject\", tickets.rows.subject), Col(\"Priority\", @Each(tickets.rows, \"t\", Tag(t.priority, null, \"sm\", t.priority == \"high\" ? \"danger\" : t.priority == \"medium\" ? \"warning\" : \"neutral\"))), Col(\"Assignee\", tickets.rows.assignee), Col(\"Age\", tickets.rows.age)])\n\nhighTable = Table([Col(\"ID\", highTickets.id), Col(\"Subject\", highTickets.subject), Col(\"Assignee\", highTickets.assignee), Col(\"Age\", highTickets.age)])\n\nSimilar for med, low.\n\nNow tabs = Tabs([TabItem(\"all\",\"All\",[allTable]), TabItem(\"high\",\"High\",[highTable]), TabItem(\"medium\",\"Medium\",[medTable]), TabItem(\"low\",\"Low\",[lowTable])])\n\nWait TabItem(value, trigger, content). value unique id. Good.\n\nLet me finalize.\n\nFor the chart card, PieChart(labels, values, variant). PieChart([\"High\",\"Medium\",\"Low\"], [@Count(highTickets), @Count(medTickets), @Count(lowTickets)], \"donut\").\n\nNow write full.\n\nI'll place root first.\n\nLet me also give header via InlineHeader.\n\nFinal check on PieChart signature: PieChart(labels: string[], values: number[], variant?, appearance?). Good.\n\nWriting now."
+  },
+  {
+   "id": "saas-kpis",
+   "kind": "ui",
+   "prompt": "Give me a KPI dashboard for a SaaS product.",
+   "ms": 12255,
+   "ttft": 1145,
+   "contentChars": 2684,
+   "reasoningChars": 7698,
+   "usage": {
+    "prompt_tokens": 7726,
+    "completion_tokens": 3247,
+    "total_tokens": 10973,
+    "prompt_tokens_details": {
+     "cached_tokens": 7168
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 2366
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 27
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's a KPI dashboard for",
+    "sentences": 2
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 3,
+    "worstShingle": "\"row\", \"m\", \"stretch\", \"start\", true)",
+    "sentences": 66
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 340,
+   "startsWithRoot": false,
+   "content": "Here's a KPI dashboard for a SaaS product, covering revenue, growth, retention, and plan performance:\n\n```openui-lang\nroot = Stack([headerCard, kpiRow, chartsRow1, chartsRow2], \"column\", \"l\")\n\nheaderCard = Card([CardHeader(\"SaaS KPI Dashboard\", \"Live product metrics · Updated just now\")])\n\nkpiRow = Stack([kpi1, kpi2, kpi3, kpi4, kpi5, kpi6], \"row\", \"m\", \"stretch\", \"start\", true)\n\nkpi1 = Card([TextContent(\"Monthly Recurring Revenue\", \"small\"), TextContent(\"$48,200\", \"large-heavy\"), TextContent(\"▲ 12.4% vs last month\", \"small\")])\nkpi2 = Card([TextContent(\"Annual Run Rate\", \"small\"), TextContent(\"$578,400\", \"large-heavy\"), TextContent(\"▲ 12.4% YoY\", \"small\")])\nkpi3 = Card([TextContent(\"Active Users\", \"small\"), TextContent(\"3,842\", \"large-heavy\"), TextContent(\"▲ 8.2% vs last month\", \"small\")])\nkpi4 = Card([TextContent(\"Monthly Churn\", \"small\"), TextContent(\"2.1%\", \"large-heavy\"), TextContent(\"▼ 0.3 pts\", \"small\")])\nkpi5 = Card([TextContent(\"New Signups\", \"small\"), TextContent(\"412\", \"large-heavy\"), TextContent(\"▲ 3.0% vs last month\", \"small\")])\nkpi6 = Card([TextContent(\"Avg Revenue / Account\", \"small\"), TextContent(\"$156\", \"large-heavy\"), TextContent(\"▲ 4.1% vs last month\", \"small\")])\n\nchartsRow1 = Stack([revenueChart, signupsChart], \"row\", \"m\", \"stretch\")\n\nrevenueChart = Card([CardHeader(\"MRR Trend\", \"Last 8 months\"), AreaChart(months, [mrrSeries], \"natural\", \"Month\", \"USD\")])\nsignupsChart = Card([CardHeader(\"New Signups\", \"Last 8 months\"), BarChart(months, [signupSeries], \"grouped\", \"Month\", \"Signups\")])\n\nmrrSeries = Series(\"MRR\", mrr)\nsignupSeries = Series(\"Signups\", signups)\n\nmonths = [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\", \"Jul\", \"Aug\"]\nmrr = [32000, 34500, 36200, 39000, 41500, 43800, 45900, 48200]\nsignups = [280, 310, 295, 340, 365, 388, 400, 412]\n\nchartsRow2 = Stack([planChart, planTableCard], \"row\", \"m\", \"stretch\")\n\nplanChart = Card([CardHeader(\"MRR by Plan\", \"Current distribution\"), PieChart(planLabels, planValues, \"donut\")])\n\nplanLabels = [\"Starter\", \"Growth\", \"Business\", \"Enterprise\"]\nplanValues = [8200, 15400, 16800, 7800]\n\nplanTableCard = Card([CardHeader(\"Plan Breakdown\"), planTable])\n\nplanTable = Table([planCol, accountsCol, mrrCol, churnCol])\n\nplanCol = Col(\"Plan\", [\"Starter\", \"Growth\", \"Business\", \"Enterprise\"])\naccountsCol = Col(\"Accounts\", [210, 142, 88, 24], \"number\")\nmrrCol = Col(\"MRR\", [8200, 15400, 16800, 7800], \"number\")\nchurnCol = Col(\"Churn\", [\"1.8%\", \"2.3%\", \"1.5%\", \"0.9%\"])\n```\n\nThis dashboard includes six headline KPI cards, an MRR trend area chart, a signups bar chart, a plan distribution donut, and a plan breakdown table. Want me to add cohort retention, a top-accounts list, or make any metrics interactive?",
+   "reasoning": "The user wants a KPI dashboard for a SaaS product. Let me create a comprehensive dashboard with KPIs, charts, and tables.\n\nLet me build this with openui-lang. I'll create:\n- Header\n- KPI cards (MRR, ARR, Active Users, Churn, etc.)\n- Charts (revenue trend, user growth)\n- A table for plan breakdown\n- Maybe a top accounts list\n\nLet me write valid openui-lang. I need to be careful with signatures.\n\nroot = Stack first.\n\nLet me define data. I'll use static data since no backend.\n\nLet me plan:\n\nKPIs:\n- MRR: $48,200 (+12.4%)\n- ARR: $578,400\n- Active Users: 3,842 (+8.2%)\n- Churn Rate: 2.1% (-0.3%)\n- New Signups: 412\n- Avg Revenue Per Account: $156\n\nCharts:\n- MRR trend over months (LineChart or AreaChart)\n- Plan distribution (PieChart)\n- Signups by month (BarChart)\n\nTable: Plan breakdown with MRR, accounts, churn\n\nLet me write it.\n\nFor KPI cards, I'll create reusable structure but each card separately.\n\nLet me define:\n```\nroot = Stack([header, kpiRow, chartsRow, planSection], \"column\", \"l\")\nheader = CardHeader(\"SaaS KPI Dashboard\", \"Live metrics · Updated today\")\n```\n\nActually CardHeader takes (title, subtitle). Let me put it in a Card or Stack.\n\nLet me build kpi cards. Each is a Card with label + value + subtext.\n\nkpi1 = Card([TextContent(\"Monthly Recurring Revenue\", \"small\"), TextContent(\"$48,200\", \"large-heavy\"), TextContent(\"+12.4% vs last month\", \"small\")])\n\nBut I want a trend color maybe. Keep simple with TextContent.\n\nLet me make 6 KPI cards in a wrapping row.\n\nkpiRow = Stack([kpi1, kpi2, kpi3, kpi4, kpi5, kpi6], \"row\", \"m\", \"stretch\", \"start\", true)\n\nWrap true.\n\nFor charts:\nmrr labels months, series values.\n\nrevenueChart = Card([CardHeader(\"MRR Trend\", \"Last 8 months\"), AreaChart(labels, [Series(\"MRR\", values)], \"natural\", \"Month\", \"USD\")])\n\nplanChart = Card([CardHeader(\"Revenue by Plan\"), PieChart([...], [...], \"donut\")])\n\nsignupsChart = Card([CardHeader(\"New Signups\", \"Last 8 months\"), BarChart(...)])\n\nTable: plan breakdown.\n\nLet me write values.\n\nMRR trend months: Jan-Aug\nvalues: 32000, 34500, 36200, 39000, 41500, 43800, 45900, 48200\n\nSignups: 280, 310, 295, 340, 365, 388, 400, 412\n\nPlan distribution: Starter, Growth, Business, Enterprise\nvalues (accounts or MRR): let's do MRR by plan: 8200, 15400, 16800, 7800\n\nTable plan breakdown:\ncolumns: Plan, Accounts, MRR, Churn\n\nLet me create table with Col.\n\nplans = labels\naccounts: 210, 142, 88, 24\nmrr: 8200, 15400, 16800, 7800\nchurn: \"1.8%\", \"2.3%\", \"1.5%\", \"0.9%\"\n\nTable([Col(\"Plan\", [...]), Col(\"Accounts\", [...], \"number\"), Col(\"MRR\", [...], \"number\"), Col(\"Churn\", [...])])\n\nTop accounts maybe skip to keep concise. Let me add a top accounts EntityList maybe. Keep it reasonable.\n\nLet me add a second row with signups chart + plan pie.\n\nLet me also add a metric using Text/BoldText? Those are inline building blocks inside cards. I'll use TextContent for simplicity.\n\nLet me finalize structure:\n\nroot = Stack([headerCard, kpiRow, chartsRow1, chartsRow2, tableCard], \"column\", \"l\")\n\nheaderCard = Card([CardHeader(\"SaaS KPI Dashboard\", \"Live product metrics · Updated just now\")])\n\nActually CardHeader inside a Card is fine.\n\nkpiRow wraps.\n\nchartsRow1 = Stack([revenueChart, planChart], \"row\", \"m\", \"stretch\", \"start\", true)\n\nHmm wrap true means they may wrap. For two charts side by side I want them to share space. Using wrap with two cards they'll each take half roughly. Let me use direction row without wrap, but Stack children flex. Actually without wrap they'll be in a row and share space. Let me use Stack([revenueChart, planChart], \"row\", \"m\"). Good.\n\nchartsRow2 = Stack([signupsChart, churnChart?], ...). Let me do signupsChart and a radial or single stacked. Maybe do signups bar + churn table? Let me do signups chart alone in a full width card, or pair with a donut.\n\nLet me pair signupsChart (BarChart) with planChart? Already used plan pie. \n\nAlternative: chartsRow1 = revenue area + signups bar. chartsRow2 = plan pie + churn/health.\n\nLet me do:\nchartsRow1 = Stack([revenueChart, signupsChart], \"row\", \"m\")\nchartsRow2 = Stack([planChart, planTableCard], \"row\", \"m\")\n\nActually table can be full width below. Let me keep it clean:\n\n- chartsRow1: revenueChart (area) + signupsChart (bar)\n- chartsRow2: planChart (pie donut) + planTableCard (table)\n\nThat gives nice layout.\n\nLet me write it all out.\n\nNeed each variable referenced. All will be in root tree.\n\nLet me write.\n\nplanTableCard = Card([CardHeader(\"Plan Breakdown\"), planTable])\n\nplanTable = Table([planCol, accountsCol, mrrCol, churnCol])\n\nLet me define cols.\n\nplanCol = Col(\"Plan\", [\"Starter\", \"Growth\", \"Business\", \"Enterprise\"])\naccountsCol = Col(\"Accounts\", [210, 142, 88, 24], \"number\")\nmrrCol = Col(\"MRR\", [8200, 15400, 16800, 7800], \"number\")\nchurnCol = Col(\"Churn\", [\"1.8%\", \"2.3%\", \"1.5%\", \"0.9%\"])\n\nGood.\n\nKPI cards - let me make them nice with label, big value, delta.\n\nkpi1 = Card([TextContent(\"Monthly Recurring Revenue\", \"small\"), TextContent(\"$48,200\", \"large-heavy\"), TextContent(\"▲ 12.4% vs last month\", \"small\")])\n\nkpi2 = Card([TextContent(\"Annual Run Rate\", \"small\"), TextContent(\"$578,400\", \"large-heavy\"), TextContent(\"▲ 12.4% YoY\", \"small\")])\n\nkpi3 = Card([TextContent(\"Active Users\", \"small\"), TextContent(\"3,842\", \"large-heavy\"), TextContent(\"▲ 8.2% vs last month\", \"small\")])\n\nkpi4 = Card([TextContent(\"Monthly Churn\", \"small\"), TextContent(\"2.1%\", \"large-heavy\"), TextContent(\"▼ 0.3 pts\", \"small\")])\n\nkpi5 = Card([TextContent(\"New Signups\", \"small\"), TextContent(\"412\", \"large-heavy\"), TextContent(\"▲ 3.0% vs last month\", \"small\")])\n\nkpi6 = Card([TextContent(\"Avg Revenue / Account\", \"small\"), TextContent(\"$156\", \"large-heavy\"), TextContent(\"▲ 4.1% vs last month\", \"small\")])\n\nCharts data:\nmonths = [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\", \"Jul\", \"Aug\"]\nmrr = [32000, 34500, 36200, 39000, 41500, 43800, 45900, 48200]\nsignups = [280, 310, 295, 340, 365, 388, 400, 412]\n\nrevenueChart = Card([CardHeader(\"MRR Trend\", \"Last 8 months\"), AreaChart(months, [mrrSeries], \"natural\", \"Month\", \"USD\")])\nmrrSeries = Series(\"MRR\", mrr)\n\nsignupsChart = Card([CardHeader(\"New Signups\", \"Last 8 months\"), BarChart(months, [signupSeries], \"grouped\", \"Month\", \"Signups\")])\nsignupSeries = Series(\"Signups\", signups)\n\nplanChart = Card([CardHeader(\"MRR by Plan\", \"Current distribution\"), PieChart(planLabels, planValues, \"donut\")])\nplanLabels = [\"Starter\", \"Growth\", \"Business\", \"Enterprise\"]\nplanValues = [8200, 15400, 16800, 7800]\n\nGood.\n\nNow root:\nroot = Stack([headerCard, kpiRow, chartsRow1, chartsRow2], \"column\", \"l\")\n\nI'll drop separate table card since planTableCard is in chartsRow2. But table might be narrow beside pie. That's fine.\n\nActually let me reconsider: chartsRow2 with pie and table side by side — table with 4 columns might be cramped but okay.\n\nLet me set root gap \"l\".\n\nNow verify all references used:\n- headerCard -> root ✓\n- kpiRow -> root ✓\n- chartsRow1 -> root ✓\n- chartsRow2 -> root ✓\n- kpi1..6 -> kpiRow ✓\n- revenueChart, signupsChart -> chartsRow1 ✓\n- planChart, planTableCard -> chartsRow2 ✓\n- months -> revenueChart, signupsChart ✓\n- mrr -> mrrSeries ✓\n- mrrSeries -> revenueChart ✓\n- signups -> signupSeries ✓\n- signupSeries -> signupsChart ✓\n- planLabels -> planChart ✓\n- planValues -> planChart ✓\n- planTableCard -> chartsRow2 ✓\n- planTable -> planTableCard ✓\n- planCol, accountsCol, mrrCol, churnCol -> planTable ✓\n\nGood. All referenced.\n\nLet me write it out. Stack signature: Stack(children, direction, gap, align, justify, wrap).\n\nkpiRow = Stack([kpi1, kpi2, kpi3, kpi4, kpi5, kpi6], \"row\", \"m\", \"stretch\", \"start\", true)\n\nchartsRow1 = Stack([revenueChart, signupsChart], \"row\", \"m\", \"stretch\")\n\nchartsRow2 = Stack([planChart, planTableCard], \"row\", \"m\", \"stretch\")\n\nGood. Let me finalize."
+  },
+  {
+   "id": "pricing-card",
+   "kind": "ui",
+   "prompt": "Show a product card for a subscription plan with pricing and a CTA.",
+   "ms": 10853,
+   "ttft": 1421,
+   "contentChars": 1717,
+   "reasoningChars": 6620,
+   "usage": {
+    "prompt_tokens": 7730,
+    "completion_tokens": 2201,
+    "total_tokens": 9931,
+    "prompt_tokens_details": {
+     "cached_tokens": 7040
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 1723
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 20
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's a subscription product card",
+    "sentences": 3
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 3,
+    "worstShingle": "\"$49\", \"per user / month\",",
+    "sentences": 65
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 226,
+   "startsWithRoot": false,
+   "content": "Here's a subscription product card with pricing, feature list, and CTA:\n\n```openui-lang\nroot = Stack([planWrap], \"column\", \"l\")\nplanWrap = Card([planHeader, planBlock, planNote], null, \"column\", \"l\")\nplanHeader = CardHeader(\"Pro Plan\", \"Built for growing product teams\")\nplanBlock = CompositeCardBlock([proCard], \"grid\", true)\nproCard = CompositeCardItem(\"pro\", proHeader, proBody, proFooter)\nproHeader = IconText(rocketIcon, \"info\", \"lg\", \"Pro Plan\", \"For teams of 5-50\", true, \"horizontal\")\nrocketIcon = Icon(\"rocket\")\nproBody = [proTagRow, proPitch, proPriceMetric, proFeatures]\nproTagRow = TagBlock([\"Most popular\", \"14-day free trial\"], \"sm\")\nproPitch = Text(\"text\", \"Everything you need to plan, build, and ship — in one workspace.\", null, null, \"sm\")\nproPriceMetric = MetricIndicatorInline(\"$49\", \"per user / month\", {direction: \"down\", value: 12})\nproFeatures = ListBlock([featProjects, featSeats, featSupport, featSecurity], \"number\", \"small\")\nfeatProjects = ListItem(\"Unlimited projects\", \"No cap on boards or docs\")\nfeatSeats = ListItem(\"Up to 50 seats\", \"Add or remove members anytime\")\nfeatSupport = ListItem(\"Priority support\", \"Response within 4 hours\")\nfeatSecurity = ListItem(\"SSO & audit logs\", \"SOC 2 Type II compliant\")\nproFooter = {price: proPrice, button: proCta}\nproPrice = BoldText(\"number\", \"$49\", \"per user / month\", null, \"lg\")\nproCta = Button(\"Start free trial\", @ToAssistant(\"I'd like to start the Pro plan free trial\"), \"primary\", \"normal\", \"large\")\nplanNote = TextContent(\"Cancel anytime. No setup fees. Prices in USD.\", \"small\")\n```\n\nThe card groups a badge row, pitch, headline price with a trend indicator, a numbered feature list, and a primary \"Start free trial\" CTA in the footer.",
+   "reasoning": "The user wants a product card for a subscription plan with pricing and a CTA. Use CompositeCardBlock with a CompositeCardItem, or just a Card. Let me use CompositeCardBlock with one item — header IconText, body with text, metrics, list block, footer with price and button.\n\nBut note: CompositeCardBlock lays out 2+ items in a grid. One item is fine presumably.\n\nLet me build:\n\nroot = Stack([planCard], \"column\", \"l\")\n\nActually let's do it with a Card containing card header and feature list plus price and button — simpler and reliable. But the guidance says use CompositeCardBlock for products/offers. Let's use CompositeCardBlock with a single item.\n\nDefinitions:\n\nroot = Stack([planSection], \"column\", \"l\")\nplanSection = Card([CardHeader(\"Subscription Plans\", \"Choose the plan that fits your team\"), plans], null, \"column\", \"m\")\nplans = CompositeCardBlock([proPlan], \"grid\", true)\nproPlan = CompositeCardItem(\"pro\", proHeader, proBody, proFooter)\nproHeader = IconText(proIcon, \"info\", \"lg\", \"Pro Plan\", \"For growing teams\", true, \"horizontal\")\nproIcon = Icon(\"rocket\", \"productivity\")\nproBody = [Text(\"text\", \"Everything you need to ship faster, billed monthly.\", null, null, \"sm\"), MetricIndicatorInline(\"$49\", \"per user / month\", {direction: \"up\", value: 0})...]\n\nHmm trend optional. MetricIndicatorInline(\"$49\", \"per user / month\") — value first, subtext second, trend optional. Good.\n\nBody items: Text, BoldText, MetricIndicatorInline, IconText, Image, charts, ListBlock, TagBlock, EntityList.\n\nListBlock(items, variant?, size?) — items ListItem(title, subtitle?, image?, actionLabel?, action?).\n\nproFeatures = ListBlock([f1, f2, f3, f4], \"number\", \"small\")\nf1 = ListItem(\"Unlimited projects\", \"No cap on active workspaces\")\n\nFooter: {price: BoldText, button: Button}\n\nproFooter = {price: proPrice, button: proCta}\nproPrice = BoldText(\"number\", \"$49\", \"billed monthly\", null, \"lg\")\nHmm BoldText(variant?, value, subtext?, subtextVariant?, size?). So BoldText(\"number\", \"$49\", \"per user / month\", null, \"lg\").\n\nproCta = Button(\"Start free trial\", @ToAssistant(\"Start the Pro plan free trial\"), \"primary\", \"normal\", \"medium\")\n\nAlso maybe add a second card for comparison — but the user asked for \"a product card\". A single card is fine. Actually CompositeCardBlock with one item might render oddly wide. Maybe use grid layout with two items: Pro and Team? The request says \"a product card\" — singular. I'll keep one card but use Card wrapper... Actually to be safe with a single card, maybe simpler: use a Card containing the IconText header etc. But IconText and MetricIndicatorInline shouldn't be placed directly in root Card — \"do not place them directly in the root Card\" — that means root-level, but inside a Card wrapper? The rule says \"Text / BoldText / IconText / ImageText / ImageTextLarge / MetricIndicator* are the inline building blocks used INSIDE card items; do not place them directly in the root Card.\" So inside a non-root Card is probably okay, but safer to use CompositeCardBlock.\n\nLet's give two items to make a nice grid? The request is a single product card. I'll do one CompositeCardItem. Grid layout with one item should render fine.\n\nAlso add a TextCallout or Tag \"Most popular\". Tag can be in header? Header options: IconText | ImageText | ImageTextLarge | Text | Image. Use Text with tag? No. Put tag in body TagBlock([\"Most popular\", \"Save 20%\"]).\n\nLet me write final.\n\nOrder: root first, then definitions, then leaf data.\n\nroot = Stack([heroSection, planBlock], \"column\", \"l\")\nheroSection = CardHeader? CardHeader can't be root child? Root is Stack with children — Card and Stack. Actually Stack children any[]. But to be safe, wrap in Card.\n\nLet me:\n\nroot = Stack([planWrap], \"column\", \"l\")\nplanWrap = Card([planHeader, planBlock, planNote], null, \"column\", \"l\")\nplanHeader = CardHeader(\"Pro Plan\", \"Built for growing product teams\")\nplanBlock = CompositeCardBlock([proCard], \"grid\", true)\nproCard = CompositeCardItem(\"pro\", proHeader, proBody, proFooter)\nproHeader = IconText(rocketIcon, \"info\", \"lg\", \"Pro Plan\", \"For teams of 5–50\", true, \"horizontal\")\nrocketIcon = Icon(\"rocket\")\nproBody = [proTagRow, proPitch, proPriceMetric, proFeatures]\nproTagRow = TagBlock([\"Most popular\", \"14-day free trial\"], \"sm\")\nproPitch = Text(\"text\", \"Everything you need to plan, build, and ship — in one workspace.\", null, null, \"sm\")\nproPriceMetric = MetricIndicatorInline(\"$49\", \"per user / month\", {direction: \"down\", value: 12})\nHmm trend down 12% — price dropped. Fine.\nproFeatures = ListBlock([featProjects, featSeats, featSupport, featSecurity], \"number\", \"small\")\nfeatProjects = ListItem(\"Unlimited projects\", \"No cap on boards or docs\")\nfeatSeats = ListItem(\"Up to 50 seats\", \"Add or remove members anytime\")\nfeatSupport = ListItem(\"Priority support\", \"Response within 4 hours\")\nfeatSecurity = ListItem(\"SSO & audit logs\", \"SOC 2 Type II compliant\")\nproFooter = {price: proPrice, button: proCta}\nproPrice = BoldText(\"number\", \"$49\", \"per user / month\", null, \"lg\")\nproCta = Button(\"Start free trial\", @ToAssistant(\"I'd like to start the Pro plan free trial\"), \"primary\", \"normal\", \"large\")\nplanNote = Text(\"small\", \"Cancel anytime. No setup fees. Prices in USD.\") — Text(variant?, value, ...). Text(\"text\", \"Cancel anytime...\", null, null, \"sm\"). Use Text(\"text\", \"...\", null, null, \"sm\").\n\nWait, planNote directly in Card children — Text is allowed in Card children list (TextContent | ... ). Hmm the signature list for Card children includes TextContent, MarkDownRenderer, ... but not Text. Safer to use TextContent.\n\nplanNote = TextContent(\"Cancel anytime. No setup fees. Prices in USD.\", \"small\")\n\nAlso planHeader = CardHeader is in Card children. Good.\n\nVerify all defined names referenced: rocketIcon used in proHeader ✓; proCard in planBlock ✓; planHeader, planBlock, planNote in planWrap ✓; planWrap in root ✓.\n\nTrailing null args: CompositeCardItem(id?, header?, body?, footer?) — ok.\n\nIconText(icon, iconVariant?, iconSize?, title, subtitle?, bold?, layout?) — \"info\" variant, \"lg\" iconSize. ok.\n\nTagBlock(tags, size?) ok.\n\nListBlock(items, variant?, size?) ok.\n\nMetricIndicatorInline(value, subtext?, trend?) ok.\n\nBoldText(variant, value, subtext, subtextVariant, size) — I pass \"number\", \"$49\", \"per user / month\", null, \"lg\". Good.\n\nButton(label, action, variant, type, size) ok.\n\nAlso maybe add a second card (Team plan) to fill grid... I'll keep one, but grid with a single card might be huge. Alternatively layout \"carousel\". Hmm. \"grid\" with one item responsive might span full width — that's fine for a product card.\n\nWrite final answer with brief intro text + code fence."
+  },
+  {
+   "id": "top-cities",
+   "kind": "ui",
+   "prompt": "List the top 5 cities by population with a bar chart.",
+   "ms": 2535,
+   "ttft": 1079,
+   "contentChars": 721,
+   "reasoningChars": 405,
+   "usage": {
+    "prompt_tokens": 7728,
+    "completion_tokens": 347,
+    "total_tokens": 8075,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 127
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 11
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's the top 5 cities",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user wants a bar",
+    "sentences": 11
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 79,
+   "startsWithRoot": false,
+   "content": "Here's the top 5 cities by population (metro area) shown as a ranked bar chart:\n\n```openui-lang\nroot = Stack([header, chartCard, tableCard], \"column\", \"l\")\nheader = CardHeader(\"Top 5 Cities by Population\", \"Metropolitan area, millions of residents\")\nchartCard = Card([chart], null, \"column\", \"m\")\nchart = HorizontalBarChart(cityLabels, [citySeries], \"grouped\", \"Population (millions)\", \"City\")\ntableCard = Card([table], null, \"column\", \"m\")\ntable = Table([cityCol, popCol])\ncityCol = Col(\"City\", cityLabels)\npopCol = Col(\"Population (M)\", popValues, \"number\")\ncityLabels = [\"Tokyo\", \"Delhi\", \"Shanghai\", \"Dhaka\", \"São Paulo\"]\npopValues = [37.4, 32.9, 29.2, 23.2, 22.6]\ncitySeries = Series(\"Population (M)\", popValues)\n```",
+   "reasoning": "The user wants a bar chart of top 5 cities by population. I need to output openui-lang code.\n\nLet me create a dashboard with a bar chart. I'll use HorizontalBarChart since city names could be long, or BarChart. Let me use HorizontalBarChart for ranked lists.\n\nTop 5 cities by population (world):\n1. Tokyo - 37.4M\n2. Delhi - 32.9M\n3. Shanghai - 29.2M\n4. Dhaka - 23.2M\n5. São Paulo - 22.6M\n\nLet me build it."
+  },
+  {
+   "id": "onboarding",
+   "kind": "ui",
+   "prompt": "Create an onboarding checklist for a new engineer.",
+   "ms": 14416,
+   "ttft": 1015,
+   "contentChars": 4358,
+   "reasoningChars": 9366,
+   "usage": {
+    "prompt_tokens": 7724,
+    "completion_tokens": 3767,
+    "total_tokens": 11491,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 2507
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 45
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's a 30-day onboarding checklist",
+    "sentences": 4
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 3,
+    "worstShingle": "Handbook\", \"Setup, standards, and architecture\",",
+    "sentences": 86
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 404,
+   "startsWithRoot": false,
+   "content": "Here's a 30-day onboarding checklist for a new engineer, organized into Day 1 / Week 1 / Month 1 tabs with interactive checkboxes and a progress overview.\n\n```openui-lang\nroot = Stack([header, welcomeCallout, kpiRow, checklistTabs, resourcesCard], \"column\", \"l\")\n\nheader = CardHeader(\"New Engineer Onboarding\", \"A 30-day checklist to get you productive and connected\")\n\nwelcomeCallout = Callout(\"info\", \"Welcome aboard!\", \"Work through these tasks over your first 30 days. Check items off as you go — your onboarding buddy is here to help.\")\n\nkpiRow = Stack([kpiTotal, kpiDone, kpiProgress], \"row\", \"m\", \"stretch\")\nkpiTotal = Card([TextContent(\"Total tasks\", \"small\"), TextContent(\"17\", \"large-heavy\")])\nkpiDone = Card([TextContent(\"Completed\", \"small\"), TextContent(\"3\", \"large-heavy\")])\nkpiProgress = Card([TextContent(\"Progress\", \"small\"), TextContent(\"18%\", \"large-heavy\")])\n\nchecklistTabs = Tabs([tabDay1, tabWeek1, tabMonth1])\n\ntabDay1 = TabItem(\"day1\", \"Day 1\", [formDay1])\ntabWeek1 = TabItem(\"week1\", \"Week 1\", [formWeek1])\ntabMonth1 = TabItem(\"month1\", \"Month 1\", [formMonth1])\n\nformDay1 = Form(\"day1\", buttons, [fcDay1])\nformWeek1 = Form(\"week1\", buttons, [fcWeek1])\nformMonth1 = Form(\"month1\", buttons, [fcMonth1])\n\nfcDay1 = FormControl(\"Day 1 tasks\", cbDay1, \"Get set up and meet the team\")\nfcWeek1 = FormControl(\"Week 1 tasks\", cbWeek1, \"Learn the codebase and how the team works\")\nfcMonth1 = FormControl(\"Month 1 tasks\", cbMonth1, \"Take ownership and give back\")\n\ncbDay1 = CheckBoxGroup(\"day1\", [d1a, d1b, d1c, d1d, d1e, d1f])\ncbWeek1 = CheckBoxGroup(\"week1\", [w1a, w1b, w1c, w1d, w1e, w1f])\ncbMonth1 = CheckBoxGroup(\"month1\", [m1a, m1b, m1c, m1d, m1e])\n\nd1a = CheckBoxItem(\"Laptop & accounts\", \"Pick up equipment and activate SSO\", \"laptop\", true)\nd1b = CheckBoxItem(\"HR & payroll paperwork\", \"Complete benefits enrollment\", \"hr\", false)\nd1c = CheckBoxItem(\"Meet your onboarding buddy\", \"30-min intro coffee chat\", \"buddy\", true)\nd1d = CheckBoxItem(\"Set up dev environment\", \"Clone repos, install tooling\", \"devenv\", false)\nd1e = CheckBoxItem(\"Read the team README\", \"Team norms, on-call, and rituals\", \"readme\", true)\nd1f = CheckBoxItem(\"Join team standup\", \"Introduce yourself to the team\", \"standup\", false)\n\nw1a = CheckBoxItem(\"Shadow a code review\", \"Pair with a reviewer on a live PR\", \"review\", false)\nw1b = CheckBoxItem(\"Ship your first PR\", \"Start with a good-first-issue\", \"firstpr\", false)\nw1c = CheckBoxItem(\"Review architecture docs\", \"Understand services and data flow\", \"arch\", false)\nw1d = CheckBoxItem(\"Set up 1:1s\", \"Schedule recurring chats with teammates\", \"ones\", false)\nw1e = CheckBoxItem(\"Complete security training\", \"Required compliance module\", \"security\", false)\nw1f = CheckBoxItem(\"Attend sprint planning\", \"Learn how work is planned\", \"planning\", false)\n\nm1a = CheckBoxItem(\"Own a small feature end-to-end\", \"From spec to deploy\", \"feature\", false)\nm1b = CheckBoxItem(\"Present at a team demo\", \"Share what you built\", \"demo\", false)\nm1c = CheckBoxItem(\"Learn the on-call rotation\", \"Shadow a rotation shift\", \"oncall\", false)\nm1d = CheckBoxItem(\"Set 30/60/90 goals\", \"Align with your manager\", \"goals\", false)\nm1e = CheckBoxItem(\"Give onboarding feedback\", \"Help improve this checklist\", \"feedback\", false)\n\nbuttons = Buttons([saveBtn])\nsaveBtn = Button(\"Save progress\", Action([@ToAssistant(\"Save my onboarding checklist progress\")]))\n\nresourcesCard = Card([CardHeader(\"Key resources\", \"Bookmark these for your first weeks\"), resourceList])\nresourceList = ListBlock([res1, res2, res3, res4])\nres1 = ListItem(\"Engineering Handbook\", \"Setup, standards, and architecture\", null, \"Open\", @ToAssistant(\"Open the engineering handbook\"))\nres2 = ListItem(\"Dev Environment Setup Guide\", \"Step-by-step local tooling setup\", null, \"Open\", @ToAssistant(\"Open the dev environment setup guide\"))\nres3 = ListItem(\"Code Review Guidelines\", \"How we review and ship changes\", null, \"Open\", @ToAssistant(\"Open the code review guidelines\"))\nres4 = ListItem(\"Who's Who on the Team\", \"Owners, on-call, and points of contact\", null, \"Open\", @ToAssistant(\"Show who's who on the team\"))\n```\n\nThe checklist is grouped into three tabs so new hires can focus on one milestone at a time. Checkbox defaults show a few Day 1 items already done, the KPI cards give a quick progress snapshot, and the resources list keeps key docs one click away.",
+   "reasoning": "The user wants an onboarding checklist for a new engineer. Let me create a nice UI with steps, checkboxes, tasks grouped by time period.\n\nLet me design a dashboard-style onboarding checklist:\n- Header\n- Progress overview (KPI cards)\n- Checklist grouped by Day 1, Week 1, Month 1\n- Use Steps or checkboxes\n- Form with checkboxes for interactive checklist\n- Maybe tabs\n\nLet me build it with openui-lang.\n\nI'll create:\n- root = Stack([header, progressCards, checklistTabs, resources])\n\nLet me use CheckBoxGroup for interactive checklists within forms, plus a progress visual.\n\nActually let me make it clean. Structure:\n\nroot = Stack([header, kpiRow, tabs, footerNote])\n\nheader = CardHeader(\"New Engineer Onboarding\", \"Your first 30 days checklist\")\n\nkpiRow = Stack([kpiTotal, kpiDone, kpiRemaining], \"row\", \"m\", \"stretch\")\n\nEach kpi is a Card with label + big number.\n\ntabs = Tabs([day1Tab, week1Tab, month1Tab])\n\nEach tab has a Form with CheckBoxGroup items and buttons? Forms need buttons. But maybe better to use CheckBoxGroup directly... CheckBoxGroup is a FormControl input, needs to be inside FormControl inside Form.\n\nLet me make each tab contain a Form with checkboxes.\n\nActually a checklist with interactive checkboxes — Form + FormControl(CheckBoxGroup). Save button sends to assistant.\n\nLet me write it.\n\nDay 1 items:\n- Get laptop and accounts set up\n- Meet your onboarding buddy\n- Complete HR paperwork\n- Set up dev environment\n- Read team README\n- Join team standup\n\nWeek 1:\n- Shadow a code review\n- Ship your first PR\n- Review architecture docs\n- Set up 1:1s with teammates\n- Complete security training\n- Attend sprint planning\n\nMonth 1:\n- Own a small feature end-to-end\n- Present at a team demo\n- Contribute to on-call rotation docs\n- Give feedback on onboarding\n- Set 30/60/90 goals with manager\n\nLet me build with CheckBoxItems.\n\nI'll define checkbox items as references, then CheckBoxGroup referencing them.\n\nLet me write.\n\nFor KPI progress I'll show numbers.\n\nLet me also add a Steps component maybe for \"First day at a glance\". Could be nice.\n\nLet me keep it focused. I'll add a resources section at bottom with EntityList or ListBlock.\n\nLet me write the code carefully.\n\n```\nroot = Stack([header, kpiRow, checklistTabs, resourcesCard], \"column\", \"l\")\n\nheader = CardHeader(\"New Engineer Onboarding\", \"A 30-day checklist to get you productive and connected\")\n\nkpiRow = Stack([kpiTotal, kpiDone, kpiProgress], \"row\", \"m\", \"stretch\")\nkpiTotal = Card([TextContent(\"Total tasks\", \"small\"), TextContent(\"17\", \"large-heavy\")])\nkpiDone = Card([TextContent(\"Completed\", \"small\"), TextContent(\"3\", \"large-heavy\")])\nkpiProgress = Card([TextContent(\"Progress\", \"small\"), TextContent(\"18%\", \"large-heavy\")])\n```\n\nHmm, hardcoded numbers. Fine for a static checklist.\n\nchecklistTabs = Tabs([tabDay1, tabWeek1, tabMonth1])\n\nEach TabItem: value, trigger, content array.\n\ntabDay1 = TabItem(\"day1\", \"Day 1\", [formDay1])\nformDay1 = Form(\"day1Checklist\", buttonsDay1, [fcDay1Setup, fcDay1Meet, ...])\n\nActually let me put all checkboxes in one CheckBoxGroup per tab, wrapped in one FormControl.\n\nformDay1 = Form(\"day1\", buttons, [fcDay1])\n\nfcDay1 = FormControl(\"Day 1 tasks\", cbDay1)\ncbDay1 = CheckBoxGroup(\"day1\", [item1, item2, ...])\n\nCheckBoxItem(label, description, name, defaultChecked)\n\nLet me define items.\n\nbuttons = Buttons([Button(\"Save progress\", Action([@ToAssistant(\"Save my onboarding progress\")]))])\n\nLet me write everything.\n\nFor resources, use ListBlock with items linking? ListItem has actionLabel and action. Or use EntityList. Let me use a Card with TextContent list or ListBlock.\n\nresourcesCard = Card([CardHeader(\"Key resources\"), ListBlock([...])])\n\nListItem(title, subtitle, image?, actionLabel?, action?) — image needs real URL. I'll skip images.\n\nListBlock([ListItem(\"Engineering Handbook\", \"Setup, standards, and architecture\", null, \"Open\", @OpenUrl(\"https://...\"))]) — but action needs real URL. I could use @ToAssistant instead. Let me use @ToAssistant to avoid fake URLs. Actually OpenUrl with example placeholder is okay but let me use ToAssistant.\n\nLet me finalize.\n\nLet me make sure all variables referenced.\n\nVariables:\n- root references header, kpiRow, checklistTabs, resourcesCard\n- header\n- kpiRow references kpiTotal, kpiDone, kpiProgress\n- kpiTotal, kpiDone, kpiProgress\n- checklistTabs references tabDay1, tabWeek1, tabMonth1\n- tabDay1 references formDay1\n- formDay1 references buttonsDay1, fcDay1\n- buttonsDay1 references saveBtnDay1? Let me just make buttons per form or share one.\n\nLet me share one buttons reference used across forms. saveBtn and buttons. Actually each Form needs buttons argument. I can reuse the same `buttons` reference in multiple forms. That's fine — same variable referenced multiple times.\n\nWait, but then \"Save progress\" would be same for all. Fine.\n\nformDay1 = Form(\"day1\", buttons, [fcDay1])\nformWeek1 = Form(\"week1\", buttons, [fcWeek1])\nformMonth1 = Form(\"month1\", buttons, [fcMonth1])\n\nbuttons = Buttons([saveBtn])\nsaveBtn = Button(\"Save progress\", Action([@ToAssistant(\"Save my onboarding checklist progress\")]))\n\nfcDay1 = FormControl(\"Day 1\", cbDay1)\ncbDay1 = CheckBoxGroup(\"day1\", [d1a, d1b, d1c, d1d, d1e, d1f])\n\nEach CheckBoxItem.\n\nLet me write items.\n\nDay 1:\nd1a = CheckBoxItem(\"Laptop & accounts\", \"Pick up equipment and activate SSO\", \"laptop\", true)\nd1b = CheckBoxItem(\"HR & payroll paperwork\", \"Complete benefits enrollment\", \"hr\", false)\nd1c = CheckBoxItem(\"Meet your onboarding buddy\", \"30-min intro coffee chat\", \"buddy\", true)\nd1d = CheckBoxItem(\"Set up dev environment\", \"Clone repos, install tooling\", \"devenv\", false)\nd1e = CheckBoxItem(\"Read the team README\", \"Team norms, on-call, and rituals\", \"readme\", true)\nd1f = CheckBoxItem(\"Join team standup\", \"Introduce yourself to the team\", \"standup\", false)\n\nWeek 1:\nw1a = CheckBoxItem(\"Shadow a code review\", \"Pair with a reviewer on a live PR\", \"review\", false)\nw1b = CheckBoxItem(\"Ship your first PR\", \"Start with a good-first-issue\", \"firstpr\", false)\nw1c = CheckBoxItem(\"Review architecture docs\", \"Understand services and data flow\", \"arch\", false)\nw1d = CheckBoxItem(\"Set up 1:1s\", \"Schedule recurring chats with teammates\", \"ones\", false)\nw1e = CheckBoxItem(\"Complete security training\", \"Required compliance module\", \"security\", false)\nw1f = CheckBoxItem(\"Attend sprint planning\", \"Learn how work is planned\", \"planning\", false)\n\nMonth 1:\nm1a = CheckBoxItem(\"Own a small feature end-to-end\", \"From spec to deploy\", \"feature\", false)\nm1b = CheckBoxItem(\"Present at a team demo\", \"Share what you built\", \"demo\", false)\nm1c = CheckBoxItem(\"Learn the on-call rotation\", \"Shadow a rotation shift\", \"oncall\", false)\nm1d = CheckBoxItem(\"Set 30/60/90 goals\", \"Align with your manager\", \"goals\", false)\nm1e = CheckBoxItem(\"Give onboarding feedback\", \"Help improve this checklist\", \"feedback\", false)\n\nTotal tasks: 6 + 6 + 5 = 17. Good matches \"17\".\n\nDone count: default checked = d1a, d1c, d1e = 3. Good, matches \"3\". Progress 3/17 ≈ 18%. Good.\n\nResources:\nListBlock([ListItem(\"Engineering Handbook\", \"Setup, standards, and architecture\", null, \"Open\", @ToAssistant(\"Show the engineering handbook\")), ...])\n\nActually ListItem signature: ListItem(title, subtitle?, image?, actionLabel?, action?). So passing null for image then actionLabel and action. That's fine positionally.\n\nHmm but with ToAssistant for open, maybe better just leave actionLabel and action off, making it non-clickable text list. But clickable is nicer. Let me use action.\n\nLet me include:\n- Engineering Handbook\n- Dev Environment Setup Guide\n- Code Review Guidelines\n- Who's Who on the Team\n\nLet me write ListBlock.\n\nresourcesCard = Card([CardHeader(\"Key resources\", \"Bookmark these for your first weeks\"), resourceList])\n\nresourceList = ListBlock([res1, res2, res3, res4])\n\nres1 = ListItem(\"Engineering Handbook\", \"Setup, standards, and architecture\", null, \"Open\", @ToAssistant(\"Open the engineering handbook\"))\n...\n\nNow the header as a Card? Let me just use CardHeader directly in root Stack. CardHeader can be a child of Stack? Stack children: any[]. It should render. Let me wrap in a Card for niceness? Actually root children can be CardHeader. Fine.\n\nLet me also add a Callout for welcome? Maybe a success/info callout at top.\n\nLet me add welcomeCallout = Callout(\"info\", \"Welcome aboard!\", \"Work through these tasks over your first 30 days. Check items off as you go — your buddy is here to help.\", null)\n\nvisible optional — omit.\n\nActually Callout signature: Callout(variant, title, description, visible?). visible optional $binding. Omit.\n\nLet me include it in root.\n\nroot = Stack([welcomeCallout, header, kpiRow, checklistTabs, resourcesCard], \"column\", \"l\")\n\nWait CardHeader and Callout both fine.\n\nLet me reorder: header then callout.\n\nLet me finalize and check every defined var referenced:\n- root ✓\n- welcomeCallout ✓\n- header ✓\n- kpiRow ✓, kpiTotal ✓, kpiDone ✓, kpiProgress ✓\n- checklistTabs ✓, tabDay1 ✓, tabWeek1 ✓, tabMonth1 ✓\n- formDay1 ✓, formWeek1 ✓, formMonth1 ✓\n- buttons ✓, saveBtn ✓\n- fcDay1 ✓, cbDay1 ✓, d1a-f ✓\n- fcWeek1 ✓, cbWeek1 ✓, w1a-f ✓\n- fcMonth1 ✓, cbMonth1 ✓, m1a-e ✓\n- resourcesCard ✓, resourceList ✓, res1-4 ✓\n\nGood. All referenced.\n\nNow write in the required order: root first, then components, then leaves.\n\nLet me produce final code.\n\nOne concern: Form inside TabItem content — content allows Form. Good.\n\nLet me write."
+  },
+  {
+   "id": "ad-spend",
+   "kind": "ui",
+   "prompt": "Show a scatter plot of ad spend versus conversions for two campaigns.",
+   "ms": 4316,
+   "ttft": 1394,
+   "contentChars": 1004,
+   "reasoningChars": 1868,
+   "usage": {
+    "prompt_tokens": 7728,
+    "completion_tokens": 827,
+    "total_tokens": 8555,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 491
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 18
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's a scatter plot comparing",
+    "sentences": 2
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user wants a scatter",
+    "sentences": 26
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 316,
+   "startsWithRoot": false,
+   "content": "Here's a scatter plot comparing ad spend against conversions for two campaigns:\n\n```openui-lang\nroot = Stack([chartCard], \"column\", \"m\")\nchartCard = Card([chartHeader, scatter], \"card\", \"column\", \"m\")\nchartHeader = CardHeader(\"Ad Spend vs Conversions\", \"Daily performance across two campaigns\")\nscatter = ScatterChart([seriesA, seriesB], \"Ad Spend ($)\", \"Conversions\")\nseriesA = ScatterSeries(\"Campaign A — Retargeting\", [a1, a2, a3, a4, a5, a6])\nseriesB = ScatterSeries(\"Campaign B — Prospecting\", [b1, b2, b3, b4, b5, b6])\na1 = Point(120, 34)\na2 = Point(180, 51)\na3 = Point(240, 63)\na4 = Point(310, 82)\na5 = Point(390, 99)\na6 = Point(460, 121)\nb1 = Point(150, 22)\nb2 = Point(220, 38)\nb3 = Point(300, 44)\nb4 = Point(360, 61)\nb5 = Point(440, 70)\nb6 = Point(520, 88)\n```\n\nCampaign A (retargeting) climbs steeply — each dollar of spend returns more conversions — while Campaign B (prospecting) shows a flatter, lower-efficiency trend. Let me know if you'd like different data points or a trendline summary.",
+   "reasoning": "The user wants a scatter plot of ad spend versus conversions for two campaigns. Let me build this with openui-lang.\n\nI'll create a ScatterChart with two ScatterSeries, each with points. Ad spend on X axis, conversions on Y axis.\n\nLet me create a root Stack with a Card containing CardHeader and ScatterChart.\n\nI'll make points representing data points for each campaign. Let me define Point references and ScatterSeries.\n\nStructure:\n- root = Stack([card])\n- card = Card([header, scatterCard], ...)\n- Actually let me make it clean.\n\nLet me create:\n- root = Stack([chartCard])\n- chartCard = Card([chartHeader, scatter], \"card\")\n- chartHeader = CardHeader(\"Ad Spend vs Conversions\", \"Daily data points across two campaigns\")\n- scatter = ScatterChart([seriesA, seriesB], \"Ad Spend ($)\", \"Conversions\")\n\nPoints for Campaign A and B.\n\nLet me define points. I'll create Point references for each point.\n\nActually Point can be inline in the ScatterSeries points array. But for streaming, references are better. But many points. Let me just inline them in the ScatterSeries.\n\nScatterSeries(name, points). points is array of Point.\n\nLet me create:\n- seriesA = ScatterSeries(\"Campaign A\", [Point(120, 34), Point(200, 58), ...])\n- seriesB = ScatterSeries(\"Campaign B\", [...])\n\nLet me make realistic data.\n\nCampaign A (e.g., retargeting): spend 100-500, conversions roughly linear.\nCampaign B (e.g., prospecting): higher spend but lower conversion efficiency.\n\nCampaign A points:\nPoint(120, 34)\nPoint(180, 51)\nPoint(240, 63)\nPoint(310, 82)\nPoint(390, 99)\nPoint(460, 121)\n\nCampaign B points:\nPoint(150, 22)\nPoint(220, 38)\nPoint(300, 44)\nPoint(360, 61)\nPoint(440, 70)\nPoint(520, 88)\n\nNow let me build the full thing.\n\nI'll add a KPI or table maybe. Keep it focused - scatter plot as requested. Maybe add a small legend note. The ScatterSeries name serves as legend.\n\nLet me write it."
+  },
+  {
+   "id": "deploy-failed",
+   "kind": "ui",
+   "prompt": "The deploy failed because of a missing environment variable. Tell the user, briefly.",
+   "ms": 2094,
+   "ttft": 1035,
+   "contentChars": 324,
+   "reasoningChars": 708,
+   "usage": {
+    "prompt_tokens": 7731,
+    "completion_tokens": 253,
+    "total_tokens": 7984,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 169
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 3
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "```openui-lang root = Stack([deployCard], \"column\",",
+    "sentences": 3
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user wants a brief",
+    "sentences": 11
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 90,
+   "startsWithRoot": false,
+   "content": "```openui-lang\nroot = Stack([deployCard], \"column\", \"m\")\ndeployCard = Card([deployCallout])\ndeployCallout = Callout(\"error\", \"Deploy failed\", \"A required environment variable is missing. Add it to your deploy config and retry.\")\n```\n\nYour deploy failed because a required environment variable isn't set. Add it and redeploy.",
+   "reasoning": "The user wants a brief message telling them the deploy failed due to a missing environment variable. This is a text-only informational response? Or should I create UI? The instruction says \"Tell the user, briefly.\" A callout would be appropriate. But it's a simple notification. I think a small UI with a Callout is good. Let me produce openui-lang.\n\nI'll make a brief card with an error callout.\n\nKeep it minimal and valid.\n\nroot = Stack([card])\ncard = Card([callout])\n\nCallout(variant, title, description)\n\nroot = Stack([card], \"column\", \"m\")\ncard = Card([callout])\ncallout = Callout(\"error\", \"Deploy failed\", \"A required environment variable is missing. Add it and redeploy.\")\n\nThat's valid and reachable."
+  },
+  {
+   "id": "notif-settings",
+   "kind": "ui",
+   "prompt": "Make a settings form with notification toggles.",
+   "ms": 5598,
+   "ttft": 1222,
+   "contentChars": 1772,
+   "reasoningChars": 2653,
+   "usage": {
+    "prompt_tokens": 7725,
+    "completion_tokens": 1051,
+    "total_tokens": 8776,
+    "prompt_tokens_details": {
+     "cached_tokens": 7552
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 616
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 21
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's a notification settings form",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user wants a settings",
+    "sentences": 14
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 104,
+   "startsWithRoot": false,
+   "content": "Here's a notification settings form with grouped toggles, a frequency selector, and save/cancel actions:\n\n```openui-lang\nroot = Stack([header, card], \"column\", \"l\")\nheader = CardHeader(\"Notification Settings\", \"Control how and when you receive alerts\")\ncard = Card([settingsForm])\nsettingsForm = Form(\"settings\", saveButtons, [notifField, frequencyField, quietField])\nnotifField = FormControl(\"Notification channels\", notifSwitches, \"Turn each channel on or off\")\nnotifSwitches = SwitchGroup(\"notifications\", [emailSwitch, pushSwitch, smsSwitch, marketingSwitch], \"card\")\nemailSwitch = SwitchItem(\"Email\", \"Receive updates and alerts via email\", \"email\", true)\npushSwitch = SwitchItem(\"Push notifications\", \"Get instant alerts on your device\", \"push\", true)\nsmsSwitch = SwitchItem(\"SMS\", \"Text message alerts for urgent items\", \"sms\", false)\nmarketingSwitch = SwitchItem(\"Marketing emails\", \"Product news, tips, and offers\", \"marketing\", false)\nfrequencyField = FormControl(\"Digest frequency\", freqSelect, \"How often to receive summary emails\")\nfreqSelect = Select(\"frequency\", [freqDaily, freqWeekly, freqMonthly], \"Select frequency\", null, $frequency)\nfreqDaily = SelectItem(\"daily\", \"Daily\")\nfreqWeekly = SelectItem(\"weekly\", \"Weekly\")\nfreqMonthly = SelectItem(\"monthly\", \"Monthly\")\nquietField = FormControl(\"Quiet hours\", quietSwitch, \"Pause all notifications overnight (10 PM – 8 AM)\")\nquietSwitch = SwitchGroup(\"quiet\", [quietToggle], \"sunk\")\nquietToggle = SwitchItem(\"Enable quiet hours\", \"Silence alerts during the night\", \"quiet_enabled\", false)\nsaveButtons = Buttons([saveBtn, cancelBtn])\nsaveBtn = Button(\"Save changes\", @ToAssistant(\"Save notification settings\"), \"primary\")\ncancelBtn = Button(\"Cancel\", @ToAssistant(\"Cancel settings changes\"), \"tertiary\")\n```",
+   "reasoning": "The user wants a settings form with notification toggles. Let me create an openui-lang UI with a Form containing SwitchGroup for notification toggles, plus some other settings fields.\n\nLet me design:\n- root Stack with header, form\n- Form with SwitchGroup (notifications), maybe Select for frequency, RadioGroup for channels, and Buttons (Save/Cancel)\n\nLet me build it carefully with references for streaming.\n\nForm signature: Form(name, buttons, fields?)\n\nSwitchGroup(name, items, variant?, value?) — Group of switch toggles\nSwitchItem(label?, description?, name, defaultChecked?)\n\nLet me create switch items for notifications:\n- Email notifications\n- Push notifications\n- SMS notifications\n- Marketing emails\n- Weekly digest\n\nLet me also add frequency select and quiet hours.\n\nLet me write:\n\nroot = Stack([header, card], \"column\", \"l\")\nheader = CardHeader(\"Settings\", \"Manage your notification preferences\")\ncard = Card([settingsForm])\n\nsettingsForm = Form(\"settings\", saveButtons, [emailSwitchField, pushSwitchField, smsSwitchField, frequencyField, channelsField, quietHoursField])\n\nActually FormControl signature: FormControl(label, input, hint?)\n\nLet me create FormControls.\n\nFor SwitchGroup, it's one form control with label. Let me group switches under \"Notifications\".\n\nActually SwitchGroup can hold multiple SwitchItems. So:\n\nnotifField = FormControl(\"Notifications\", notifSwitches, \"Choose how you want to be notified\")\nnotifSwitches = SwitchGroup(\"notifications\", [emailSwitch, pushSwitch, smsSwitch, marketingSwitch], \"card\")\n\nFor frequency:\nfreqField = FormControl(\"Digest frequency\", freqSelect, \"How often to receive summary emails\")\nfreqSelect = Select(\"frequency\", [freqDaily, freqWeekly, freqMonthly], \"Select frequency\", null, $frequency)\nfreqDaily = SelectItem(\"daily\", \"Daily\")\nfreqWeekly = SelectItem(\"weekly\", \"Weekly\")\nfreqMonthly = SelectItem(\"monthly\", \"Monthly\")\n\nFor quiet hours maybe a Slider or just a switch.\n\nLet me add a SwitchGroup for other preferences too, or keep simple.\n\nLet me add buttons:\nsaveBtn = Button(\"Save changes\", @ToAssistant(\"Save settings\"), \"primary\")\ncancelBtn = Button(\"Cancel\", @ToAssistant(\"Cancel\"), \"tertiary\")\nsaveButtons = Buttons([saveBtn, cancelBtn])\n\nLet me finalize.\n\nI'll keep it clean. Let me write the code.\n\nSwitch items:\nemailSwitch = SwitchItem(\"Email\", \"Receive updates via email\", \"email\", true)\npushSwitch = SwitchItem(\"Push notifications\", \"Get alerts on your device\", \"push\", true)\nsmsSwitch = SwitchItem(\"SMS\", \"Text message alerts\", \"sms\", false)\nmarketingSwitch = SwitchItem(\"Marketing\", \"Product news and offers\", \"marketing\", false)\n\nAll variables must be referenced. Good."
+  },
+  {
+   "id": "revenue-12m",
+   "kind": "ui",
+   "prompt": "Show revenue trend over 12 months as a line chart.",
+   "ms": 2684,
+   "ttft": 1076,
+   "contentChars": 523,
+   "reasoningChars": 906,
+   "usage": {
+    "prompt_tokens": 7727,
+    "completion_tokens": 431,
+    "total_tokens": 8158,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 251
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 7
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's a 12-month revenue trend",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user wants a revenue",
+    "sentences": 12
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 48,
+   "startsWithRoot": false,
+   "content": "Here's a 12-month revenue trend as a line chart:\n\n```openui-lang\nroot = Stack([card], \"column\", \"l\")\ncard = Card([chartHeader, chart], null, \"column\", \"m\")\nchartHeader = CardHeader(\"Revenue Trend\", \"Last 12 months\")\nchart = LineChart(labels, [revenueSeries], \"natural\", \"Month\", \"Revenue ($K)\", 320)\nlabels = [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\", \"Jul\", \"Aug\", \"Sep\", \"Oct\", \"Nov\", \"Dec\"]\nrevenueSeries = Series(\"Revenue\", revenueValues)\nrevenueValues = [120, 128, 145, 138, 160, 172, 168, 185, 192, 205, 198, 220]\n```",
+   "reasoning": "The user wants a revenue trend over 12 months as a line chart. I need to create openui-lang code with a line chart.\n\nLet me build a reasonable revenue dataset for 12 months.\n\nroot = Stack first.\n\nLet me define months labels, revenue values, and a line chart wrapped in a card.\n\nI'll create the root Stack containing a Card with CardHeader and LineChart.\n\nLet me write it with references for streaming.\n\nMonths: Jan-Dec. Revenue values.\n\nLet me produce:\n\nroot = Stack([card], \"column\", \"l\")\ncard = Card([chartHeader, chart], null, \"column\", \"m\")\nchartHeader = CardHeader(\"Revenue Trend\", \"Last 12 months\")\nchart = LineChart(labels, [revenueSeries], \"natural\", \"Month\", \"Revenue ($K)\")\nlabels = [\"Jan\", \"Feb\", ...]\nrevenueSeries = Series(\"Revenue\", revenueValues)\nrevenueValues = [120, 132, ...]\n\nThat's clean. Let me pick values.\n\n120, 128, 145, 138, 160, 172, 168, 185, 192, 205, 198, 220\n\nLet me write it."
+  },
+  {
+   "id": "tier-compare",
+   "kind": "ui",
+   "prompt": "Compare our two pricing tiers in cards.",
+   "ms": 4576,
+   "ttft": 1068,
+   "contentChars": 1395,
+   "reasoningChars": 2317,
+   "usage": {
+    "prompt_tokens": 7723,
+    "completion_tokens": 887,
+    "total_tokens": 8610,
+    "prompt_tokens_details": {
+     "cached_tokens": 7552
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 533
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 15
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's a side-by-side comparison of",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user wants a comparison",
+    "sentences": 28
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 153,
+   "startsWithRoot": false,
+   "content": "Here's a side-by-side comparison of two pricing tiers:\n\n```openui-lang\nroot = Stack([header, tiersRow], \"column\", \"l\")\nheader = CardHeader(\"Compare Our Plans\", \"Choose the tier that fits your team\")\ntiersRow = Stack([starterCard, proCard], \"row\", \"l\", \"stretch\", \"start\", true)\nstarterCard = Card([starterHeader, starterPrice, starterDivider, starterFeatures, starterButton], \"card\", \"column\", \"m\")\nproCard = Card([proHeader, proPrice, proDivider, proFeatures, proButton], \"card\", \"column\", \"m\")\nstarterHeader = CardHeader(\"Starter\", \"For individuals getting started\")\nstarterPrice = TextContent(\"$19 / month\", \"large-heavy\")\nstarterDivider = Separator(\"horizontal\", true)\nstarterFeatures = TextContent(\"✓ Up to 3 projects\\n✓ 1 GB storage\\n✓ Community support\\n✓ Basic analytics\")\nstarterButton = Button(\"Choose Starter\", @ToAssistant(\"I'd like the Starter plan\"), \"secondary\", \"normal\", \"medium\")\nproHeader = CardHeader(\"Pro\", \"For growing teams that need more\")\nproPrice = TextContent(\"$49 / month\", \"large-heavy\")\nproDivider = Separator(\"horizontal\", true)\nproFeatures = TextContent(\"✓ Unlimited projects\\n✓ 50 GB storage\\n✓ Priority support\\n✓ Advanced analytics\\n✓ Custom integrations\")\nproButton = Button(\"Choose Pro\", @ToAssistant(\"I'd like the Pro plan\"), \"primary\", \"normal\", \"medium\")\n```\n\nLet me know if you'd like more tiers, different pricing, or a feature comparison table instead.",
+   "reasoning": "The user wants a comparison of two pricing tiers in cards. I should create a UI with two cards side by side comparing pricing tiers. I'll use Card components with direction \"row\" and wrap.\n\nLet me build a clean structure: root Stack with a header and two pricing tier cards side by side.\n\nI'll design two tiers: Starter and Pro. Use InlineHeader or CardHeader for titles, EntityList or feature lists, and buttons.\n\nLet me create the layout:\n\nroot = Stack([header, tiersRow], \"column\", \"l\")\n\nheader = CardHeader(\"Compare Our Plans\", \"Choose the tier that fits your team\")\n\ntiersRow = Stack([starterCard, proCard], \"row\", \"l\", \"stretch\", \"start\")  -- wrap true maybe\n\nActually for two cards side by side, use Stack direction \"row\" wrap true.\n\nEach card:\nstarterCard = Card([starterHeader, starterPrice, starterSeparator, starterFeatures, starterButton], \"card\", \"column\", \"m\")\n...\n\nLet me use TextContent and EntityList for features.\n\nFor price display, I can use TextContent with large-heavy.\n\nLet me build it. I'll use references for progressive streaming.\n\nstarterHeader = CardHeader(\"Starter\", \"For individuals getting started\")\nproHeader = CardHeader(\"Pro\", \"For growing teams\")\n\nFor price, use TextContent(\"$19\", \"large-heavy\") plus small \"/month\".\n\nFeatures could be ListBlock or EntityList or just TextContent lines with checkmarks. Let me use ListBlock for nice features with checkmark? ListBlock uses number or image variant, not checkmarks. I'll use EntityList for feature comparison, or TagBlock. Actually let me use simple TextContent lines with markdown checkmarks.\n\nLet me use TextContent with markdown bullet list for features. That works well.\n\nstarterFeatures = TextContent(\"✓ Up to 3 projects\\n✓ 1 GB storage\\n✓ Community support\\n✓ Basic analytics\")\n\nproFeatures = TextContent(\"✓ Unlimited projects\\n✓ 50 GB storage\\n✓ Priority support\\n✓ Advanced analytics\\n✓ Custom integrations\")\n\nButtons: Button(\"Choose Starter\", ...) and Button(\"Choose Pro\", ...). Give them variant primary/secondary.\n\nLet me assemble the full thing.\n\nI'll keep price as a Stack row with big number and small text. Actually TextContent size \"large-heavy\" gives big text. Let me do:\n\nstarterPrice = TextContent(\"$19 / month\", \"large-heavy\")\n\nSimple.\n\nLet me write final code.\n\nI'll use wrap on the tiers row so it's responsive."
+  },
+  {
+   "id": "employees",
+   "kind": "ui",
+   "prompt": "Show a table of employees with name, role and start date.",
+   "ms": 2348,
+   "ttft": 1338,
+   "contentChars": 757,
+   "reasoningChars": 337,
+   "usage": {
+    "prompt_tokens": 7728,
+    "completion_tokens": 331,
+    "total_tokens": 8059,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 80
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 12
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "```openui-lang root = Stack([card]) card",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user wants a table",
+    "sentences": 5
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 0,
+   "startsWithRoot": false,
+   "content": "```openui-lang\nroot = Stack([card])\ncard = Card([CardHeader(\"Employees\", \"Team directory\"), employeeTable])\nemployeeTable = Table([nameCol, roleCol, startCol])\nnameCol = Col(\"Name\", data.rows.name, \"string\")\nroleCol = Col(\"Role\", data.rows.role, \"string\")\nstartCol = Col(\"Start Date\", data.rows.startDate, \"string\")\ndata = {rows: [row1, row2, row3, row4, row5]}\nrow1 = {name: \"Alice Johnson\", role: \"Engineering Manager\", startDate: \"2019-03-11\"}\nrow2 = {name: \"Marcus Lee\", role: \"Senior Developer\", startDate: \"2020-07-22\"}\nrow3 = {name: \"Priya Nair\", role: \"Product Designer\", startDate: \"2021-01-05\"}\nrow4 = {name: \"David Kim\", role: \"Data Analyst\", startDate: \"2022-09-14\"}\nrow5 = {name: \"Sofia Rossi\", role: \"QA Engineer\", startDate: \"2023-04-30\"}\n```",
+   "reasoning": "The user wants a table of employees with name, role and start date. I'll create a Table component with columns. Let me use fictional employee data.\n\nTable is column-oriented: Table([Col(label, data, type)]).\n\nLet me build:\n- name column (string)\n- role column (string)\n- start date column (string)\n\nI'll wrap in a Card with a CardHeader."
+  },
+  {
+   "id": "survey",
+   "kind": "ui",
+   "prompt": "Build a short survey with five rating questions.",
+   "ms": 5220,
+   "ttft": 1482,
+   "contentChars": 1022,
+   "reasoningChars": 2459,
+   "usage": {
+    "prompt_tokens": 7724,
+    "completion_tokens": 1016,
+    "total_tokens": 8740,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 678
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 22
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "```openui-lang root = Stack([header, surveyCard],",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user wants a survey",
+    "sentences": 29
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 0,
+   "startsWithRoot": false,
+   "content": "```openui-lang\nroot = Stack([header, surveyCard], \"column\", \"l\")\nheader = CardHeader(\"Customer Feedback Survey\", \"Please rate each statement from 1 (poor) to 5 (excellent).\")\nsurveyCard = Card([surveyForm], \"card\")\nsurveyForm = Form(\"survey\", submitButtons, [q1, q2, q3, q4, q5])\nq1 = FormControl(\"Overall satisfaction with the product\", r1)\nq2 = FormControl(\"Ease of use\", r2)\nq3 = FormControl(\"Value for money\", r3)\nq4 = FormControl(\"Quality of customer support\", r4)\nq5 = FormControl(\"Likelihood to recommend us to a friend\", r5)\nr1 = Chips(\"satisfaction\", \"single\", ratingItems)\nr2 = Chips(\"ease_of_use\", \"single\", ratingItems)\nr3 = Chips(\"value\", \"single\", ratingItems)\nr4 = Chips(\"support\", \"single\", ratingItems)\nr5 = Chips(\"recommend\", \"single\", ratingItems)\nratingItems = [c1, c2, c3, c4, c5]\nc1 = ChipItem(\"1\", \"1\")\nc2 = ChipItem(\"2\", \"2\")\nc3 = ChipItem(\"3\", \"3\")\nc4 = ChipItem(\"4\", \"4\")\nc5 = ChipItem(\"5\", \"5\")\nsubmitButtons = Buttons([submitBtn], \"row\")\nsubmitBtn = Button(\"Submit survey\", null, \"primary\")\n```",
+   "reasoning": "The user wants a survey with five rating questions. Let me build a Form with rating questions. I'll use RadioGroup or Chips for rating questions. A rating scale 1-5 could use RadioGroup with items 1-5, or Chips.\n\nLet me build a clean survey form with five rating questions, each as a Chips or RadioGroup with a 1-5 scale.\n\nLet me structure it:\n- root = Stack with header, form\n- Form with 5 FormControls each being a RadioGroup or Chips rating 1-5\n- Buttons with submit\n\nLet me use Chips for compact rating 1-5. Actually RadioGroup with 1-5 is good too but Chips is compact. Let me use Chips type single with ChipItems 1-5.\n\nActually, let me use RadioGroup for clarity, or Chips. Chips is nice for ratings. Let me define ChipItems.\n\nI'll create chip items 1-5 shared, then five FormControls each with a Chips field.\n\nWait, Chips requires name. Each FormControl label with Chips(name, type, items). The chip items can be shared reference.\n\nLet me build:\n\n```\nroot = Stack([header, surveyCard], \"column\", \"l\")\nheader = CardHeader(\"Customer Feedback Survey\", \"Rate each statement from 1 (poor) to 5 (excellent)\")\nsurveyCard = Card([surveyForm], \"card\")\nsurveyForm = Form(\"survey\", submitButtons, [q1, q2, q3, q4, q5])\nq1 = FormControl(\"How satisfied are you with our product?\", rating1)\n...\n```\n\nEach rating uses Chips with items = ratingItems.\n\nratingItems = [chip1, chip2, chip3, chip4, chip5]\nchip1 = ChipItem(\"1\", \"1\") ... \n\nBut can I reuse the same items array across multiple Chips? Yes, references resolve fine.\n\nLet me define:\nratingItems = [c1, c2, c3, c4, c5]\nc1 = ChipItem(\"1\", \"1\")\n...\n\nThen each rating field:\nr1 = Chips(\"satisfaction\", \"single\", ratingItems)\nr2 = Chips(\"ease\", \"single\", ratingItems)\n...\n\nFormControls:\nq1 = FormControl(\"Overall satisfaction with the product\", r1)\nq2 = FormControl(\"Ease of use\", r2)\nq3 = FormControl(\"Value for money\", r3)\nq4 = FormControl(\"Customer support quality\", r4)\nq5 = FormControl(\"Likelihood to recommend\", r5)\n\nButtons:\nsubmit = Button(\"Submit survey\", null, \"primary\")\nbuttons = Buttons([submit])\n\nThe submit button without action sends label to assistant. Good.\n\nLet me write it. Every variable must be referenced. Let me ensure all referenced.\n\nroot -> header, surveyCard\nsurveyCard -> surveyForm\nsurveyForm -> buttons, q1..q5\nq1 -> r1, q2 -> r2 etc.\nr1 -> ratingItems\nratingItems -> c1..c5\nbuttons -> submit\n\nAll referenced. Good.\n\nLet me order for streaming: root first, then components, then leaf."
+  },
+  {
+   "id": "order-detail",
+   "kind": "ui",
+   "prompt": "Show an order detail view with line items, a subtotal and a total.",
+   "ms": 14645,
+   "ttft": 1054,
+   "contentChars": 2062,
+   "reasoningChars": 11988,
+   "usage": {
+    "prompt_tokens": 7731,
+    "completion_tokens": 4027,
+    "total_tokens": 11758,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 3397
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 26
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's an order detail view",
+    "sentences": 2
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 3,
+    "worstShingle": "March 14, 2025 · 3",
+    "sentences": 143
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 349,
+   "startsWithRoot": false,
+   "content": "Here's an order detail view with line items, shipping/payment info, and a totals summary:\n\n```openui-lang\nroot = Stack([orderHeaderCard, metaRow, lineItemsCard, totalsCard], \"column\", \"l\")\norderHeaderCard = Card([orderHeaderRow])\norderHeaderRow = Stack([orderHeaderLeft, statusTag], \"row\", \"m\", \"center\", \"between\")\norderHeaderLeft = Stack([orderNumberText, orderDateText], \"column\", \"xs\")\norderNumberText = TextContent(\"Order #10482\", \"large-heavy\")\norderDateText = TextContent(\"Placed March 14, 2025 · 3 items\", \"small\")\nstatusTag = Tag(\"Shipped\", null, \"md\", \"success\")\nmetaRow = Stack([shipCard, payCard], \"row\", \"l\", \"stretch\")\nshipCard = Card([CardHeader(\"Shipping Details\"), shippingRows])\npayCard = Card([CardHeader(\"Payment\"), paymentRows])\nlineItemsCard = Card([CardHeader(\"Line Items\", \"3 items\"), lineItemsTable])\ntotalsCard = Card([CardHeader(\"Summary\"), totals])\nlineItemsTable = Table([itemCol, skuCol, qtyCol, priceCol, totalCol])\nitemCol = Col(\"Item\", items)\nskuCol = Col(\"SKU\", skus)\nqtyCol = Col(\"Qty\", qtys, \"number\")\npriceCol = Col(\"Unit Price\", unitPrices)\ntotalCol = Col(\"Total\", lineTotals)\nshippingRows = EntityList([{left: \"Recipient\", right: \"Jordan Lee\"}, {left: \"Address\", right: \"221B Baker St, London\"}, {left: \"Method\", right: \"Express · 2-day\"}])\npaymentRows = EntityList([{left: \"Card\", right: \"Visa •••• 4242\"}, {left: \"Billed\", right: \"March 14, 2025\"}])\ntotals = EntityList([{left: \"Subtotal\", right: \"$202.00\"}, {left: \"Shipping\", right: \"$12.00\"}, {left: \"Tax\", right: \"$16.16\"}], \"default\", null, {left: \"Total\", right: \"$230.16\", rightVariant: \"number\"})\nitems = [\"Wireless Keyboard\", \"Ergonomic Mouse\", \"USB-C Hub\"]\nskus = [\"KB-201\", \"MS-118\", \"HB-045\"]\nqtys = [2, 1, 1]\nunitPrices = [\"$49.00\", \"$39.00\", \"$65.00\"]\nlineTotals = [\"$98.00\", \"$39.00\", \"$65.00\"]\n```\n\nThe header shows the order number and shipped status, followed by shipping and payment details side by side. The line items table breaks down each product with quantity and price, and the summary card ends with the subtotal, shipping, tax, and final total.",
+   "reasoning": "The user wants an order detail view with line items, a subtotal and a total. Let me create a nice order detail UI.\n\nLet me build this with openui-lang. I'll create an order detail view.\n\nLet me structure:\n- root = Stack with header, order info, line items table, totals.\n\nLet me use Table for line items, EntityList for totals.\n\nLet me define data as inline arrays.\n\nLine items:\n- Product, SKU, Qty, Unit Price, Total\n\nLet me create the table columns.\n\nLet me define:\n- header = CardHeader(\"Order #10482\", \"Placed on March 14, 2025\")\n- Actually let me build a good order detail view.\n\nLet me think about the layout.\n\nroot = Stack([header, meta, lineItemsCard, totalsCard], \"column\", \"l\")\n\nheader = InlineHeader? Or Card with CardHeader.\n\nLet me do:\n- orderHeader = Card([CardHeader(\"Order #10482\", \"Placed March 14, 2025 · 3 items\")], ...) — actually CardHeader inside Card.\n\nLet me structure with cards.\n\nOrder summary card with status tag, shipping info.\n\nLet me define line items data.\n\nproducts = [\"Aeron Chair\", \"Standing Desk\", \"Monitor Arm\"]\nActually let me keep it generic.\n\nLine items:\n1. Wireless Keyboard - SKU KB-201 - Qty 2 - $49.00 - $98.00\n2. Ergonomic Mouse - SKU MS-118 - Qty 1 - $39.00 - $39.00\n3. USB-C Hub - SKU HB-045 - Qty 1 - $65.00 - $65.00\n\nSubtotal: $202.00\nShipping: $12.00\nTax: $16.16\nTotal: $230.16\n\nLet me create the table with columns: Item, SKU, Qty, Unit Price, Total.\n\nTable is column-oriented:\nTable([Col(\"Item\", items), Col(\"SKU\", skus), Col(\"Qty\", qtys, \"number\"), Col(\"Unit Price\", prices), Col(\"Total\", totals, \"number\")])\n\nActually, \"number\" type for currency may not format. Let me use string for prices to include $. But number type might be better for qty. Let me use strings for currency to keep the $ sign.\n\nLet me use \"number\" for Qty and strings for prices.\n\nTotals: use EntityList with rows for subtotal, shipping, tax, and then a total.\n\nEntityList header/footer. Let me do EntityList with header {left: \"Summary\", right: \"\"} ... actually let me keep it simple.\n\ntotals = EntityList([{left: \"Subtotal\", right: \"$202.00\"}, {left: \"Shipping\", right: \"$12.00\"}, {left: \"Tax\", right: \"$16.16\"}], \"default\", null, {left: \"Total\", right: \"$230.16\"})\n\nHmm EntityList signature: EntityList(rows?, size?, header?, footer?). So EntityList(rows, size, header, footer).\n\nFor footer total with number variant.\n\nLet me build it. I'll place totals in a card aligned to the right maybe. Keep it simple with a card.\n\nLet me write out all statements, root first.\n\nLet me define everything with references.\n\nData:\nitems = [\"Wireless Keyboard\", \"Ergonomic Mouse\", \"USB-C Hub\"]\nskus = [\"KB-201\", \"MS-118\", \"HB-045\"]\nqtys = [2, 1, 1]\nunitPrices = [\"$49.00\", \"$39.00\", \"$65.00\"]\nlineTotals = [\"$98.00\", \"$39.00\", \"$65.00\"]\n\nTable columns.\n\nLet me write:\n\nlineItemsTable = Table([itemCol, skuCol, qtyCol, priceCol, totalCol])\nitemCol = Col(\"Item\", items)\nskuCol = Col(\"SKU\", skus)\nqtyCol = Col(\"Qty\", qtys, \"number\")\npriceCol = Col(\"Unit Price\", unitPrices)\ntotalCol = Col(\"Total\", lineTotals)\n\nlineItemsCard = Card([CardHeader(\"Line Items\", \"3 items\"), lineItemsTable], \"sunk\")? Let me use variant \"card\" default. Actually Card(children, variant?, direction?, gap?, ...). Let me do Card([header, table], \"card\", \"column\", \"m\").\n\nWait CardHeader and table. Good.\n\nStatus tag in header. Let me add a tag row.\n\nLet me make orderHeader a Card with a row layout: left order number + date, right status tag.\n\norderHeaderLeft = Stack([Text(\"large-heavy\", \"Order #10482\"), Text(\"small\", \"Placed March 14, 2025\")], \"column\", \"xs\")\nstatusTag = Tag(\"Shipped\", null, \"md\", \"success\")\norderHeaderRow = Stack([orderHeaderLeft, statusTag], \"row\", \"m\", \"between\")\nWait Stack align param... Stack(children, direction, gap, align, justify, wrap). justify \"between\" is 5th. So Stack([orderHeaderLeft, statusTag], \"row\", \"m\", \"center\", \"between\").\n\nHmm align center, justify between.\n\norderHeaderCard = Card([orderHeaderRow])\n\nLet me also add shipping info via EntityList.\n\nShipping:\ncustomer = EntityList([{left: \"Customer\", right: \"Jordan Lee\"}, {left: \"Email\", right: \"jordan.lee@example.com\"}, {left: \"Ship to\", right: \"221B Baker St, London\"}])\n\nHmm but ship to is long. Fine.\n\nLet me put meta in a card.\n\nActually let me create two side-by-side cards: shipping details and order summary? Let me keep layout manageable.\n\nLet me do:\nroot = Stack([orderHeaderCard, metaRow, lineItemsCard, totalsRow], \"column\", \"l\")\n\nmetaRow = Stack([shipCard, payCard], \"row\", \"l\", \"stretch\")\nshipCard = Card([CardHeader(\"Shipping Details\"), shippingList])\npayCard = Card([CardHeader(\"Payment\"), paymentList])\n\nBut row layout with cards... Cards flex. Good.\n\ntotalsRow = Stack([null, totalsCard], \"row\", \"l\", \"end\", \"end\")? Hmm to align right. Let me just put totalsCard full width but content right-aligned. Simpler: Card with EntityList.\n\nActually a nice pattern: totals card with justify end. Let me make totalsCard contain the EntityList. Keep full width.\n\nLet me finalize. I'll make it clean.\n\nLet me write shipping list:\nshippingRows = EntityList([{left: \"Recipient\", right: \"Jordan Lee\"}, {left: \"Address\", right: \"221B Baker St, London\"}, {left: \"Method\", right: \"Express (2-day)\"}])\n\npaymentRows = EntityList([{left: \"Card\", right: \"Visa •••• 4242\"}, {left: \"Billed\", right: \"March 14, 2025\"}])\n\ntotals = EntityList([{left: \"Subtotal\", right: \"$202.00\"}, {left: \"Shipping\", right: \"$12.00\"}, {left: \"Tax\", right: \"$16.16\"}], \"default\", null, {left: \"Total\", right: \"$230.16\", rightVariant: \"number\"})\n\nWait footer is 4th arg, header is 3rd. So EntityList(rows, size, header, footer). I want no header, footer total. Pass null for header.\n\ntotalsCard = Card([CardHeader(\"Order Total\"), totals])\n\nHmm but I want the total emphasized. EntityList footer works.\n\nLet me wrap totals in a narrower card. I could put it in a row with justify end so it's ~half width. Let me do totalsRow = Stack([totalsCard], \"row\", \"m\", \"center\", \"end\") — but card is full width always (\"Always full width\"). So cards flex. A single card in a row will take full width anyway. Fine, full width totals card is okay.\n\nActually let me reconsider — maybe better to keep totals as a card with EntityList, full width is fine.\n\nLet me just finalize and verify all references.\n\nFinal statement list:\n1. root\n2. orderHeaderCard\n3. metaRow\n4. lineItemsCard\n5. totalsCard\n... and sub-references.\n\nLet me write it all out with root first.\n\nroot = Stack([orderHeaderCard, metaRow, lineItemsCard, totalsCard], \"column\", \"l\")\n\norderHeaderCard = Card([orderHeaderRow])\norderHeaderRow = Stack([orderHeaderLeft, statusTag], \"row\", \"m\", \"center\", \"between\")\norderHeaderLeft = Stack([orderNumberText, orderDateText], \"column\", \"xs\")\norderNumberText = Text(\"large-heavy\", \"Order #10482\")\norderDateText = Text(\"small\", \"Placed March 14, 2025 · 3 items\")\nstatusTag = Tag(\"Shipped\", null, \"md\", \"success\")\n\nWait Text signature: Text(variant?, value, subtext?, subtextVariant?, size?). variant is first! So Text(\"large-heavy\", ...) — but \"large-heavy\" is not a valid variant. Valid variants: \"text\" | \"number\". The size param is the 5th arg: \"xs\" | \"sm\" | \"md\" | \"lg\". Hmm.\n\nWait, so Text(variant?, value, subtext?, subtextVariant?, size?). There's no \"large-heavy\" size. Sizes: xs, sm, md, lg. So for large heavy text... hmm. TextContent has \"large-heavy\" size but Text doesn't.\n\nLet me re-read. Text(variant?: \"text\" | \"number\", value: string, subtext?: string, subtextVariant?: \"text\" | \"number\" | \"metric\", size?: \"xs\" | \"sm\" | \"md\" | \"lg\").\n\nSo Text variant is \"text\" or \"number\", not size. To make it large, size \"lg\". But there's no bold. For emphasis, use BoldText.\n\nLet me use BoldText for the order number:\norderNumberText = BoldText(\"text\", \"Order #10482\", null, null, \"lg\")\n\nHmm BoldText(variant?, value, subtext?, subtextVariant?, size?). Yes.\n\nActually wait — the rule says Text and BoldText take variant FIRST: Text(variant?, value, ...). Write Text(\"text\", \"Sell well\") or Text(\"number\", \"1,284\"). So yes variant first.\n\nBut note: for simple text inside cards, TextContent is fine too. TextContent(text, size?) — TextContent(\"Order #10482\", \"large-heavy\"). That's cleaner for headings! But TextContent is a top-level content component, can be inside Card. Yes TextContent is allowed in Card children.\n\nHmm, but the \"inline building blocks\" Text/BoldText are for inside card items (SnippetCardItem etc). For a regular card, I can use TextContent. Let me use TextContent for the heading.\n\nActually let me reconsider the whole approach. For order header, using Card with a Stack row containing TextContent for order number and a Tag.\n\nLet me use:\norderNumberText = TextContent(\"Order #10482\", \"large-heavy\")\norderDateText = TextContent(\"Placed March 14, 2025 · 3 items\", \"small\")\n\nThese are fine inside Stack inside Card.\n\nLet me use TextContent throughout for text blocks. Good.\n\nLet me redo:\n\norderHeaderLeft = Stack([orderNumberText, orderDateText], \"column\", \"xs\")\norderHeaderRow = Stack([orderHeaderLeft, statusTag], \"row\", \"m\", \"center\", \"between\")\norderHeaderCard = Card([orderHeaderRow])\n\nmetaRow = Stack([shipCard, payCard], \"row\", \"l\", \"stretch\")\nshipCard = Card([CardHeader(\"Shipping Details\"), shippingRows])\npayCard = Card([CardHeader(\"Payment\"), paymentRows])\n\nlineItemsCard = Card([CardHeader(\"Line Items\", \"3 items\"), lineItemsTable])\n\ntotalsCard = Card([CardHeader(\"Summary\"), totals])\n\nNow data:\nitems = [\"Wireless Keyboard\", \"Ergonomic Mouse\", \"USB-C Hub\"]\nskus = [\"KB-201\", \"MS-118\", \"HB-045\"]\nqtys = [2, 1, 1]\nunitPrices = [\"$49.00\", \"$39.00\", \"$65.00\"]\nlineTotals = [\"$98.00\", \"$39.00\", \"$65.00\"]\n\nitemCol = Col(\"Item\", items)\nskuCol = Col(\"SKU\", skus)\nqtyCol = Col(\"Qty\", qtys, \"number\")\npriceCol = Col(\"Unit Price\", unitPrices)\ntotalCol = Col(\"Total\", lineTotals)\nlineItemsTable = Table([itemCol, skuCol, qtyCol, priceCol, totalCol])\n\nshippingRows = EntityList([{left: \"Recipient\", right: \"Jordan Lee\"}, {left: \"Address\", right: \"221B Baker St, London\"}, {left: \"Method\", right: \"Express · 2-day\"}])\npaymentRows = EntityList([{left: \"Card\", right: \"Visa •••• 4242\"}, {left: \"Billed\", right: \"March 14, 2025\"}])\n\ntotals = EntityList([{left: \"Subtotal\", right: \"$202.00\"}, {left: \"Shipping\", right: \"$12.00\"}, {left: \"Tax\", right: \"$16.16\"}], \"default\", null, {left: \"Total\", right: \"$230.16\", rightVariant: \"number\"})\n\nCheck: EntityList(rows?, size?, header?, footer?). rows array, size \"default\", header null, footer object. Good.\n\nNow let me double check Tag signature: Tag(text, icon?, size?, variant?). Tag(\"Shipped\", null, \"md\", \"success\"). Good.\n\nNow verify all references reachable from root:\nroot -> orderHeaderCard, metaRow, lineItemsCard, totalsCard ✓\norderHeaderCard -> orderHeaderRow ✓\norderHeaderRow -> orderHeaderLeft, statusTag ✓\norderHeaderLeft -> orderNumberText, orderDateText ✓\nstatusTag (leaf) ✓\nmetaRow -> shipCard, payCard ✓\nshipCard -> shippingRows ✓\npayCard -> paymentRows ✓\nlineItemsCard -> lineItemsTable ✓\nlineItemsTable -> itemCol, skuCol, qtyCol, priceCol, totalCol ✓\ncols -> data arrays ✓\ntotalsCard -> totals ✓\ntotals (leaf) ✓\n\nAll good. Every defined variable referenced.\n\nLet me order statements: root first, then components, then data. I'll write it cleanly.\n\nOne concern: Stack justify \"between\" — order is Stack(children, direction, gap, align, justify, wrap). align \"center\", justify \"between\". Good.\n\nmetaRow Stack([shipCard, payCard], \"row\", \"l\", \"stretch\") — align stretch. Good.\n\nLet me write final. I'll add a brief text intro before the code block.\n\nActually the instructions say output ONLY openui-lang code? No — inline mode allows explanatory text. But \"Your ENTIRE response must be valid openui-lang code\" from system top conflicts with inline mode... The inline mode section says I can include explanatory text before/after in fences. I'll keep explanation minimal or none. Let me just provide the code block cleanly. I'll add a short line.\n\nActually to be safe and clean, I'll just output the fenced code block with a short sentence.\n\nLet me write it."
+  },
+  {
+   "id": "funnel",
+   "kind": "ui",
+   "prompt": "Show a funnel of signup, activation and retention.",
+   "ms": 7490,
+   "ttft": 973,
+   "contentChars": 1634,
+   "reasoningChars": 6112,
+   "usage": {
+    "prompt_tokens": 7726,
+    "completion_tokens": 2124,
+    "total_tokens": 9850,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 1659
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": false,
+    "codes": [
+     "excess-args"
+    ],
+    "messages": [
+     "excess-args/Stack: Stack takes 6 arg(s), got 7 (1 excess dropped)"
+    ],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 15
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's a funnel dashboard tracking",
+    "sentences": 2
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 3,
+    "worstShingle": "root = Stack([header, kpiRow, funnelCard,",
+    "sentences": 46
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 279,
+   "startsWithRoot": false,
+   "content": "Here's a funnel dashboard tracking progression from signup through activation to retention:\n\n```openui-lang\nroot = Stack([header, kpiRow, funnelCard, tableCard], \"column\", \"l\")\nheader = InlineHeader(\"Signup Funnel\", \"How users progress from signup to activation to retention\")\nkpiRow = Stack([signupKpi, activationKpi, retentionKpi], \"row\", \"m\", \"stretch\", null, null, true)\nsignupKpi = Card([TextContent(\"Signup\", \"small\"), TextContent(\"10,000\", \"large-heavy\"), TextContent(\"100% of visitors\", \"small\")], \"card\")\nactivationKpi = Card([TextContent(\"Activation\", \"small\"), TextContent(\"6,200\", \"large-heavy\"), TextContent(\"62% of signups\", \"small\")], \"card\")\nretentionKpi = Card([TextContent(\"Retention\", \"small\"), TextContent(\"3,100\", \"large-heavy\"), TextContent(\"50% of activated\", \"small\")], \"card\")\nfunnelCard = Card([CardHeader(\"Conversion funnel\", \"Users remaining at each stage\"), funnelChart], \"card\")\nfunnelChart = HorizontalBarChart(funnelLabels, [Series(\"Users\", funnelValues)], \"grouped\", \"Users\", \"Stage\")\nfunnelLabels = [\"Signup\", \"Activation\", \"Retention\"]\nfunnelValues = [10000, 6200, 3100]\ntableCard = Card([CardHeader(\"Stage detail\", \"Step conversion and drop-off\"), stageTable], \"card\")\nstageTable = Table([Col(\"Stage\", stageNames), Col(\"Users\", stageUsers, \"number\"), Col(\"Step conversion (%)\", stepConv, \"number\")])\nstageNames = [\"Signup\", \"Activation\", \"Retention\"]\nstageUsers = [10000, 6200, 3100]\nstepConv = [100, 62, 50]\n```\n\nThe funnel shows 10,000 signups, of which 6,200 activate (62%) and 3,100 retain (50% of activated). The horizontal bars and the detail table make each stage's drop-off easy to compare.",
+   "reasoning": "The user wants a funnel visualization showing signup, activation, and retention stages. A funnel is best shown with a HorizontalBarChart or a SingleStackedBarChart, or a funnel-like representation. Let me think about the best components.\n\nA funnel typically shows decreasing values across stages. I can use a HorizontalBarChart to show the stages with decreasing values. Or I can use a BarChart. Actually, for a funnel, a horizontal bar chart works well to show decreasing numbers.\n\nLet me build a dashboard:\n- KPI cards showing counts and conversion rates\n- A funnel chart (HorizontalBarChart)\n- Maybe a table with stages, counts, and conversion rates\n\nLet me create the data. Signup: 10,000, Activation: 6,200, Retention: 3,100. Conversion rates: signup→activation 62%, activation→retention 50%.\n\nLet me build with openui-lang.\n\nStructure:\n- root = Stack([header, kpiRow, funnelCard, tableCard])\n- header = CardHeader or InlineHeader\n- KPI cards for each stage with conversion rate\n- Funnel chart using HorizontalBarChart\n- Table with stages\n\nLet me write it.\n\nFor the funnel, HorizontalBarChart(labels, [Series(\"Users\", values)]) works. Labels = [\"Signup\", \"Activation\", \"Retention\"], values = [10000, 6200, 3100].\n\nLet me build KPIs:\n- Signup: 10,000\n- Activation: 6,200 (62% of signups)\n- Retention: 3,100 (50% of activated)\n\nLet me write clean code.\n\nFor the funnel stages with conversion, I could also show step conversion rates in a table.\n\nLet me build:\n\n```\nroot = Stack([header, kpiRow, funnelCard, tableCard], \"column\", \"l\")\nheader = InlineHeader(\"Signup Funnel\", \"Conversion across signup, activation, and retention\")\nkpiRow = Stack([signupKpi, activationKpi, retentionKpi], \"row\", \"m\", null, null, null, true)\n```\n\nWait, Stack signature: Stack(children, direction?, gap?, align?, justify?, wrap?). So for wrap: Stack([...], \"row\", \"m\", null, null, null, true). Positional args - align, justify, wrap. Need to pass null for align and justify to reach wrap.\n\nActually let me just make it a row without wrap for KPIs, three cards. Or use wrap for responsiveness.\n\nLet me do: kpiRow = Stack([signupKpi, activationKpi, retentionKpi], \"row\", \"m\", \"stretch\", null, null, true)\n\nEach KPI card:\nsignupKpi = Card([TextContent(\"Signup\", \"small\"), TextContent(\"10,000\", \"large-heavy\"), TextContent(\"Top of funnel\", \"small\")], \"card\")\n\nActually let me use Card with proper signature: Card(children, variant?, direction?, gap?, align?, justify?, wrap?)\n\nLet me make KPI cards cleaner with conversion indicators.\n\nsignupKpi = Card([TextContent(\"Signup\", \"small\"), TextContent(\"10,000\", \"large-heavy\")])\nactivationKpi = Card([TextContent(\"Activation\", \"small\"), TextContent(\"6,200\", \"large-heavy\"), TextContent(\"62% of signups\", \"small\")])\nretentionKpi = Card([TextContent(\"Retention\", \"small\"), TextContent(\"3,100\", \"large-heavy\"), TextContent(\"50% of activated\", \"small\")])\n\nFunnel chart card:\nfunnelCard = Card([CardHeader(\"Funnel\", \"Users at each stage\"), HorizontalBarChart(funnelLabels, [Series(\"Users\", funnelValues)], \"grouped\", \"Users\", \"Stage\")], \"card\")\n\nWait HorizontalBarChart(labels, series, variant?, xLabel?, yLabel?). \n\nfunnelLabels = [\"Signup\", \"Activation\", \"Retention\"]\nfunnelValues = [10000, 6200, 3100]\n\nTable:\nstagesTable = Table([Col(\"Stage\", stageNames), Col(\"Users\", stageUsers, \"number\"), Col(\"Conversion\", stageConv, \"number\")])\n\nstageNames = [\"Signup\", \"Activation\", \"Retention\"]\nstageUsers = [10000, 6200, 3100]\nstageConv = [100, 62, 50]  -- conversion to previous stage\n\nHmm, but I need to reference all these. Let me define them.\n\nActually let me make the funnel more funnel-like. A SingleStackedBarChart shows parts of a whole. But a funnel is about decreasing stages. HorizontalBarChart with decreasing values conveys it.\n\nAlternatively use a funnel made of colored cards decreasing in width... but that's complex. HorizontalBarChart is clean.\n\nLet me also add step conversion percentages.\n\nLet me finalize the code. Every variable must be referenced.\n\nroot = Stack([header, kpiRow, funnelCard, tableCard], \"column\", \"l\")\n\nheader = InlineHeader(\"Signup Funnel\", \"How users progress from signup to activation to retention\")\n\nkpiRow = Stack([signupKpi, activationKpi, retentionKpi], \"row\", \"m\", \"stretch\", null, null, true)\n\nsignupKpi = Card([TextContent(\"Signup\", \"small\"), TextContent(\"10,000\", \"large-heavy\"), TextContent(\"100% of visitors\", \"small\")])\nactivationKpi = Card([TextContent(\"Activation\", \"small\"), TextContent(\"6,200\", \"large-heavy\"), TextContent(\"62% of signups\", \"small\")])\nretentionKpi = Card([TextContent(\"Retention\", \"small\"), TextContent(\"3,100\", \"large-heavy\"), TextContent(\"50% of activated\", \"small\")])\n\nfunnelCard = Card([CardHeader(\"Conversion funnel\", \"Users remaining at each stage\"), funnelChart], \"card\")\nfunnelChart = HorizontalBarChart(funnelLabels, [Series(\"Users\", funnelValues)], \"grouped\", \"Users\", \"Stage\")\n\nfunnelLabels = [\"Signup\", \"Activation\", \"Retention\"]\nfunnelValues = [10000, 6200, 3100]\n\ntableCard = Card([CardHeader(\"Stage detail\", \"Step conversion and drop-off\"), stageTable], \"card\")\nstageTable = Table([Col(\"Stage\", stageNames), Col(\"Users\", stageUsers, \"number\"), Col(\"Step conversion\", stepConv, \"number\")])\n\nstageNames = [\"Signup\", \"Activation\", \"Retention\"]\nstageUsers = [10000, 6200, 3100]\nstepConv = [100, 62, 50]\n\nAll referenced. Let me check each defined var is referenced:\n- header ✓ in root\n- kpiRow ✓\n- funnelCard ✓\n- tableCard ✓\n- signupKpi ✓ in kpiRow\n- activationKpi ✓\n- retentionKpi ✓\n- funnelChart ✓ in funnelCard\n- funnelLabels ✓ in funnelChart\n- funnelValues ✓ in funnelChart\n- stageTable ✓ in tableCard\n- stageNames ✓\n- stageUsers ✓\n- stepConv ✓\n\nGood. Let me verify Series usage: Series(category, values). Yes.\n\nLet me also check Card with variant \"card\" as second positional. Card(children, variant, direction, gap, align, justify, wrap). So Card([...], \"card\") works.\n\nStack kpiRow: Stack(children, direction, gap, align, justify, wrap). Stack([...], \"row\", \"m\", \"stretch\", null, null, true). That's children, direction=\"row\", gap=\"m\", align=\"stretch\", justify=null, wrap=true. Good.\n\nLet me write it all out."
+  },
+  {
+   "id": "filter-bar",
+   "kind": "ui",
+   "prompt": "Create a filter bar for a report: date range, region and status.",
+   "ms": 5604,
+   "ttft": 1021,
+   "contentChars": 1416,
+   "reasoningChars": 3431,
+   "usage": {
+    "prompt_tokens": 7730,
+    "completion_tokens": 1161,
+    "total_tokens": 8891,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 811
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 12
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's a filter bar for",
+    "sentences": 3
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 2,
+    "worstShingle": "a filter bar for a",
+    "sentences": 41
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 320,
+   "startsWithRoot": false,
+   "content": "Here's a filter bar for your report with date range, region, and status controls:\n\n```openui-lang\nroot = Stack([filterCard])\nfilterCard = Card([cardHeader, filterForm])\ncardHeader = CardHeader(\"Report Filters\", \"Narrow down the data shown in your report\")\nfilterForm = Form(\"reportFilters\", filterButtons, [dateField, regionField, statusField])\ndateField = FormControl(\"Date Range\", DatePicker(\"dateRange\", \"range\"), \"Select a start and end date\")\nregionField = FormControl(\"Region\", Select(\"region\", regionItems, \"All regions\"))\nstatusField = FormControl(\"Status\", Chips(\"status\", \"multiple\", statusItems), \"Select one or more statuses\")\nfilterButtons = Buttons([applyBtn, resetBtn])\napplyBtn = Button(\"Apply Filters\", @ToAssistant(\"Apply the report filters for the selected date range, region, and status\"), \"primary\")\nresetBtn = Button(\"Reset\", @ToAssistant(\"Reset all report filters to their defaults\"), \"secondary\")\nregionItems = [SelectItem(\"na\", \"North America\"), SelectItem(\"emea\", \"EMEA\"), SelectItem(\"apac\", \"APAC\"), SelectItem(\"latam\", \"Latin America\")]\nstatusItems = [ChipItem(\"open\", \"Open\"), ChipItem(\"in_progress\", \"In Progress\"), ChipItem(\"closed\", \"Closed\")]\n```\n\nThis gives you a card with three filter fields — a date range picker, a region dropdown, and multi-select status chips — plus Apply and Reset buttons. Want me to add more filters (e.g. owner, priority) or wire it to a data table below?",
+   "reasoning": "The user wants a filter bar for a report: date range, region and status. I should create an openui-lang UI with a Form containing these filters.\n\nLet me build a filter bar with:\n- Date range DatePicker (mode \"range\")\n- Region Select\n- Status Select or Chips\n- Buttons to apply/reset\n\nLet me structure it with references for good streaming.\n\nRoot first, then components, then leaf data.\n\nLet me create:\n\nroot = Stack([card])\ncard = Card([header, form])\nheader = CardHeader(\"Filters\", \"Refine your report\")\n\nFor the form, I need Form(name, buttons, fields). Fields are FormControl references.\n\nLet me make field references:\n- dateField = FormControl(\"Date Range\", DatePicker(\"dateRange\", \"range\"))\n- regionField = FormControl(\"Region\", Select(\"region\", [regionItems], \"All regions\"))\n- statusField = FormControl(\"Status\", Chips(\"status\", \"multiple\", [statusItems]))\n\nWait, but these are form fields. Actually let me think about layout. A filter bar is typically horizontal. But Form fields are vertical. Let me use a row Stack inside the card with the fields... but Form needs to wrap them. Actually the Form signature is Form(name, buttons, fields). Fields are FormControl[]. The form lays out fields.\n\nActually, maybe better to not use Form and just lay out a row of inputs? But inputs need a form typically. Let me use Form with fields.\n\nActually the requirement: \"Create a filter bar for a report: date range, region and status.\" A filter bar. I'll use a Form with three fields and Apply/Reset buttons.\n\nLet me put fields in a row via Stack? The Form's fields argument is FormControl[]. I can't easily put them in a row inside Form since fields is just an array. Hmm. But actually the layout of form fields is determined by the renderer. Let me just use a Form.\n\nAlternatively, I can build a custom filter bar using a Card with a row Stack containing individual FormControl-like inputs... but inputs aren't FormControls by themselves; they're inside FormControl.\n\nLet me keep it clean with a Form. Actually, to make it a \"bar\", I could put the three FormControls and buttons. Let me just do a Form.\n\nLet me define SelectItems and ChipItems.\n\nregionItems = [SelectItem(\"na\", \"North America\"), SelectItem(\"emea\", \"EMEA\"), SelectItem(\"apac\", \"APAC\"), SelectItem(\"latam\", \"Latin America\")]\n\nstatusItems = [ChipItem(\"open\", \"Open\"), ChipItem(\"in_progress\", \"In Progress\"), ChipItem(\"closed\", \"Closed\")]\n\nFor status, use Chips multiple.\n\nFields:\ndateField = FormControl(\"Date Range\", DatePicker(\"dateRange\", \"range\"))\nregionField = FormControl(\"Region\", Select(\"region\", regionItems, \"All regions\"))\nstatusField = FormControl(\"Status\", Chips(\"status\", \"multiple\", statusItems))\n\nbuttons = Buttons([applyBtn, resetBtn])\n\napplyBtn = Button(\"Apply Filters\", @ToAssistant(\"Apply filters...\"), \"primary\")\nresetBtn = Button(\"Reset\", @ToAssistant(\"Reset filters\"), \"secondary\")\n\nform = Form(\"reportFilters\", buttons, [dateField, regionField, statusField])\n\nNow every variable must be referenced. Let me make sure regionItems, statusItems, dateField, regionField, statusField, buttons, applyBtn, resetBtn, form, header, card all referenced.\n\nOrder for streaming: root first, then card, header, form, then fields, then items, then buttons.\n\nLet me write it.\n\nActually, maybe I should make the filter bar more horizontal-looking. But Form is vertical. I think a Form is the right component for filters. Let me go with it.\n\nLet me write the code."
+  },
+  {
+   "id": "overview-cards",
+   "kind": "ui",
+   "prompt": "Show an overview card set with four metrics and their week-over-week change.",
+   "ms": 5560,
+   "ttft": 980,
+   "contentChars": 1558,
+   "reasoningChars": 2914,
+   "usage": {
+    "prompt_tokens": 7730,
+    "completion_tokens": 1271,
+    "total_tokens": 9001,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 808
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 16
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 3,
+    "worstShingle": "last week\", {direction: \"up\", value:",
+    "sentences": 7
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 2,
+    "worstShingle": "an overview card set with",
+    "sentences": 44
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 178,
+   "startsWithRoot": false,
+   "content": "```openui-lang\nroot = Stack([header, kpiBlock, footer], \"column\", \"l\")\nheader = CardHeader(\"Key Metrics\", \"Week-over-week performance\")\nkpiBlock = OverviewCardBlock([revenueCard, usersCard, convCard, aovCard], \"grid\", true, null, \"m\")\nrevenueCard = OverviewCardItem(\"revenue\", revenueTop, revenueMetric)\nrevenueTop = IconText(Icon(\"dollar-sign\"), \"success\", \"sm\", \"Revenue\", \"This week\")\nrevenueMetric = MetricIndicatorInline(\"$48,290\", \"vs. $42,960 last week\", {direction: \"up\", value: 12.4})\nusersCard = OverviewCardItem(\"users\", usersTop, usersMetric)\nusersTop = IconText(Icon(\"users\"), \"info\", \"sm\", \"Active Users\", \"This week\")\nusersMetric = MetricIndicatorInline(\"12,847\", \"vs. 12,329 last week\", {direction: \"up\", value: 4.2})\nconvCard = OverviewCardItem(\"conversion\", convTop, convMetric)\nconvTop = IconText(Icon(\"percent\"), \"warning\", \"sm\", \"Conversion Rate\", \"This week\")\nconvMetric = MetricIndicatorInline(\"3.8%\", \"vs. 4.4% last week\", {direction: \"down\", value: 13.6})\naovCard = OverviewCardItem(\"aov\", aovTop, aovMetric)\naovTop = IconText(Icon(\"shopping-cart\"), \"neutral\", \"sm\", \"Avg. Order Value\", \"This week\")\naovMetric = MetricIndicatorInline(\"$86.40\", \"vs. $84.62 last week\", {direction: \"up\", value: 2.1})\nfooter = TextCallout(\"info\", \"3 of 4 metrics up\", \"Revenue, active users and order value all improved week over week; conversion rate slipped 13.6%.\")\n```\n\nFour KPI cards with icon headers, current values, and week-over-week trend indicators (green up / red down). Conversion rate is the only decliner, flagged in the summary callout.",
+   "reasoning": "The user wants an overview card set with four metrics and their week-over-week change. Use OverviewCardBlock with OverviewCardItem top IconText and bottom MetricIndicatorInline with trend.\n\nLet me build it.\n\nroot = Stack([header, kpis], \"column\", \"l\")\n\nEach item: OverviewCardItem with id, top = IconText(icon, iconVariant, iconSize, title, subtitle), bottom = MetricIndicatorInline(value, subtext, trend).\n\nFour metrics: Revenue, Active Users, Conversion Rate, Avg Order Value.\n\nValues and trends: Revenue $48,290 up 12.4%; Active Users 12,847 up 4.2%; Conversion Rate 3.8% down 0.6%; Avg Order Value $86.40 up 2.1%.\n\nMetricIndicatorInline(value, subtext?, trend?) — value string, subtext, trend {direction, value}.\n\nLet me write references for each item.\n\nroot = Stack([header, kpiBlock], \"column\", \"l\")\nheader = CardHeader(\"Key Metrics\", \"Week-over-week performance\")\nkpiBlock = OverviewCardBlock([revenueCard, usersCard, convCard, aovCard], \"grid\", true, null, \"m\")\n\nWait OverviewCardBlock(items, layout?, responsive?, action?, gap?). gap can be number | string. Pass \"m\".\n\nActually maybe pass just items and layout. I'll pass layout \"grid\", responsive true.\n\nEach card:\nrevenueCard = OverviewCardItem(\"revenue\", revenueTop, revenueMetric)\nrevenueTop = IconText(Icon(\"dollar-sign\"), \"success\", \"sm\", \"Revenue\", \"This week\")\nrevenueMetric = MetricIndicatorInline(\"$48,290\", \"vs. $42,960 last week\", {direction: \"up\", value: 12.4})\n\nIcon signature: Icon(name, category?). So Icon(\"dollar-sign\").\n\nIconText(icon, iconVariant?, iconSize?, title, subtitle?, bold?, layout?). Positional: IconText(Icon(\"dollar-sign\"), \"success\", \"sm\", \"Revenue\", \"This week\").\n\nUsers: Icon(\"users\"), \"info\", \"sm\", \"Active Users\", \"This week\"; MetricIndicatorInline(\"12,847\", \"vs. 12,329 last week\", {direction:\"up\", value:4.2})\n\nConversion: Icon(\"percent\"), \"warning\", \"sm\", \"Conversion Rate\", \"This week\"; MetricIndicatorInline(\"3.8%\", \"vs. 4.4% last week\", {direction:\"down\", value:0.6}) — trend value should be percentage number, maybe 13.6? Hmm. The trend value is a percent change. For conversion 3.8 vs 4.4 → down 13.6%. Let me use 13.6.\n\nActually for revenue 48,290 vs 42,960 → +12.4% correct. Users 12,847 vs 12,329 → +4.2% correct. AOV $86.40 vs $84.62 → +2.1%. Conversion 3.8 vs 4.4 → -13.6%.\n\nGood.\n\nAdd a Callout or TextContent footer? Keep it clean. Maybe add a TagBlock? Not needed. Maybe add a summary card below? The request: \"Show an overview card set with four metrics and their week-over-week change.\" Just the card set. I'll add a small InlineHeader or CardHeader. Keep it.\n\nMaybe wrap in Card? OverviewCardBlock inside a Card might be fine but it's a block itself. I'll put a CardHeader above in a Stack.\n\nLet me write it.\n\nEnsure every variable referenced. root references header and kpiBlock. kpiBlock references four cards. Each card references top and metric. Good.\n\nLine order: root first, then definitions."
+  },
+  {
+   "id": "tabs-charts",
+   "kind": "ui",
+   "prompt": "Compare a bar chart and a line chart for the same data, in tabs.",
+   "ms": 2044,
+   "ttft": 1033,
+   "contentChars": 820,
+   "reasoningChars": 211,
+   "usage": {
+    "prompt_tokens": 7731,
+    "completion_tokens": 292,
+    "total_tokens": 8023,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 50
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 11
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "```openui-lang root = Stack([header, chartCard],",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user wants a comparison",
+    "sentences": 3
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 158,
+   "startsWithRoot": false,
+   "content": "```openui-lang\nroot = Stack([header, chartCard], \"column\", \"l\")\nheader = CardHeader(\"Chart Comparison\", \"The same dataset shown as a bar chart and a line chart\")\nchartCard = Card([chartTabs], null, \"column\", \"m\")\nchartTabs = Tabs([barTab, lineTab])\nbarTab = TabItem(\"bar\", \"Bar Chart\", [barChart])\nlineTab = TabItem(\"line\", \"Line Chart\", [lineChart])\nbarChart = BarChart(labels, [revenueSeries], \"grouped\", \"Month\", \"Revenue ($k)\")\nlineChart = LineChart(labels, [revenueSeries], \"natural\", \"Month\", \"Revenue ($k)\")\nrevenueSeries = Series(\"Revenue\", revenueValues)\nlabels = [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"]\nrevenueValues = [12, 19, 14, 25, 22, 30]\n```\n\nBoth tabs render the exact same `labels` and `revenueSeries`, so you can compare how the identical data reads as discrete bars versus a continuous trend line.",
+   "reasoning": "The user wants a comparison of a bar chart and a line chart for the same data, in tabs. Let me create a dashboard with Tabs containing a bar chart tab and a line chart tab, using the same data.\n\nLet me build it."
+  },
+  {
+   "id": "invoice",
+   "kind": "ui",
+   "prompt": "Show an invoice with line items and a total.",
+   "ms": 8782,
+   "ttft": 1318,
+   "contentChars": 2512,
+   "reasoningChars": 4446,
+   "usage": {
+    "prompt_tokens": 7725,
+    "completion_tokens": 2014,
+    "total_tokens": 9739,
+    "prompt_tokens_details": {
+     "cached_tokens": 7040
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 1251
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 24
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's an invoice with itemized",
+    "sentences": 3
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 2,
+    "worstShingle": "Card([totalsList], \"sunk\", \"column\", \"none\", \"end\")",
+    "sentences": 35
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 63,
+   "startsWithRoot": false,
+   "content": "Here's an invoice with itemized line items and a running total:\n\n```openui-lang\nroot = Stack([invoiceCard, footerNote], \"column\", \"m\", \"center\")\n\ninvoiceCard = Card([invoiceHeader, Separator(\"horizontal\", true), metaRow, lineItemsTable, totalsRow, actionButtons], \"card\", \"column\", \"l\")\n\ninvoiceHeader = Stack([titleStack, statusTag], \"row\", \"m\", \"start\", \"between\")\ntitleStack = Stack([invoiceTitle, invoiceSubtitle], \"column\", \"none\")\ninvoiceTitle = TextContent(\"# Invoice INV-2043\", \"large-heavy\")\ninvoiceSubtitle = TextContent(\"Acme Design Studio · Issued Jan 01, 2025\", \"small\")\nstatusTag = Tag(\"Paid\", null, \"md\", \"success\")\n\nmetaRow = Stack([billToCard, invoiceMetaCard], \"row\", \"l\", \"start\", \"start\", true)\nbillToCard = Card([InlineHeader(\"Bill To\"), billToList], \"sunk\")\nbillToList = EntityList([{left: \"Client\", right: \"Northwind Traders\"}, {left: \"Contact\", right: \"jane@northwind.com\"}, {left: \"Address\", right: \"42 Harbor St, Seattle, WA\"}], \"small\")\ninvoiceMetaCard = Card([InlineHeader(\"Invoice Details\"), invoiceMetaList], \"sunk\")\ninvoiceMetaList = EntityList([{left: \"Issue Date\", right: \"Jan 01, 2025\"}, {left: \"Due Date\", right: \"Jan 31, 2025\"}, {left: \"Terms\", right: \"Net 30\"}], \"small\")\n\nlineItemsTable = Card([InlineHeader(\"Line Items\", \"Services rendered for the Q1 brand refresh\"), itemsTable], \"clear\")\nitemsTable = Table([descriptionCol, qtyCol, unitCol, amountCol])\ndescriptionCol = Col(\"Description\", [\"Brand Strategy Workshop\", \"Logo & Mark Design\", \"Website UI Kit (2 screens)\", \"Design System Handoff\"])\nqtyCol = Col(\"Qty\", [1, 1, 2, 1], \"number\")\nunitCol = Col(\"Unit Price\", [\"$2,400.00\", \"$1,800.00\", \"$950.00\", \"$1,200.00\"], \"number\")\namountCol = Col(\"Amount\", [\"$2,400.00\", \"$1,800.00\", \"$1,900.00\", \"$1,200.00\"], \"number\")\n\ntotalsRow = Card([totalsList], \"sunk\", \"column\", \"none\", \"end\")\ntotalsList = EntityList([{left: \"Subtotal\", right: \"$7,300.00\", rightVariant: \"number\"}, {left: \"Discount\", right: \"-$200.00\", rightVariant: \"number\"}, {left: \"Tax (8.5%)\", right: \"$620.50\", rightVariant: \"number\"}], \"default\", null, {left: \"Total Due\", right: \"$7,720.50\", rightVariant: \"number\"})\n\nactionButtons = Buttons([downloadBtn, reminderBtn], \"row\")\ndownloadBtn = Button(\"Download PDF\", @ToAssistant(\"Download invoice INV-2043 as a PDF\"), \"primary\")\nreminderBtn = Button(\"Send Reminder\", @ToAssistant(\"Send a payment reminder for invoice INV-2043\"), \"secondary\")\n\nfooterNote = TextContent(\"Thank you for your business! Questions? Reach us at billing@acmedesign.co\", \"small\")\n```",
+   "reasoning": "The user wants an invoice with line items and a total. I need to produce openui-lang code.\n\nLet me build a nice invoice:\n- CardHeader with invoice title/subtitle\n- EntityList for invoice meta (invoice number, date, due date, bill to)\n- Table with line items (Description, Qty, Unit Price, Amount)\n- EntityList for totals (Subtotal, Tax, Total)\n- Maybe a Callout for payment status\n\nLet me start with root = Stack.\n\nI'll use Table with columns. Line items data - I can use Col with literal arrays.\n\nLet me define:\n```\nroot = Stack([invoiceCard], \"column\", \"l\")\ninvoiceCard = Card([header, metaSection, lineItemsTable, totalsSection, actionsRow])\n```\n\nTable: Table([Col(\"Description\", [...]), Col(\"Qty\", [...], \"number\"), Col(\"Unit Price\", [...], \"number\"), Col(\"Amount\", [...], \"number\")])\n\nLet me write it out.\n\nI'll keep it clean. Add a Callout success for \"Paid\" maybe, or just status tag.\n\nLet me build.\n\n```\nroot = Stack([invoiceCard, footerNote], \"column\", \"l\", \"center\")\n\ninvoiceCard = Card([invoiceHeader, Separator(\"horizontal\", true), metaRow, lineItemsTable, totalRows, actionButtons], \"card\", \"column\", \"l\")\n\ninvoiceHeader = Stack([titleStack, statusTag], \"row\", \"s\", \"start\", \"between\")\ntitleStack = Stack([CardHeader(\"Invoice #INV-2043\", \"Acme Design Studio · Due Jan 31, 2025\")], \"column\", \"none\")\nstatusTag = Tag(\"Paid\", null, \"md\", \"success\")\n\nmetaRow = Stack([billToCard, invoiceMetaCard], \"row\", \"l\", \"stretch\", \"start\", true)\n```\n\nHmm, metaRow children cards. Let me make EntityLists.\n\n```\nbillToCard = Card([InlineHeader(\"Bill To\"), billToList], \"sunk\")\nbillToList = EntityList([{left: \"Client\", right: \"Northwind Traders\"}, {left: \"Contact\", right: \"jane@northwind.com\"}, {left: \"Address\", right: \"42 Harbor St, Seattle, WA\"}], \"small\")\n\ninvoiceMetaCard = Card([InlineHeader(\"Invoice Details\"), invoiceMetaList], \"sunk\")\ninvoiceMetaList = EntityList([{left: \"Issue Date\", right: \"Jan 01, 2025\"}, {left: \"Due Date\", right: \"Jan 31, 2025\"}, {left: \"Terms\", right: \"Net 30\"}], \"small\")\n```\n\nLine items table:\n```\nlineItemsTable = Card([InlineHeader(\"Line Items\"), itemsTable], \"clear\")\nitemsTable = Table([descriptionCol, qtyCol, unitCol, amountCol])\ndescriptionCol = Col(\"Description\", [\"Brand Strategy Workshop\", \"Logo Design\", \"Website UI Kit\", \"Design System Handoff\"])\nqtyCol = Col(\"Qty\", [1, 1, 2, 1], \"number\")\nunitCol = Col(\"Unit Price\", [\"$2,400.00\", \"$1,800.00\", \"$950.00\", \"$1,200.00\"], \"number\")\namountCol = Col(\"Amount\", [\"$2,400.00\", \"$1,800.00\", \"$1,900.00\", \"$1,200.00\"], \"number\")\n```\n\nTotals:\n```\ntotalRows = Card([totalsList], \"sunk\", \"column\", \"none\", \"end\")\ntotalsList = EntityList([\n  {left: \"Subtotal\", right: \"$7,300.00\", rightVariant: \"number\"},\n  {left: \"Tax (8.5%)\", right: \"$620.50\", rightVariant: \"number\"},\n  {left: \"Discount\", right: \"-$200.00\", rightVariant: \"number\"}\n], \"default\", null, {left: \"Total Due\", right: \"$7,720.50\", rightVariant: \"number\"})\n```\n\nWait header is optional, footer is the third arg. Signature: EntityList(rows?, size?, header?, footer?). So footer is 4th arg. I'll pass null for header and the footer as 4th.\n\nActually to show total prominently maybe use a separate TextContent large-heavy. But footer works.\n\nLet me add action buttons: Button \"Download PDF\", \"Send Reminder\".\n\nAction buttons - I'll use Buttons with Buttons() group.\n\n```\nactionButtons = Buttons([downloadBtn, reminderBtn], \"row\")\ndownloadBtn = Button(\"Download PDF\", @ToAssistant(\"Download invoice INV-2043 as PDF\"), \"primary\")\nreminderBtn = Button(\"Send Reminder\", @ToAssistant(\"Send a payment reminder for INV-2043\"), \"secondary\")\n```\n\nWait Button signature: Button(label, action?, variant?, type?, size?). Good.\n\nBut target - Buttons are inside Card. Card children can include Buttons. Good.\n\nLet me verify Total: subtotal 7300 + tax 620.5 - 200 = 7720.5. Good.\n\nNow check all references reachable. Let me finalize ordering with root first.\n\nLet me make sure Card variant args: Card(children, variant, direction, gap, align, justify, wrap). For totalRows Card([totalsList], \"sunk\", \"column\", \"none\", \"end\") — align \"end\". That aligns... hmm align affects cross axis. For column direction, align affects horizontal. \"end\" would push to right. Fine.\n\nLet me assemble final code.\n\nfooterNote = TextContent(\"Thank you for your business!\", \"small\")\n\nActually root has footerNote referenced. Good.\n\nLet me double check EntityList rows object format: {left, right, rightVariant}. Good.\n\nLet me write final."
+  },
+  {
+   "id": "timeline",
+   "kind": "ui",
+   "prompt": "Show a timeline of the last five releases.",
+   "ms": 4438,
+   "ttft": 1834,
+   "contentChars": 915,
+   "reasoningChars": 1308,
+   "usage": {
+    "prompt_tokens": 7724,
+    "completion_tokens": 584,
+    "total_tokens": 8308,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 310
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 9
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "```openui-lang root = Stack([header, timelineCard])",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 2,
+    "worstShingle": "a timeline. Let me use",
+    "sentences": 22
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 102,
+   "startsWithRoot": false,
+   "content": "```openui-lang\nroot = Stack([header, timelineCard])\nheader = CardHeader(\"Release Timeline\", \"The last five releases\")\ntimelineCard = Card([steps], \"sunk\")\nsteps = Steps([rel5, rel4, rel3, rel2, rel1])\nrel5 = StepsItem(\"v2.8.0 · May 12, 2025\", \"Introduced real-time collaboration, redesigned the dashboard, and cut initial load time by 40%.\")\nrel4 = StepsItem(\"v2.7.0 · Apr 3, 2025\", \"Added dark mode, keyboard shortcuts, and a new export-to-PDF option.\")\nrel3 = StepsItem(\"v2.6.0 · Feb 18, 2025\", \"Shipped the new analytics charts, improved search relevance, and fixed 32 bugs.\")\nrel2 = StepsItem(\"v2.5.0 · Jan 7, 2025\", \"Launched mobile layouts, offline drafts, and a refreshed onboarding flow.\")\nrel1 = StepsItem(\"v2.4.0 · Nov 21, 2024\", \"Performance overhaul, SSO support, and expanded API rate limits.\")\n```\n\nHere's a timeline of your last five releases, ordered from newest to oldest using a step-based layout.",
+   "reasoning": "The user wants a timeline of the last five releases. I should create a UI showing a timeline. Let me use Steps component for a timeline, or ListBlock. A timeline of releases — Steps with title and details makes sense, or ListBlock with dates.\n\nLet me create a nice release timeline. I'll use Steps or ListBlock. Steps is good for a timeline with title and details.\n\nLet me think about what data. Since no specific data given, I'll make up plausible release data.\n\nLet me build:\n- root = Stack with a Card containing InlineHeader and Steps\n- Each StepsItem has title (version + date) and details\n\nActually Steps might be best for a timeline. Let me use Steps.\n\nLet me define references for each release.\n\nI'll make it look good.\n\nroot = Stack([header, timelineCard])\nheader = CardHeader(\"Release Timeline\", \"Last five releases\")\ntimelineCard = Card([InlineHeader(\"Recent Releases\", \"A look at what shipped in the last five versions\"), steps], \"sunk\")\nsteps = Steps([rel1, rel2, rel3, rel4, rel5])\nrel1 = StepsItem(\"v2.8.0 — May 12\", \"...\")\netc.\n\nLet me write details.\n\nActually, let me make the timeline richer with tags maybe. But Steps is clean. Let me go with Steps inside a card.\n\nLet me order most recent first or oldest first? Timeline usually chronological. I'll go most recent first.\n\nLet me write it."
+  },
+  {
+   "id": "chart-table",
+   "kind": "ui",
+   "prompt": "Show the same monthly numbers twice: once as a bar chart, once as a table.",
+   "ms": 3647,
+   "ttft": 1211,
+   "contentChars": 836,
+   "reasoningChars": 1604,
+   "usage": {
+    "prompt_tokens": 7733,
+    "completion_tokens": 634,
+    "total_tokens": 8367,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 398
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 8
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "Here's the same monthly data",
+    "sentences": 2
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user wants to show",
+    "sentences": 26
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 288,
+   "startsWithRoot": false,
+   "content": "Here's the same monthly data shown both as a bar chart and as a table:\n\n```openui-lang\nroot = Stack([header, barCard, tableCard], \"column\", \"l\")\nheader = InlineHeader(\"Monthly Revenue\", \"The same numbers shown twice — once as a bar chart, once as a table.\")\nbarCard = Card([CardHeader(\"Bar Chart\"), barChart])\nbarChart = BarChart(months, [Series(\"Revenue\", revenue)], \"grouped\", \"Month\", \"Revenue ($k)\")\ntableCard = Card([CardHeader(\"Table\"), table])\ntable = Table([Col(\"Month\", months), Col(\"Revenue\", revenue, \"number\")])\nmonths = [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"]\nrevenue = [120, 150, 130, 170, 190, 210]\n```\n\nThis renders a bar chart and a table side-by-side from the same `months` and `revenue` arrays, so both stay in sync. If you'd like different numbers or a different metric, just let me know and I'll update the data.",
+   "reasoning": "The user wants to show monthly numbers twice: once as a bar chart, once as a table. I need to create openui-lang code with sample monthly data.\n\nLet me create a dashboard with monthly data (e.g., months and some values). I'll show a bar chart and a table with the same data.\n\nLet me structure:\n- root = Stack with two cards or a Stack containing a bar chart card and a table card.\n\nI need monthly numbers. Let me create data inline. Since data arrays need to be plucked, I'll define months and values.\n\nLet me create:\n```\nroot = Stack([header, barCard, tableCard], \"column\", \"l\")\nheader = InlineHeader(\"Monthly Numbers\", \"The same data shown as a chart and a table.\")\nbarCard = Card([CardHeader(\"Bar Chart\"), barChart])\nbarChart = BarChart(months, [Series(\"Revenue\", revenue)], \"grouped\", \"Month\", \"Revenue\")\ntableCard = Card([CardHeader(\"Table\"), table])\ntable = Table([Col(\"Month\", months), Col(\"Revenue\", revenue, \"number\")])\nmonths = [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"]\nrevenue = [120, 150, 130, 170, 190, 210]\n```\n\nWait — Col data needs an array. months is a string array, revenue is number array. That works.\n\nBarChart(labels: string[], series: Series[], ...). labels = months. Series(\"Revenue\", revenue). Good.\n\nLet me verify everything is referenced. root references header, barCard, tableCard. header defined. barCard references CardHeader and barChart. barChart references months and revenue. tableCard references table. table references months, revenue. All good.\n\nLet me make it look nice. I'll present values in thousands maybe. Let me just keep simple numbers.\n\nI'll output the code."
+  },
+  {
+   "id": "no-such-component",
+   "kind": "ui",
+   "prompt": "Show a map of our offices with pins on a world map.",
+   "ms": 12744,
+   "ttft": 1433,
+   "contentChars": 2808,
+   "reasoningChars": 7347,
+   "usage": {
+    "prompt_tokens": 7728,
+    "completion_tokens": 2968,
+    "total_tokens": 10696,
+    "prompt_tokens_details": {
+     "cached_tokens": 7552
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 2045
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 29
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "There's no dedicated map component",
+    "sentences": 4
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 2,
+    "worstShingle": "root = Stack([header, mapCard, kpiRow,",
+    "sentences": 70
+   },
+   "fenced": true,
+   "hasFence": false,
+   "proseChars": 414,
+   "startsWithRoot": false,
+   "content": "There's no dedicated map component available, so I've approximated a world map using a lat/long scatter plot (longitude on x, latitude on y), grouped by region — plus a full office table and a headcount breakdown.\n\n```openui-lang\nroot = Stack([header, mapCard, kpiRow, tableCard, regionCard], \"column\", \"l\")\n\nheader = Card([title, subtitle], \"clear\", \"column\", \"xs\")\ntitle = TextContent(\"Global Offices\", \"large-heavy\")\nsubtitle = TextContent(\"8 locations across 3 regions — 1,395 employees worldwide\", \"small\")\n\nmapCard = Card([mapHeader, mapChart, mapNote], null, \"column\", \"m\")\nmapHeader = CardHeader(\"Office map\", \"Each pin is plotted by longitude (x) and latitude (y)\")\nmapChart = ScatterChart([americasSeries, emeaSeries, apacSeries], \"Longitude\", \"Latitude\")\namericasSeries = ScatterSeries(\"Americas\", americasPoints)\nemeaSeries = ScatterSeries(\"EMEA\", emeaPoints)\napacSeries = ScatterSeries(\"APAC\", apacPoints)\namericasPoints = [Point(-122.42, 37.77), Point(-74.01, 40.71)]\nemeaPoints = [Point(-0.13, 51.51), Point(13.40, 52.52)]\napacPoints = [Point(77.59, 12.97), Point(103.82, 1.35), Point(139.69, 35.68), Point(151.21, -33.87)]\nmapNote = TextContent(\"Hover a pin to inspect it. Exact coordinates for every office are listed in the table below.\", \"small\")\n\nkpiRow = Stack([kpiTotal, kpiRegions, kpiLargest], \"row\", \"m\")\nkpiTotal = Card([TextContent(\"Total employees\", \"small\"), TextContent(\"1,395\", \"large-heavy\")])\nkpiRegions = Card([TextContent(\"Regions\", \"small\"), TextContent(\"3\", \"large-heavy\")])\nkpiLargest = Card([TextContent(\"Largest office\", \"small\"), TextContent(\"San Francisco · 320\", \"large-heavy\")])\n\ntableCard = Card([tableHeader, officeTable], null, \"column\", \"m\")\ntableHeader = CardHeader(\"All offices\", \"Ordered west to east\")\nofficeTable = Table([cityCol, regionCol, coordsCol, staffCol, tzCol])\ncityCol = Col(\"City\", [\"San Francisco\", \"New York\", \"London\", \"Berlin\", \"Bangalore\", \"Singapore\", \"Tokyo\", \"Sydney\"])\nregionCol = Col(\"Region\", [\"Americas\", \"Americas\", \"EMEA\", \"EMEA\", \"APAC\", \"APAC\", \"APAC\", \"APAC\"])\ncoordsCol = Col(\"Coordinates\", [\"37.77°N 122.42°W\", \"40.71°N 74.01°W\", \"51.51°N 0.13°W\", \"52.52°N 13.40°E\", \"12.97°N 77.59°E\", \"1.35°N 103.82°E\", \"35.68°N 139.69°E\", \"33.87°S 151.21°E\"])\nstaffCol = Col(\"Employees\", [320, 210, 180, 120, 260, 140, 95, 70], \"number\")\ntzCol = Col(\"Timezone\", [\"UTC−8\", \"UTC−5\", \"UTC±0\", \"UTC+1\", \"UTC+5:30\", \"UTC+8\", \"UTC+9\", \"UTC+11\"])\n\nregionCard = Card([regionHeader, regionChart], null, \"column\", \"m\")\nregionHeader = CardHeader(\"Headcount by region\")\nregionChart = PieChart([\"Americas\", \"EMEA\", \"APAC\"], [530, 300, 565], \"donut\")\n```\n\nThe scatter plot groups pins into three region-colored series (Americas, EMEA, APAC). If you'd like, I can swap in real map tiles via an image-based layout, or filter the table and chart by region.",
+   "reasoning": "The user wants a map of offices with pins on a world map. There's no map component in the available signatures. I need to work with what's available. I could show an office list with locations, maybe using a table or list of offices with coordinates, tags, entity lists, and maybe I could use a chart? A scatter chart could represent lat/long coordinates as a \"map-like\" scatter plot! That's a nice approach — ScatterChart with x = longitude, y = latitude, points labeled per office.\n\nLet me build:\n- Header\n- A \"world map\" approximation using ScatterChart with longitude/latitude of offices as a proxy, with tooltips? Points only have x, y, z. Names could be in the dataset name but each dataset is one series with points... Actually each ScatterSeries has a name, so one series per office with a single point would allow legend showing office names. Hmm, that gives many series with one point each — that actually shows office names. Might be reasonable.\n\nThen a table/list of offices with city, country, coordinates, timezone, headcount.\n\nLet me create office data. Since there's no query/data source, I need to define data inline. I'll define arrays.\n\nLet's define offices:\n- San Francisco, US: lat 37.77, lon -122.42, 320 staff\n- New York, US: 40.71, -74.01, 210\n- London, UK: 51.51, -0.13, 180\n- Berlin, Germany: 52.52, 13.40, 120\n- Bangalore, India: 12.97, 77.59, 260\n- Singapore: 1.35, 103.82, 140\n- Tokyo, Japan: 35.68, 139.69, 95\n- Sydney, Australia: -33.87, 151.21, 70\n\nNow building openui-lang. Data as arrays?\n\nI can define labels = [\"San Francisco\", ...] and lat/lon arrays. Scatter points need Point(x, y).\n\nI'll define points via @Each? Hmm, @Each(data.rows, \"item\", ...) — I can use @Each on an array of objects? The patterns shown use data.rows. I could define offices = [{name:..., lat:..., lon:...}, ...] and then use @Each(offices, \"o\", Point(o.lon, o.lat)). That's plausible. But it's risky. Alternatively define points explicitly with Point calls.\n\nLet me be safe and create two scatter series: \"Offices\" with all points. But then no labels. Actually to label, use one series per office:\n\nScatterChart([ScatterSeries(\"San Francisco\", [Point(-122.42, 37.77)])], \"Longitude\", \"Latitude\")\n\nThat's clean. Define each as a reference.\n\nAlternatively group by region: Americas, EMEA, APAC — three series with colored points. That gives region grouping which is nice. Points within a series aren't individually labeled, but the table below lists them.\n\nI'll do 3 series by region, plus a table with all offices, plus EntityList of regional headcount, plus maybe a PieChart of headcount by region.\n\nLet me define:\n\nroot = Stack([header, mapCard, kpiRow, tableCard, detailsCard], \"column\", \"l\")\n\nmapCard = Card([CardHeader(\"Global offices\", \"Pin locations plotted as latitude/longitude on a scatter map\")], ...) — Card takes children array only for content.\n\nLet me write:\n\nroot = Stack([pageHeader, mapCard, statsRow, officesCard], \"column\", \"l\")\n\npageHeader = Stack([title, subtitle], \"column\", \"xs\")\n\nActually simpler: CardHeader inside a Card? CardHeader is allowed inside Card children. Let's do:\n\ntitleBlock = CardHeader(\"Global Offices\", \"8 offices across 3 regions · 1,395 employees\")\n\nHmm, CardHeader can be used in root Stack? The root is Stack which accepts children of any type presumably. I'll wrap in Card for style.\n\nLet me write statements:\n\nroot = Stack([header, mapCard, kpiRow, tableCard, regionCard], \"column\", \"l\")\n\nheader = Card([title, subtitle], \"clear\", \"column\", \"xs\")\ntitle = TextContent(\"Global Offices\", \"large-heavy\")\nsubtitle = TextContent(\"8 locations across 3 regions — 1,395 employees worldwide\", \"small\")\n\nmapCard = Card([mapHeader, mapChart, mapNote], null, \"column\", \"m\")\nmapHeader = CardHeader(\"Office map\", \"Pins plotted by longitude (x) and latitude (y)\")\nmapChart = ScatterChart([americasSeries, emeaSeries, apacSeries], \"Longitude\", \"Latitude\")\namericasSeries = ScatterSeries(\"Americas\", americasPoints)\n... points arrays.\n\namericasPoints = [Point(-122.42, 37.77), Point(-74.01, 40.71)]\nemeaPoints = [Point(-0.13, 51.51), Point(13.40, 52.52)]\napacPoints = [Point(77.59, 12.97), Point(103.82, 1.35), Point(139.69, 35.68), Point(151.21, -33.87)]\n\nmapNote = TextContent(\"Tip: hover points in the scatter plot. Exact coordinates are listed in the table below.\", \"small\")\n\nkpiRow = Stack([kpiTotal, kpiRegions, kpiLargest], \"row\", \"m\") — Cards flex in row.\n\nkpiTotal = Card([TextContent(\"Total employees\", \"small\"), TextContent(\"1,395\", \"large-heavy\")])\nkpiRegions = Card([TextContent(\"Regions\", \"small\"), TextContent(\"3\", \"large-heavy\")])\nkpiLargest = Card([TextContent(\"Largest office\", \"small\"), TextContent(\"San Francisco · 320\", \"large-heavy\")])\n\nShould I use null for variant in Card? Card(children, variant?, ...). Passing \"card\" is fine too. I'll pass null to be neutral — the instructions say pass null for variant when using direction. Fine.\n\ntableCard = Card([tableHeader, officeTable], null, \"column\", \"m\")\ntableHeader = CardHeader(\"All offices\", \"Sorted west to east\")\nofficeTable = Table([cityCol, regionCol, coordsCol, staffCol, tzCol])\n\nCol(label, data, type?)\n\ncityCol = Col(\"City\", [\"San Francisco\", \"New York\", \"London\", \"Berlin\", \"Bangalore\", \"Singapore\", \"Tokyo\", \"Sydney\"])\nregionCol = Col(\"Region\", [@Each?]) — simpler: array of strings: [\"Americas\", \"Americas\", \"EMEA\", \"EMEA\", \"APAC\", \"APAC\", \"APAC\", \"APAC\"]\ncoordsCol = Col(\"Coordinates\", [\"37.77°N, 122.42°W\", ...], \"string\")\nstaffCol = Col(\"Employees\", [320, 210, 180, 120, 260, 140, 95, 70], \"number\")\ntzCol = Col(\"Timezone\", [...], \"string\")\n\nWait Table is column-oriented, and Col data arrays. Unrelated? Everything referenced properly.\n\nThen regionCard with PieChart of employees by region:\nregionCard = Card([regionHeader, regionChart], null, \"column\", \"m\")\nregionHeader = CardHeader(\"Headcount by region\")\nregionChart = PieChart([\"Americas\", \"EMEA\", \"APAC\"], [530, 300, 565], \"donut\")\n\nCheck total: 320+210=530; 180+120=300; 260+140+95+70=565. Total = 1395. ✓\n\nMaybe also EntityList of offices — but table covers it. I'll keep the pie card, maybe alongside.\n\nAlso add hover-ish? Fine.\n\nVerify every defined variable is referenced:\n- root ✓ (entry)\n- header referenced in root ✓\n- mapCard ✓\n- kpiRow ✓\n- tableCard ✓\n- regionCard ✓\n- title, subtitle in header ✓\n- mapHeader, mapChart, mapNote in mapCard ✓\n- americasSeries, emeaSeries, apacSeries in mapChart ✓\n- americasPoints, emeaPoints, apacPoints ✓\n- kpiTotal, kpiRegions, kpiLargest ✓\n- tableHeader, officeTable ✓\n- cityCol, regionCol, coordsCol, staffCol, tzCol ✓\n- regionHeader, regionChart ✓\n\nShould the KPIs be Cards inside a row Stack — Cards flex to share space in row layouts ✓.\n\nOne concern: ScatterChart points z optional. Fine.\n\nAlso maybe a Callout info about the map being a coordinate plot. The mapNote TextContent covers it.\n\nAlso, the user might want an actual map image. I could add ImageBlock with a static map image URL — but must be a real URL. Risky. Skip; mention in chat text. Actually inline mode: I can add explanatory text around the code. I'll add a brief note that there's no native map component, so I used a lat/long scatter plus table.\n\nLet me write final code.\n\nCard signature: Card(children, variant?, direction?, gap?, align?, justify?, wrap?). For header Card: Card([title, subtitle], \"clear\", \"column\", \"xs\").\n\nWrite it out."
+  },
+  {
+   "id": "math",
+   "kind": "text",
+   "prompt": "What is 2 + 2?",
+   "ms": 1256,
+   "ttft": 984,
+   "contentChars": 10,
+   "reasoningChars": 91,
+   "usage": {
+    "prompt_tokens": 7723,
+    "completion_tokens": 36,
+    "total_tokens": 7759,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 27
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": false,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": false,
+    "statements": 0
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "2 + 2 = 4.",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user asks a question",
+    "sentences": 1
+   },
+   "fenced": false,
+   "hasFence": false,
+   "proseChars": 10,
+   "startsWithRoot": false,
+   "content": "2 + 2 = 4.",
+   "reasoning": "The user asks a question \"What is 2 + 2?\" — this is a question, respond text-only, no code."
+  },
+  {
+   "id": "haiku",
+   "kind": "text",
+   "prompt": "Write a haiku about rain.",
+   "ms": 3814,
+   "ttft": 1247,
+   "contentChars": 408,
+   "reasoningChars": 1566,
+   "usage": {
+    "prompt_tokens": 7722,
+    "completion_tokens": 553,
+    "total_tokens": 8275,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 419
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 7
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([haikuCard], \"column\", \"l\",",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user asks for a",
+    "sentences": 27
+   },
+   "fenced": false,
+   "hasFence": false,
+   "proseChars": 408,
+   "startsWithRoot": true,
+   "content": "root = Stack([haikuCard], \"column\", \"l\", \"center\")\nhaikuCard = Card([haikuHeader, line1, line2, line3, haikuTag], null, \"column\", \"s\", \"center\")\nhaikuHeader = CardHeader(\"Rain\", \"A haiku in 5–7–5\")\nline1 = TextContent(\"Silver threads descend\", \"large\")\nline2 = TextContent(\"whispering on quiet leaves\", \"large\")\nline3 = TextContent(\"earth drinks deeply now\", \"large\")\nhaikuTag = TagBlock([\"5 · 7 · 5\"], \"sm\")",
+   "reasoning": "The user asks for a haiku about rain. This is a creative text request. But I'm in inline mode and must respond using openui-lang... Hmm. The system says \"Your ENTIRE response must be valid openui-lang code\". But inline mode allows text. However the instruction at top says entire response must be openui-lang code — no markdown, no explanations.\n\nBut inline mode says wrap code in fences and can include explanatory text. Conflict. The safest: produce openui-lang that displays the haiku nicely.\n\nLet me create a nice card with the haiku.\n\nHaiku about rain:\n\nSilver threads fall down\nwhispering on quiet leaves\nearth drinks deeply now\n\nLet me build:\n\nroot = Stack([card])\ncard = Card([header, verse1, verse2, verse3], null, \"column\", \"s\")\nheader = CardHeader(\"Haiku: Rain\")\nverse1 = TextContent(\"Silver threads descend\", \"large\")\n...\n\nMaybe add a tag \"5-7-5\". Keep it simple.\n\nLet me count syllables:\n\"Sil-ver threads des-cend\" = 5 ✓\n\"whis-per-ing on qui-et leaves\" = 5? whis-per-ing(3) on(1) qui-et(2) leaves(1) = 7 ✓\n\"earth drinks deep-ly now\" = 5 ✓\n\nGood.\n\nRoot must be first line.\n\nUse Stack with gap \"l\", align center maybe.\n\nI'll add Tag for \"5-7-5 syllables\" — Tag needs to be inside Card children? Tag is a data display component, allowed in Card children. Yes Tag is in the allowed list for Card children? The list includes TagBlock but Tag... Card children list: TextContent | MarkDownRenderer | CardHeader | Callout | TextCallout | CodeBlock | Image | ... | TagBlock | Form | ... Tag isn't listed. TagBlock is. So use TagBlock([\"5-7-5\"]).\n\nLet's write it."
+  },
+  {
+   "id": "who",
+   "kind": "text",
+   "prompt": "Who are you?",
+   "ms": 3252,
+   "ttft": 2212,
+   "contentChars": 871,
+   "reasoningChars": 106,
+   "usage": {
+    "prompt_tokens": 7719,
+    "completion_tokens": 231,
+    "total_tokens": 7950,
+    "prompt_tokens_details": {
+     "cached_tokens": 7680
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 26
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": false,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": false,
+    "statements": 0
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "I'm an AI assistant that",
+    "sentences": 5
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "The user is asking a",
+    "sentences": 2
+   },
+   "fenced": false,
+   "hasFence": false,
+   "proseChars": 871,
+   "startsWithRoot": false,
+   "content": "I'm an AI assistant that builds interactive user interfaces. I respond using openui-lang, a declarative UI language — so instead of just describing things, I can create dashboards, tables, charts, forms, cards, and more that you can interact with.\n\nHere's roughly how it works:\n- **You ask for something** — a dashboard, a comparison table, a form, a data view — and I generate openui-lang code that renders live in your workspace.\n- **You ask a question** — like this one — and I reply in plain text without touching your existing UI.\n\nA few things I can do:\n- Build layouts with cards, stacks, tabs, and accordions\n- Show data in tables, editable tables, and lists\n- Visualize numbers with bar, line, area, pie, radar, and scatter charts\n- Create forms with inputs, selects, sliders, and validation\n- Wire up buttons to actions\n\nWhat would you like to build or explore?",
+   "reasoning": "The user is asking a question — \"Who are you?\" This is a text-only response. I should not output any code."
+  }
+ ]
+}

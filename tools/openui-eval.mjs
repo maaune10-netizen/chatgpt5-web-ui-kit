@@ -76,7 +76,16 @@ const FIX_RULES = [
   '`Text` and `BoldText` take variant FIRST: Text(variant?, value, subtext?, ...). Write Text("text", "Sell well") or Text("number", "1,284"). The value is never the first argument.',
 ];
 const USE_FIX = argv.includes('--fix-rules');
-const SYSTEM_PROMPT = openuiLibrary.prompt(USE_FIX ? { additionalRules: FIX_RULES } : undefined);
+/**
+ * `inlineMode` يعلّم النموذج أن يجيب **نثرًا** ثم يضع الواجهة في سياج كود.
+ * وهو ما يحلّ مشكلة «كل جواب صار واجهة»: النثر يبقى ماركداون في الخيط،
+ * والواجهة تصير «قطعة» تُعرض جانبًا — كما تفعل ChatGPT في Artifacts.
+ */
+const USE_INLINE = argv.includes('--inline');
+const SYSTEM_PROMPT = openuiLibrary.prompt({
+  ...(USE_FIX ? { additionalRules: FIX_RULES } : {}),
+  ...(USE_INLINE ? { inlineMode: true } : {}),
+});
 const PARSER = createParser(openuiLibrary.toJSONSchema(), openuiLibrary.root);
 
 /**
@@ -199,10 +208,15 @@ async function call(prompt) {
   const ms = Date.now() - started;
 
   /* الحكم: محلّل المكتبة، لا رأيي */
+  /* في inlineMode يُحكم على السياج لا على النصّ كلّه */
+  const fence = /```[\w-]*\n([\s\S]*?)```/.exec(content);
+  const judged = USE_INLINE && fence ? fence[1] : content;
+  const prose = USE_INLINE ? content.replace(/```[\s\S]*?```/g, '').trim() : '';
+
   let parsed = { ok: false, codes: [], messages: [], unresolved: 0, orphaned: 0, incomplete: null, hasRoot: false, statements: 0 };
-  if (content.trim()) {
+  if (judged.trim()) {
     try {
-      const r = PARSER.parse(content);
+      const r = PARSER.parse(judged);
       const codes = r.meta.errors.map((e) => e.code);
       parsed = {
         ok: r.root !== null && !r.meta.incomplete && codes.length === 0 && r.meta.unresolved.length === 0 && r.meta.orphaned.length === 0,
@@ -212,7 +226,7 @@ async function call(prompt) {
         orphaned: r.meta.orphaned.length,
         incomplete: !!r.meta.incomplete,
         hasRoot: r.root !== null,
-        statements: (content.match(/^[A-Za-z_$][\w$]*\s*=/gm) || []).length,
+        statements: (judged.match(/^[A-Za-z_$][\w$]*\s*=/gm) || []).length,
       };
     } catch (e) {
       parsed = { ...parsed, codes: ['parse-exception'], messages: [String(e.message).slice(0, 160)] };
@@ -237,7 +251,9 @@ async function call(prompt) {
     rep,
     reasoningRep,
     fenced: /```/.test(content),
-    startsWithRoot: /^\s*root\s*=/.test(content),
+    hasFence: !!fence,
+    proseChars: prose.length,
+    startsWithRoot: /^\s*root\s*=/.test(judged),
     content,
     reasoning,
   };
@@ -270,7 +286,7 @@ if (ANALYZE) {
 
 /* ————— التشغيل ————— */
 console.log(`\nنموذج: ${MODEL} · جهد التفكير: ${EFFORT} · max_tokens: ${MAX_TOKENS}`);
-console.log(`نصّ التعليمات: ${SYSTEM_PROMPT.length} حرفًا (~${Math.round(SYSTEM_PROMPT.length / 4)} توكن)${USE_FIX ? ' · + قاعدتا الإصلاح' : ''}`);
+console.log(`نصّ التعليمات: ${SYSTEM_PROMPT.length} حرفًا (~${Math.round(SYSTEM_PROMPT.length / 4)} توكن)${USE_FIX ? ' · + قاعدتا الإصلاح' : ''}${USE_INLINE ? ' · + inlineMode' : ''}`);
 console.log(`طلبات: ${PROMPTS.length} · تزامن: ${CONCURRENCY}\n`);
 
 const results = [];
@@ -320,7 +336,7 @@ console.log(`  حلقة متتالية     ${loops.length}${loops.length ? ' →
 console.log(`  مقطوع (length)   ${truncated.length}${truncated.length ? ' → ' + truncated.map((r) => r.id).join(', ') : ''}`);
 console.log(`  بطيء >15s        ${slow.length}${slow.length ? ' → ' + slow.map((r) => `${r.id}(${Math.round(r.ms / 1000)}s)`).join(', ') : ''}`);
 console.log(`  يبدأ بـroot=      ${results.filter((r) => r.startsWithRoot).length}/${results.length}`);
-console.log(`  فيه سياج كود      ${results.filter((r) => r.fenced).length}`);
+console.log(`  فيه سياج كود      ${results.filter((r) => r.fenced).length}${USE_INLINE ? ` (سياج قابل للقراءة: ${results.filter((r) => r.hasFence).length}, متوسّط النثر ${Math.round(results.reduce((n, r) => n + (r.proseChars || 0), 0) / results.length)} حرفًا)` : ''}`);
 console.log(`  تفكير/إخراج      ${thinkAll.toLocaleString()} / ${outAll.toLocaleString()} توكنًا`);
 if (Object.keys(codeCounts).length) {
   console.log('\n  أكواد الأخطاء:');

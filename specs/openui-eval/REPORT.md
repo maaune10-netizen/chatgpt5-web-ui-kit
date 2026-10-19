@@ -31,6 +31,7 @@ node tools/openui-eval.mjs --analyze specs/openui-eval/run-*.json
 | 3 | off | yes | **22/27** | 3.4s | 0 |
 | 4 | auto | yes | **27/27** | 6.5s | 22,006 |
 | 5 | auto | yes | **26/27** | 7.3s | 29,670 |
+| 6 | auto | yes + `inlineMode` | **24/27 render a block, 2/27 correctly prose-only, 1/27 broken** | 6.6s | 26,136 |
 
 Two things fall out of this:
 
@@ -73,19 +74,39 @@ With those, the remaining failures change character — they are no longer argum
 order but structural: one unresolved reference, one invented `@function`, three
 orphaned statements, and one incomplete program. Different problem, much smaller.
 
-## Every answer becomes an interface
+## Every answer becomes an interface — unless you turn on `inlineMode`
 
-All three non-UI prompts came back as OpenUI Lang:
+By default all three non-UI prompts came back as OpenUI Lang:
 
 - `What is 2 + 2?` → a `Card` with `TextContent("4", "large-heavy")` and an explanation line.
 - `Write a haiku about rain.` → three `TextContent` lines, a `Separator`, and a `5 · 7 · 5` note.
 - `Who are you?` → a `CardHeader`, an intro, and a `ListBlock` of capabilities.
 
 This is the prompt working as designed — *"Your ENTIRE response must be valid
-openui-lang code"* — and it is a product decision, not a bug. But it means
-OpenUI cannot be the only path: a chat app that renders every reply as a
-component tree is a different product from ChatGPT. It needs a switch, or a
-router, or a fence the model opts into.
+openui-lang code"* — and it is a product decision, not a bug. A chat app that
+renders every reply as a component tree is a different product from ChatGPT.
+
+**OpenUI has the escape hatch built in: `inlineMode`.** It teaches the model to
+answer in prose and put the interface in a fenced block. Measured on the same 27
+prompts, `auto` + rules + `inlineMode`:
+
+| | count |
+|---|---|
+| responses with a fenced UI block | 24/27 |
+| average prose before the block | 223 chars |
+| fenced block parses clean | 23/24 |
+| answered in prose only — and was right to | 2/27 (`What is 2 + 2?` → `2 + 2 = 4.`; `Who are you?` → an explanation) |
+| genuinely broken | 1/27 (`excess-args`: 7 positional arguments to `Stack`, which takes 6) |
+
+So **26 of 27 did the right thing**, and the model chose the right shape on its
+own — no router, no toggle. That is the Artifacts pattern: prose stays in the
+thread, the fenced block becomes a rendered panel beside it. The thread keeps its
+Markdown and its design; the interface gets its own surface.
+
+Re-scored from the stored responses with a corrected fence pattern — the first
+extractor used `[a-zA-Z]*` for the language tag and missed `openui-lang`, so it
+reported 0 readable fences on 24 responses that all had one. Same data, fixed
+extractor, not a fresh run.
 
 ## And the loop: not reproduced
 
@@ -123,12 +144,14 @@ and it is the one to build a guard on.
 
 ## Recommendation
 
-**Worth building, as a panel rather than as the reply.**
+**Worth building, as a panel beside the reply, with `inlineMode` on.**
 
-- 26–27/27 at 6–7s is good enough to ship, and the two prompt rules are the
-  whole cost of getting there.
-- Keep thinking on for this feature. It is the difference between 96% and 70%.
-- Do not put it in the chat thread — it would replace the design this project
-  exists to match, and every answer would become a component tree.
-- Do build the guard, on the consecutive metric, because the failure is cheap to
+- `inlineMode` + the two rules is the configuration: 24/27 render a UI block,
+  2/27 correctly answer in prose, 1/27 breaks. The model picks the shape itself.
+- Keep thinking on for this feature. It is the difference between 96% and 70%,
+  and it is what pays for the argument order.
+- Do not replace the thread's Markdown with a component tree. Prose stays prose;
+  the fenced block gets a panel — which is also what ChatGPT does with Artifacts,
+  so the design parity this project is built on survives.
+- Do build the loop guard, on the consecutive metric. The failure is cheap to
   detect and expensive to show.
