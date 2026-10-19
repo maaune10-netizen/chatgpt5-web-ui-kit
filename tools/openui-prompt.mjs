@@ -4,8 +4,8 @@
  *
  * والسبب الوزن: `openuiLibrary.prompt()` يحتاج `@openuidev/react-ui` — نحو
  * ٢ ميجابايت — لإنتاج **نصّ**. فلا يجوز أن يدفعها من يريد محادثة عاديّة.
- * فيُولَّد مرّة عند البناء إلى `src/generated/openui-prompt.txt` (٢٩ كيلوبايت)،
- * ويُستورد بـ`?raw`. فالمكتبة الثقيلة لا تُحمَّل إلا حين تظهر واجهة فعلًا.
+ * ويُولَّد إلى `public/openui-prompt.txt` ويُجلب **وقت الحاجة** — لا يُستورد
+ * في الحزمة. فحتى النصّ (٣١ كيلوبايت) لا يصل من أطفأ الخيار.
  *
  * والقواعد هنا ليست رأيًا: كلّها مقيسة في `specs/openui-eval/REPORT.md`.
  *
@@ -37,7 +37,7 @@ const RULES = [
 
 const prompt = openuiLibrary.prompt({ preamble: PREAMBLE, additionalRules: RULES, inlineMode: true });
 
-const out = join(ROOT, 'src', 'generated', 'openui-prompt.txt');
+const out = join(ROOT, 'public', 'openui-prompt.txt');
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, prompt);
 

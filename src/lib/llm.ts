@@ -7,7 +7,6 @@
  */
 
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_PARAMS } from './prompt';
-import GENUI_PROMPT from '../generated/openui-prompt.txt?raw';
 
 export interface Config {
   baseUrl: string;
@@ -137,6 +136,24 @@ export function saveConfig(c: Config): void {
   }
 }
 
+/**
+ * نصّ تعليمات OpenUI — **يُجلب عند الحاجة، لا يُستورد**.
+ *
+ * كان `?raw` فيدخل الحزمة (٣١ كيلوبايت) ويُشحن إلى من أطفأ الخيار ولم
+ * يستعمله قطّ. والحزمة الرئيسية كانت ٣٢٢ كيلوبايت، فصارت ٣٧٩ — والفرق
+ * يدفعه كلّ مستخدم مقابل ميزة لا يراها.
+ *
+ * والجلب مرّة واحدة ويُحفظ في الذاكرة، فلا يتكرّر.
+ */
+let genuiPrompt: string | null = null;
+async function loadGenuiPrompt(): Promise<string> {
+  if (genuiPrompt !== null) return genuiPrompt;
+  const r = await fetch('/openui-prompt.txt');
+  if (!r.ok) throw new Error(`تعذّر جلب نصّ OpenUI (HTTP ${r.status})`);
+  genuiPrompt = await r.text();
+  return genuiPrompt;
+}
+
 /** مع الوسيط لا يلزم مفتاح في المتصفح — الخادم يحمله */
 export function isConfigured(c: Config): boolean {
   return Boolean(c.baseUrl && c.model);
@@ -172,6 +189,19 @@ export class ChatStream {
   ): Promise<void> {
     const url = `${config.baseUrl.replace(/\/$/, '')}/chat`;
 
+    /*
+     * النصّ يُجلب قبل الطلب — وإن فشل الجلب قلنا السبب بدل أن نرسل محادثة
+     * بلا تعليمات فيأتي الردّ نثرًا ويُظنّ أنّ OpenUI تعطّل.
+     */
+    let systemPrompt = config.systemPrompt;
+    if (config.genui) {
+      try {
+        systemPrompt = await loadGenuiPrompt();
+      } catch (e) {
+        return h.onError(new Error((e as Error).message));
+      }
+    }
+
     let res: Response;
     try {
       res = await fetch(url, {
@@ -185,9 +215,7 @@ export class ChatStream {
            * تعليمات النظام تُقدَّم أولًا — وهذا ما كان غائبًا كليًا.
            * و`messages` المرسلة لا تحتوي رسائل system، فلا تكرار.
            */
-          messages: (config.genui ? GENUI_PROMPT : config.systemPrompt)?.trim()
-            ? [{ role: 'system', content: config.genui ? GENUI_PROMPT : config.systemPrompt }, ...messages]
-            : messages,
+          messages: systemPrompt?.trim() ? [{ role: 'system', content: systemPrompt }, ...messages] : messages,
           stream: true,
           stream_options: { include_usage: true },
           temperature: config.temperature,
