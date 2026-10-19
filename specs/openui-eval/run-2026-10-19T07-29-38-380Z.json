@@ -1,0 +1,1400 @@
+{
+ "at": "2026-10-19T07:30:05.439Z",
+ "model": "deepseek-v4.1-flash",
+ "effort": "off",
+ "maxTokens": 32768,
+ "systemPromptChars": 29265,
+ "results": [
+  {
+   "id": "sales-quarter",
+   "kind": "ui",
+   "prompt": "Show me quarterly sales for a coffee roastery in Riyadh.",
+   "ms": 4382,
+   "ttft": 1338,
+   "contentChars": 2762,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7480,
+    "completion_tokens": 865,
+    "total_tokens": 8345,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 28
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, kpiCard, chartCard,",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, kpiCard, chartCard, tableCard, notesCard], \"column\", \"l\")\n\nheader = CardHeader(\"Quarterly Sales — Riyadh Coffee Roastery\", \"2025 fiscal year · SAR thousands\")\n\nkpiCard = Card([kpiRow], \"sunk\")\nkpiRow = Stack([kpiQ1, kpiQ2, kpiQ3, kpiQ4, kpiTotal], \"row\", \"l\", \"stretch\", \"between\")\n\nkpiQ1 = Card([TextContent(\"Q1\", \"small\"), TextContent(\"SAR 412k\", \"large-heavy\"), TextContent(\"+6% QoQ\", \"small\")], \"clear\")\nkpiQ2 = Card([TextContent(\"Q2\", \"small\"), TextContent(\"SAR 486k\", \"large-heavy\"), TextContent(\"+18% QoQ\", \"small\")], \"clear\")\nkpiQ3 = Card([TextContent(\"Q3\", \"small\"), TextContent(\"SAR 531k\", \"large-heavy\"), TextContent(\"+9% QoQ\", \"small\")], \"clear\")\nkpiQ4 = Card([TextContent(\"Q4\", \"small\"), TextContent(\"SAR 604k\", \"large-heavy\"), TextContent(\"+14% QoQ\", \"small\")], \"clear\")\nkpiTotal = Card([TextContent(\"FY 2025\", \"small\"), TextContent(\"SAR 2,033k\", \"large-heavy\"), TextContent(\"+32% YoY\", \"small\")], \"clear\")\n\nchartCard = Card([InlineHeader(\"Sales by quarter\", \"Wholesale and retail combined, SAR thousands\"), chartTabs], \"card\")\n\nchartTabs = Tabs([\n  TabItem(\"bar\", \"Bar\", [barChart]),\n  TabItem(\"line\", \"Trend\", [lineChart]),\n  TabItem(\"mixed\", \"Channel mix\", [pieChart])\n])\n\nbarChart = BarChart(labels, [Series(\"Sales (SAR k)\", salesValues)], \"grouped\", \"Quarter\", \"SAR k\", 280)\nlineChart = LineChart(labels, [Series(\"Sales (SAR k)\", salesValues)], \"natural\", \"Quarter\", \"SAR k\", 280)\npieChart = PieChart([\"Q1\", \"Q2\", \"Q3\", \"Q4\"], salesValues, \"donut\")\n\nlabels = [\"Q1\", \"Q2\", \"Q3\", \"Q4\"]\nsalesValues = [412, 486, 531, 604]\n\ntableCard = Card([InlineHeader(\"Quarterly breakdown\", \"Retail cafés, online, and wholesale orders\"), tableStack], \"card\")\n\ntableStack = Stack([salesTable, sep, channelStack], \"column\", \"m\")\n\nsalesTable = Table([\n  Col(\"Quarter\", labels),\n  Col(\"Sales (SAR k)\", salesValues, \"number\")\n])\n\nsep = Separator(\"horizontal\", true)\n\nchannelStack = Stack([channelHeader, channelTable], \"column\", \"xs\")\nchannelHeader = InlineHeader(\"Channel breakdown, FY 2025\", \"Share of total revenue\")\nchannelTable = Table([\n  Col(\"Channel\", [\"Retail cafés\", \"Online subscriptions\", \"Wholesale (cafés & hotels)\", \"Events & catering\"]),\n  Col(\"Revenue (SAR k)\", [\"1,038\", \"467\", \"406\", \"122\"], \"number\"),\n  Col(\"Share\", [\"51%\", \"23%\", \"20%\", \"6%\"], \"number\")\n])\n\nnotesCard = Card([InlineHeader(\"Notes\", \"Key drivers behind the numbers\"), notesList], \"sunk\")\nnotesList = ListBlock([note1, note2, note3], \"number\")\n\nnote1 = ListItem(\"Q4 peak driven by holiday gift boxes\", \"Bundled subscriptions and seasonal single-origin blends\")\nnote2 = ListItem(\"Wholesale expansion in Riyadh\", \"12 new café and hotel accounts signed in H2\")\nnote3 = ListItem(\"Online subscriptions grew fastest\", \"Subscription revenue up 41% year over year\")",
+   "reasoning": ""
+  },
+  {
+   "id": "crm-compare",
+   "kind": "ui",
+   "prompt": "Compare three CRM tools in a table: HubSpot, Pipedrive and Attio.",
+   "ms": 3289,
+   "ttft": 1545,
+   "contentChars": 1338,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7484,
+    "completion_tokens": 391,
+    "total_tokens": 7875,
+    "prompt_tokens_details": {
+     "cached_tokens": 7296
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 11
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, comparisonCard, verdictCard],",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, comparisonCard, verdictCard], \"column\", \"l\")\nheader = CardHeader(\"CRM Comparison\", \"HubSpot vs Pipedrive vs Attio\")\ncomparisonCard = Card([comparisonTable], null, \"column\", \"m\")\ncomparisonTable = Table([featureCol, hubspotCol, pipedriveCol, attioCol])\nfeatureCol = Col(\"Feature\", [\"Best for\", \"Pricing (entry)\", \"Free tier\", \"Ease of setup\", \"Customization\", \"Automation\", \"Reporting\", \"Integrations\", \"Learning curve\"])\nhubspotCol = Col(\"HubSpot\", [\"All-in-one marketing & sales\", \"Free tier; paid from ~$20/user/mo\", \"Yes\", \"Easy (guided onboarding)\", \"High\", \"Strong\", \"Strong\", \"Very broad (1,500+)\", \"Low–medium\"], \"string\")\npipedriveCol = Col(\"Pipedrive\", [\"Sales pipeline management\", \"~$14/user/mo\", \"No (trial only)\", \"Very easy\", \"Moderate\", \"Good\", \"Moderate\", \"Broad (400+)\", \"Low\"], \"string\")\nattioCol = Col(\"Attio\", [\"Modern, data-driven CRM\", \"Free tier; paid from ~$29/user/mo\", \"Yes\", \"Easy (modern UI)\", \"Very high (flexible data model)\", \"Good\", \"Strong (real-time)\", \"Growing ecosystem\", \"Low–medium\"], \"string\")\nverdictCard = Card([verdictHeader, verdictTags], null, \"column\", \"m\")\nverdictHeader = CardHeader(\"Quick Verdict\", \"Pick based on your team's priority\")\nverdictTags = TagBlock([\"HubSpot: full-stack growth\", \"Pipedrive: simple sales pipelines\", \"Attio: flexible data-first CRM\"], \"md\")",
+   "reasoning": ""
+  },
+  {
+   "id": "newsletter-form",
+   "kind": "ui",
+   "prompt": "Build a signup form for a weekly newsletter.",
+   "ms": 3097,
+   "ttft": 1545,
+   "contentChars": 1568,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7476,
+    "completion_tokens": 403,
+    "total_tokens": 7879,
+    "prompt_tokens_details": {
+     "cached_tokens": 7296
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": false,
+    "codes": [],
+    "messages": [],
+    "unresolved": 1,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 23
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, formCard], \"column\",",
+    "sentences": 2
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, formCard], \"column\", \"l\")\n\nheader = CardHeader(\"Join the Weekly Digest\", \"One thoughtful email every Friday. No spam, unsubscribe anytime.\")\n\nformCard = Card([signupForm])\n\nsignupForm = Form(\"newsletter_signup\", submitButtons, [nameField, emailField, topicsField, frequencyField, consentField])\n\nnameField = FormControl(\"Name\", nameInput)\nnameInput = Input(\"name\", \"Your first name\", \"text\", {required: true, minLength: 2})\n\nemailField = FormControl(\"Email\", emailInput, \"We'll never share your address.\")\nemailInput = Input(\"email\", \"you@example.com\", \"email\", {required: true, email: true})\n\ntopicsField = FormControl(\"Topics you care about\", topicsChips)\ntopicsChips = Chips(\"topics\", \"multiple\", [techChip, designChip, businessChip, scienceChip])\ntechChip = ChipItem(\"tech\", \"Technology\")\ndesignChip = ChipItem(\"design\", \"Design\")\nbusinessChip = ChipItem(\"business\", \"Business\")\nscienceChip = ChipItem(\"science\", \"Science\")\n\nfrequencyField = FormControl(\"How often?\", frequencySelect)\nfrequencySelect = Select(\"frequency\", [weeklyItem, biweeklyItem, monthlyItem], \"Choose a frequency\", {required: true})\nweeklyItem = SelectItem(\"weekly\", \"Every week\")\nbiweeklyItem = SelectItem(\"biweekly\", \"Every two weeks\")\nmonthlyItem = SelectItem(\"monthly\", \"Once a month\")\n\nconsentField = FormControl(\"Permissions\", consentSwitch)\nconsentSwitch = CheckBoxGroup(\"consent\", [consentItem], {required: true})\nconsentItem = CheckBoxItem(\"I agree to receive the newsletter\", \"You can unsubscribe at any time.\", \"agree\")\n\nsubmitButtons = Buttons([subscribeBtn])",
+   "reasoning": ""
+  },
+  {
+   "id": "tickets-priority",
+   "kind": "ui",
+   "prompt": "Show my open support tickets grouped by priority.",
+   "ms": 4038,
+   "ttft": 1252,
+   "contentChars": 2952,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7475,
+    "completion_tokens": 887,
+    "total_tokens": 8362,
+    "prompt_tokens_details": {
+     "cached_tokens": 7296
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 15
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, summaryRow, prioritySection],",
+    "sentences": 4
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, summaryRow, prioritySection], \"column\", \"l\")\nheader = InlineHeader(\"Open Support Tickets\", \"All unresolved tickets grouped by priority\")\nsummaryRow = Stack([kpiTotal, kpiHigh, kpiMedium, kpiLow], \"row\", \"m\", \"stretch\")\nkpiTotal = Card([TextContent(\"Total Open\", \"small\"), TextContent(\"\" + tickets.total, \"large-heavy\")])\nkpiHigh = Card([TextContent(\"High Priority\", \"small\"), TextContent(\"\" + tickets.high, \"large-heavy\")])\nkpiMedium = Card([TextContent(\"Medium Priority\", \"small\"), TextContent(\"\" + tickets.medium, \"large-heavy\")])\nkpiLow = Card([TextContent(\"Low Priority\", \"small\"), TextContent(\"\" + tickets.low, \"large-heavy\")])\nprioritySection = Stack([highCard, mediumCard, lowCard], \"column\", \"l\")\nhighCard = Card([Stack([TextContent(\"🔴 High Priority\", \"large-heavy\"), Tag(\"\" + tickets.high, null, \"sm\", \"danger\")], \"row\", \"s\", \"center\"), highTable], \"card\", \"column\", \"m\")\nhighTable = tickets.high > 0 ? Table([Col(\"Ticket\", tickets.highRows.id), Col(\"Subject\", tickets.highRows.subject), Col(\"Assignee\", tickets.highRows.assignee), Col(\"Status\", tickets.highRows.status, \"string\")]) : TextContent(\"No high priority tickets — nice!\", \"small\")\nmediumCard = Card([Stack([TextContent(\"🟡 Medium Priority\", \"large-heavy\"), Tag(\"\" + tickets.medium, null, \"sm\", \"warning\")], \"row\", \"s\", \"center\"), mediumTable], \"card\", \"column\", \"m\")\nmediumTable = tickets.medium > 0 ? Table([Col(\"Ticket\", tickets.mediumRows.id), Col(\"Subject\", tickets.mediumRows.subject), Col(\"Assignee\", tickets.mediumRows.assignee), Col(\"Status\", tickets.mediumRows.status, \"string\")]) : TextContent(\"No medium priority tickets.\", \"small\")\nlowCard = Card([Stack([TextContent(\"🟢 Low Priority\", \"large-heavy\"), Tag(\"\" + tickets.low, null, \"sm\", \"neutral\")], \"row\", \"s\", \"center\"), lowTable], \"card\", \"column\", \"m\")\nlowTable = tickets.low > 0 ? Table([Col(\"Ticket\", tickets.lowRows.id), Col(\"Subject\", tickets.lowRows.subject), Col(\"Assignee\", tickets.lowRows.assignee), Col(\"Status\", tickets.lowRows.status, \"string\")]) : TextContent(\"No low priority tickets.\", \"small\")\ntickets = {total: 11, high: 3, medium: 5, low: 3, highRows: {id: [\"T-1042\", \"T-1058\", \"T-1071\"], subject: [\"Checkout fails for EU customers\", \"Data export times out\", \"Login loop on SSO\"], assignee: [\"Priya S.\", \"Marco D.\", \"Jon K.\"], status: [\"In progress\", \"Investigating\", \"Escalated\"]}, mediumRows: {id: [\"T-1031\", \"T-1047\", \"T-1052\", \"T-1063\", \"T-1075\"], subject: [\"Search results missing filters\", \"Billing page slow to load\", \"Avatar upload rejects PNG\", \"CSV import drops columns\", \"Mobile nav overlaps content\"], assignee: [\"Ana L.\", \"Priya S.\", \"Jon K.\", \"Marco D.\", \"Ana L.\"], status: [\"Waiting\", \"In progress\", \"Triage\", \"In progress\", \"Waiting\"]}, lowRows: {id: [\"T-1029\", \"T-1055\", \"T-1068\"], subject: [\"Typo in welcome email\", \"Dark mode contrast tweak\", \"Add tooltip to save icon\"], assignee: [\"Jon K.\", \"Ana L.\", \"Marco D.\"], status: [\"Backlog\", \"Backlog\", \"Triage\"]}}",
+   "reasoning": ""
+  },
+  {
+   "id": "saas-kpis",
+   "kind": "ui",
+   "prompt": "Give me a KPI dashboard for a SaaS product.",
+   "ms": 4275,
+   "ttft": 1771,
+   "contentChars": 2596,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7477,
+    "completion_tokens": 839,
+    "total_tokens": 8316,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 30
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 4,
+    "worstShingle": "null, \"sm\", \"success\")], null, \"column\",",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, kpiRow, divider, chartCard, metaRow], \"column\", \"l\")\n\nheader = Stack([titleBlock, tagBlock], \"row\", \"m\", \"start\", \"between\")\ntitleBlock = Stack([title, subtitle], \"column\", \"xs\")\ntitle = TextContent(\"SaaS KPI Dashboard\", \"large-heavy\")\nsubtitle = TextContent(\"Live snapshot of core product and revenue metrics\", \"small\")\ntagBlock = TagBlock([\"Dashboard\", \"SaaS\", \"Live\"], \"md\")\n\nkpiRow = Stack([kpiMrr, kpiArr, kpiChurn, kpiNps], \"row\", \"m\", \"stretch\", \"start\", true)\n\nkpiMrr = Card([TextContent(\"Monthly Recurring Revenue\", \"small\"), TextContent(\"$248,500\", \"large-heavy\"), Tag(\"+8.2% MoM\", null, \"sm\", \"success\")], null, \"column\", \"s\")\nkpiArr = Card([TextContent(\"Annual Run Rate\", \"small\"), TextContent(\"$2.98M\", \"large-heavy\"), Tag(\"+12.4% YoY\", null, \"sm\", \"success\")], null, \"column\", \"s\")\nkpiChurn = Card([TextContent(\"Monthly Churn Rate\", \"small\"), TextContent(\"2.1%\", \"large-heavy\"), Tag(\"-0.3 pts\", null, \"sm\", \"success\")], null, \"column\", \"s\")\nkpiNps = Card([TextContent(\"Net Promoter Score\", \"small\"), TextContent(\"48\", \"large-heavy\"), Tag(\"+5 pts\", null, \"sm\", \"success\")], null, \"column\", \"s\")\n\ndivider = Separator(\"horizontal\", true)\n\nchartCard = Card([chartHeader, chart], null, \"column\", \"m\")\nchartHeader = CardHeader(\"Growth Trend\", \"MRR and active accounts over the last six months\")\nchart = AreaChart(months, [Series(\"MRR ($K)\", mrrValues), Series(\"Active Accounts ($K)\", acctValues)], \"natural\", \"Month\", \"Value\", 260)\n\nmetaRow = Stack([planCard, channelCard], \"row\", \"m\", \"start\", \"start\", true)\n\nplanCard = Card([planHeader, planList], null, \"column\", \"s\")\nplanHeader = CardHeader(\"Revenue by Plan\", \"Split of MRR across subscription tiers\")\nplanList = EntityList(planRows, \"default\", planHead, planFoot)\n\nchannelCard = Card([channelHeader, channelChart], null, \"column\", \"s\")\nchannelHeader = CardHeader(\"Acquisition Channels\", \"New signups by source this month\")\nchannelChart = PieChart(channelLabels, channelValues, \"donut\")\n\nmonths = [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"]\nmrrValues = [198, 212, 221, 233, 241, 248]\nacctValues = [1.2, 1.35, 1.42, 1.55, 1.61, 1.7]\n\nplanHead = {left: \"Plan\", right: \"MRR\"}\nplanRows = [\n  {left: \"Starter\", right: \"$42,300\", rightVariant: \"number\"},\n  {left: \"Growth\", right: \"$88,100\", rightVariant: \"number\"},\n  {left: \"Pro\", right: \"$76,500\", rightVariant: \"number\"},\n  {left: \"Enterprise\", right: \"$41,600\", rightVariant: \"number\"}\n]\nplanFoot = {left: \"Total\", right: \"$248,500\", rightVariant: \"number\"}\n\nchannelLabels = [\"Organic\", \"Paid\", \"Referral\", \"Partner\", \"Direct\"]\nchannelValues = [38, 27, 15, 12, 8]",
+   "reasoning": ""
+  },
+  {
+   "id": "pricing-card",
+   "kind": "ui",
+   "prompt": "Show a product card for a subscription plan with pricing and a CTA.",
+   "ms": 2808,
+   "ttft": 1398,
+   "contentChars": 1162,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7481,
+    "completion_tokens": 320,
+    "total_tokens": 7801,
+    "prompt_tokens_details": {
+     "cached_tokens": 7296
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 15
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([planCard], \"column\", \"l\")",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([planCard], \"column\", \"l\")\n\nplanCard = CompositeCardBlock([planItem], \"grid\", true)\n\nplanItem = CompositeCardItem(\"pro-plan\", planHeader, planBody, planFooter)\n\nplanHeader = IconText(rocketIcon, \"info\", \"m\", \"Pro Plan\", \"For growing teams\", true)\n\nplanBody = [planMetric, planFeatures, planTags]\n\nplanMetric = MetricIndicatorInline(\"$49 / month\", \"billed annually\", {direction: \"down\", value: 10})\n\nplanFeatures = ListBlock([seatItem, apiItem, supportItem], \"number\", \"small\")\n\nseatItem = ListItem(\"Up to 10 team seats\", \"Add collaborators at no extra cost\", null, null, null)\n\napiItem = ListItem(\"Full API access\", \"10,000 requests per day included\", null, null, null)\n\nsupportItem = ListItem(\"Priority support\", \"Responses within 4 business hours\", null, null, null)\n\nplanTags = TagBlock([\"14-day free trial\", \"No credit card\", \"Cancel anytime\"], \"sm\")\n\nplanFooter = {price: planPrice, button: startTrialBtn}\n\nplanPrice = BoldText(\"number\", \"$588\", \"per year, save 10%\", \"metric\", \"lg\")\n\nstartTrialBtn = Button(\"Start free trial\", @ToAssistant(\"I want to start the Pro Plan free trial\"), \"primary\", \"normal\", \"medium\")\n\nrocketIcon = Icon(\"rocket\")",
+   "reasoning": ""
+  },
+  {
+   "id": "top-cities",
+   "kind": "ui",
+   "prompt": "List the top 5 cities by population with a bar chart.",
+   "ms": 1635,
+   "ttft": 987,
+   "contentChars": 499,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7479,
+    "completion_tokens": 152,
+    "total_tokens": 7631,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 6
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([headerCard, chartCard, tableCard],",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([headerCard, chartCard, tableCard], \"column\", \"l\")\nheaderCard = Card([CardHeader(\"Top 5 Cities by Population\", \"Ranked by latest available population figures\")])\nchartCard = Card([HorizontalBarChart(labels, [Series(\"Population (millions)\", values)], \"grouped\", \"Population (millions)\")])\ntableCard = Card([Table([Col(\"City\", labels), Col(\"Population (millions)\", values, \"number\")])])\nlabels = [\"Tokyo\", \"Delhi\", \"Shanghai\", \"Dhaka\", \"São Paulo\"]\nvalues = [37.4, 32.9, 29.2, 23.2, 22.6]",
+   "reasoning": ""
+  },
+  {
+   "id": "onboarding",
+   "kind": "ui",
+   "prompt": "Create an onboarding checklist for a new engineer.",
+   "ms": 4039,
+   "ttft": 1493,
+   "contentChars": 2629,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7475,
+    "completion_tokens": 682,
+    "total_tokens": 8157,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": false,
+    "codes": [
+     "unknown-function"
+    ],
+    "messages": [
+     "unknown-function/ToOpenUrl: Unknown function \"@ToOpenUrl\": not a built-in or action step. The call evaluates to null"
+    ],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 21
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, progressCard, checklistCard,",
+    "sentences": 2
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, progressCard, checklistCard, resourcesCard, footerNote], \"column\", \"l\")\n\nheader = CardHeader(\"New Engineer Onboarding\", \"Your first two weeks — work through this list at your own pace.\")\n\nprogressCard = Card([InlineHeader(\"Progress\", \"2 of 8 tasks complete\"), SingleStackedBarChart([\"Completed\", \"Remaining\"], [2, 6])], \"sunk\")\n\nchecklistCard = Card([InlineHeader(\"Checklist\", \"Tick items off as you go\"), checklist])\n\nchecklist = ListBlock([task1, task2, task3, task4, task5, task6, task7, task8], \"number\", \"default\")\n\ntask1 = ListItem(\"Set up your dev environment\", \"Clone the repo, install dependencies, and run the app locally.\", null, \"Guide\", @ToAssistant(\"Show me the dev environment setup guide\"))\ntask2 = ListItem(\"Get access to our tools\", \"GitHub, Slack, CI dashboard, and cloud console.\", null, \"Request access\", @ToAssistant(\"How do I request access to our tools?\"))\ntask3 = ListItem(\"Read the architecture overview\", \"Understand the main services and how they talk to each other.\", null, \"Open docs\", @ToAssistant(\"Summarize the architecture overview\"))\ntask4 = ListItem(\"Ship your first small change\", \"Pick a 'good first issue' and open a pull request.\", null, \"Find an issue\", @ToAssistant(\"Help me find a good first issue\"))\ntask5 = ListItem(\"Meet your onboarding buddy\", \"Book a 30-minute intro chat this week.\", null, \"Schedule\", @ToAssistant(\"Who is my onboarding buddy?\"))\ntask6 = ListItem(\"Attend a team standup\", \"Sit in on a daily sync and learn the rhythm.\", null, \"Add to calendar\", @ToAssistant(\"When is the team standup?\"))\ntask7 = ListItem(\"Review our coding standards\", \"Read the style guide and PR review checklist.\", null, \"Read guide\", @ToAssistant(\"Summarize the coding standards\"))\ntask8 = ListItem(\"Complete security training\", \"Finish the required compliance modules.\", null, \"Start training\", @ToOpenUrl(\"https://example.com/security-training\"))\n\nresourcesCard = Card([InlineHeader(\"Key resources\", \"Bookmark these for quick access\"), resources], null, \"column\", \"s\")\n\nresources = EntityList([rowRepo, rowSlack, rowWiki, rowOncall], \"default\", headerRow, null)\n\nheaderRow = {left: \"Resource\", right: \"Where\", rightVariant: \"text\"}\nrowRepo = {left: \"Code repository\", right: \"github.com/your-org\", rightVariant: \"text\"}\nrowSlack = {left: \"Team channel\", right: \"#eng-team\", rightVariant: \"text\"}\nrowWiki = {left: \"Engineering wiki\", right: \"wiki.internal\", rightVariant: \"text\"}\nrowOncall = {left: \"On-call runbook\", right: \"runbooks.oncall\", rightVariant: \"text\"}\n\nfooterNote = TextContent(\"Questions? Ask your onboarding buddy or drop a note in #eng-team.\", \"small\")",
+   "reasoning": ""
+  },
+  {
+   "id": "ad-spend",
+   "kind": "ui",
+   "prompt": "Show a scatter plot of ad spend versus conversions for two campaigns.",
+   "ms": 3501,
+   "ttft": 2514,
+   "contentChars": 827,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7479,
+    "completion_tokens": 252,
+    "total_tokens": 7731,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 8
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([headerCard, scatterCard, legendCard],",
+    "sentences": 2
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([headerCard, scatterCard, legendCard], \"column\", \"m\")\nheaderCard = Card([CardHeader(\"Ad Spend vs. Conversions\", \"Two campaigns compared across the last reporting window\")])\nscatterCard = Card([ScatterChart([seriesA, seriesB], \"Ad Spend ($)\", \"Conversions\")])\nseriesA = ScatterSeries(\"Campaign A — Search\", pointsA)\nseriesB = ScatterSeries(\"Campaign B — Social\", pointsB)\npointsA = [Point(120, 34), Point(180, 52), Point(240, 61), Point(310, 88), Point(390, 97), Point(450, 121), Point(520, 134)]\npointsB = [Point(100, 18), Point(160, 27), Point(210, 41), Point(270, 39), Point(330, 58), Point(400, 66), Point(480, 79)]\nlegendCard = Card([InlineHeader(\"What to look for\", \"Campaign A converts more efficiently: its points sit higher for the same spend, suggesting a steeper conversions-per-dollar curve.\")], \"sunk\")",
+   "reasoning": ""
+  },
+  {
+   "id": "deploy-failed",
+   "kind": "ui",
+   "prompt": "The deploy failed because of a missing environment variable. Tell the user, briefly.",
+   "ms": 1908,
+   "ttft": 1803,
+   "contentChars": 192,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7482,
+    "completion_tokens": 47,
+    "total_tokens": 7529,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 1
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 2,
+    "worstShingle": "\"Deploy failed\", \"A required environment",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": false,
+   "content": "Callout(\"error\", \"Deploy failed\", \"A required environment variable is missing.\")\nroot = Stack([Callout(\"error\", \"Deploy failed\", \"A required environment variable is missing.\")], \"column\", \"m\")",
+   "reasoning": ""
+  },
+  {
+   "id": "notif-settings",
+   "kind": "ui",
+   "prompt": "Make a settings form with notification toggles.",
+   "ms": 2708,
+   "ttft": 1420,
+   "contentChars": 1334,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7476,
+    "completion_tokens": 335,
+    "total_tokens": 7811,
+    "prompt_tokens_details": {
+     "cached_tokens": 7296
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 21
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, settingsCard], \"column\",",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, settingsCard], \"column\", \"l\")\nheader = CardHeader(\"Settings\", \"Manage how and when you hear from us\")\nsettingsCard = Card([notifForm])\nnotifForm = Form(\"notifications\", formButtons, [emailToggle, pushToggle, digestToggle, frequencyField])\nemailToggle = FormControl(\"Email notifications\", emailSwitch)\npushToggle = FormControl(\"Push notifications\", pushSwitch)\ndigestToggle = FormControl(\"Weekly digest\", digestSwitch)\nfrequencyField = FormControl(\"Digest frequency\", frequencySelect, \"How often we send your summary\")\nemailSwitch = SwitchGroup(\"channels\", [emailItem], \"clear\")\npushSwitch = SwitchGroup(\"channels\", [pushItem], \"clear\")\ndigestSwitch = SwitchGroup(\"channels\", [digestItem], \"clear\")\nemailItem = SwitchItem(\"Email\", \"Receive updates by email\", \"email\", true)\npushItem = SwitchItem(\"Push\", \"Alerts on your devices\", \"push\", true)\ndigestItem = SwitchItem(\"Weekly digest\", \"A roundup every Monday\", \"digest\", false)\nfrequencySelect = Select(\"frequency\", [freqDaily, freqWeekly, freqMonthly], \"Choose frequency\")\nfreqDaily = SelectItem(\"daily\", \"Daily\")\nfreqWeekly = SelectItem(\"weekly\", \"Weekly\")\nfreqMonthly = SelectItem(\"monthly\", \"Monthly\")\nformButtons = Buttons([saveButton, resetButton], \"row\")\nsaveButton = Button(\"Save changes\", null, \"primary\")\nresetButton = Button(\"Reset\", null, \"secondary\")",
+   "reasoning": ""
+  },
+  {
+   "id": "revenue-12m",
+   "kind": "ui",
+   "prompt": "Show revenue trend over 12 months as a line chart.",
+   "ms": 2665,
+   "ttft": 1387,
+   "contentChars": 1079,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7478,
+    "completion_tokens": 350,
+    "total_tokens": 7828,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": false,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 3,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 13
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([headerCard, chartCard, summaryCard],",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([headerCard, chartCard, summaryCard], \"column\", \"l\")\n\nheaderCard = Card([CardHeader(\"Revenue Trend\", \"Last 12 months, all products\")])\n\nchartCard = Card([revenueChart])\n\nrevenueChart = LineChart(months, [Series(\"Revenue\", revenue)], \"natural\", \"Month\", \"Revenue ($)\", 320)\n\nsummaryCard = Card([CardHeader(\"Summary\", \"Year over year\"), EntityList(summaryRows, \"default\", summaryHeader, summaryFooter)])\n\nmonths = [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\", \"Jul\", \"Aug\", \"Sep\", \"Oct\", \"Nov\", \"Dec\"]\nrevenue = [42000, 45500, 48200, 51000, 49500, 53800, 57200, 60100, 58900, 63400, 68200, 74100]\n\ntotalRevenue = 672000\npeakMonth = \"Dec\"\navgMonthly = 56000\n\nsummaryHeader = {left: \"Metric\", right: \"Value\"}\nsummaryRows = [{left: \"Total revenue\", right: \"$672,000\", rightVariant: \"number\"}, {left: \"Average per month\", right: \"$56,000\", rightVariant: \"number\"}, {left: \"Peak month\", right: \"Dec ($74,100)\", rightVariant: \"text\"}, {left: \"Growth (Jan to Dec)\", right: \"+76.4%\", rightVariant: \"number\"}]\nsummaryFooter = {left: \"Trend\", right: \"Upward\", rightVariant: \"text\"}",
+   "reasoning": ""
+  },
+  {
+   "id": "tier-compare",
+   "kind": "ui",
+   "prompt": "Compare our two pricing tiers in cards.",
+   "ms": 3875,
+   "ttft": 1281,
+   "contentChars": 2110,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7474,
+    "completion_tokens": 610,
+    "total_tokens": 8084,
+    "prompt_tokens_details": {
+     "cached_tokens": 7296
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 15
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 2,
+    "worstShingle": "/ user / month\", \"Billed",
+    "sentences": 4
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([headerCard, comparisonCard, verdictCard], \"column\", \"l\")\nheaderCard = Card([CardHeader(\"Pricing Tier Comparison\", \"Plus vs. Pro — side-by-side\"), TextContent(\"Both tiers include unlimited projects and core analytics. Pro unlocks advanced controls, higher limits, and priority support.\", \"default\")])\ncomparisonCard = Card([tiersRow], null, \"column\", \"l\")\ntiersRow = Stack([plusCard, proCard], \"row\", \"l\", \"stretch\")\nplusCard = Card([plusHeader, plusPrice, plusFeatureList, plusCta], \"card\", \"column\", \"m\")\nplusHeader = CardHeader(\"Plus\", \"For growing teams getting started\")\nplusPrice = Text(\"text\", \"**$29** / user / month\", \"Billed monthly · 15% off annually\", \"text\", \"lg\")\nplusFeatureList = EntityList([{left: \"Projects\", right: \"Unlimited\"}, {left: \"Team members\", right: \"Up to 25\"}, {left: \"Analytics\", right: \"Core dashboards\"}, {left: \"API access\", right: \"10k calls / mo\"}, {left: \"SSO / SAML\", right: \"—\"}, {left: \"Support\", right: \"Email, 24h\"}], \"default\", {left: \"Feature\", right: \"Plus\"})\nplusCta = Buttons([Button(\"Start with Plus\", @ToAssistant(\"Tell me more about the Plus tier\"), \"secondary\")])\nproCard = Card([proHeader, proPrice, proFeatureList, proCta], \"card\", \"column\", \"m\")\nproHeader = CardHeader(\"Pro\", \"For scaling organizations with compliance needs\")\nproPrice = Text(\"text\", \"**$79** / user / month\", \"Billed monthly · 15% off annually\", \"text\", \"lg\")\nproFeatureList = EntityList([{left: \"Projects\", right: \"Unlimited\"}, {left: \"Team members\", right: \"Unlimited\"}, {left: \"Analytics\", right: \"Advanced + custom\"}, {left: \"API access\", right: \"1M calls / mo\"}, {left: \"SSO / SAML\", right: \"Included\"}, {left: \"Support\", right: \"Priority, 1h\"}], \"default\", {left: \"Feature\", right: \"Pro\"})\nproCta = Buttons([Button(\"Choose Pro\", @ToAssistant(\"Tell me more about the Pro tier\"), \"primary\")])\nverdictCard = Card([TextContent(\"## Which one fits?\\n\\n**Choose Plus** if your team is under 25 people and you need core reporting without enterprise controls. **Choose Pro** when you need unlimited seats, SSO/SAML, high-volume API usage, or a 1-hour support SLA.\", \"default\")])",
+   "reasoning": ""
+  },
+  {
+   "id": "employees",
+   "kind": "ui",
+   "prompt": "Show a table of employees with name, role and start date.",
+   "ms": 1569,
+   "ttft": 983,
+   "contentChars": 498,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7479,
+    "completion_tokens": 153,
+    "total_tokens": 7632,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 6
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, employeeTable], \"column\",",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, employeeTable], \"column\", \"m\")\nheader = InlineHeader(\"Employees\", \"Team members with their role and start date.\")\nemployeeTable = Table([nameCol, roleCol, startCol])\nnameCol = Col(\"Name\", [\"Alice Johnson\", \"Brian Lee\", \"Carla Mendes\", \"David Kim\", \"Elena Petrova\"])\nroleCol = Col(\"Role\", [\"Product Manager\", \"Software Engineer\", \"UX Designer\", \"Data Analyst\", \"QA Engineer\"])\nstartCol = Col(\"Start Date\", [\"2019-03-11\", \"2021-07-05\", \"2020-01-20\", \"2022-09-13\", \"2018-11-27\"])",
+   "reasoning": ""
+  },
+  {
+   "id": "survey",
+   "kind": "ui",
+   "prompt": "Build a short survey with five rating questions.",
+   "ms": 2729,
+   "ttft": 1261,
+   "contentChars": 1516,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7475,
+    "completion_tokens": 438,
+    "total_tokens": 7913,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 23
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([surveyHeader, surveyCard, doneCallout],",
+    "sentences": 2
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([surveyHeader, surveyCard, doneCallout], \"column\", \"l\")\n\nsurveyHeader = CardHeader(\"Quick Product Feedback\", \"Five quick ratings — takes under a minute.\")\n\nsurveyCard = Form(\"ratingSurvey\", surveyButtons, [q1, q2, q3, q4, q5])\n\nq1 = FormControl(\"Overall satisfaction\", rating1, \"1 = very dissatisfied, 5 = very satisfied\")\nq2 = FormControl(\"Ease of use\", rating2, \"How easy was it to get started?\")\nq3 = FormControl(\"Features\", rating3, \"Do the features meet your needs?\")\nq4 = FormControl(\"Performance\", rating4, \"Speed and reliability of the product\")\nq5 = FormControl(\"Likelihood to recommend\", rating5, \"Would you suggest us to a colleague?\")\n\nrating1 = Chips(\"overall\", \"single\", ratingItems, null, \"4\")\nrating2 = Chips(\"ease\", \"single\", ratingItems, null, \"4\")\nrating3 = Chips(\"features\", \"single\", ratingItems, null, \"4\")\nrating4 = Chips(\"performance\", \"single\", ratingItems, null, \"4\")\nrating5 = Chips(\"recommend\", \"single\", ratingItems, null, \"4\")\n\nratingItems = [chip1, chip2, chip3, chip4, chip5]\nchip1 = ChipItem(\"1\", \"1\")\nchip2 = ChipItem(\"2\", \"2\")\nchip3 = ChipItem(\"3\", \"3\")\nchip4 = ChipItem(\"4\", \"4\")\nchip5 = ChipItem(\"5\", \"5\")\n\nsurveyButtons = Buttons([submitBtn, skipBtn])\nsubmitBtn = Button(\"Submit ratings\", Action([@Set($showThanks, true), @ToAssistant(\"Thanks! Analyze my survey ratings.\")]), \"primary\")\nskipBtn = Button(\"Cancel\", null, \"secondary\")\n\ndoneCallout = Callout(\"success\", \"Ratings submitted\", \"Thanks for your feedback — your responses have been recorded.\", $showThanks)",
+   "reasoning": ""
+  },
+  {
+   "id": "order-detail",
+   "kind": "ui",
+   "prompt": "Show an order detail view with line items, a subtotal and a total.",
+   "ms": 3324,
+   "ttft": 1223,
+   "contentChars": 1938,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7482,
+    "completion_tokens": 582,
+    "total_tokens": 8064,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 29
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([headerStack, itemsCard, totalsCard,",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([headerStack, itemsCard, totalsCard, actions], \"column\", \"l\")\n\nheaderStack = Stack([orderTitle, orderMeta], \"column\", \"xs\")\norderTitle = CardHeader(\"Order #10482\", \"Placed March 14, 2025 · 2 items\")\norderMeta = Stack([metaLeft, metaRight], \"row\", \"m\", \"center\", \"between\")\nmetaLeft = TagBlock([\"Paid\", \"Standard shipping\"], \"sm\")\nmetaRight = TextContent(\"Estimated delivery: Mar 18–20\", \"small\")\n\nitemsCard = Card([itemsHeader, itemsTable, Separator(\"horizontal\", true), shippingRow], \"card\", \"column\", \"m\")\nitemsHeader = InlineHeader(\"Line items\", \"Products in this order\")\nitemsTable = Table([colProduct, colQty, colUnit, colLine])\ncolProduct = Col(\"Product\", productNames, \"string\")\ncolQty = Col(\"Qty\", quantities, \"number\")\ncolUnit = Col(\"Unit price\", unitPrices, \"number\")\ncolLine = Col(\"Amount\", lineAmounts, \"number\")\n\nshippingRow = Stack([shippingLabel, shippingValue], \"row\", \"m\", \"center\", \"between\")\nshippingLabel = TextContent(\"Shipping\", \"small\")\nshippingValue = TextContent(\"$8.00\", \"small-heavy\")\n\ntotalsCard = Card([totalsHeader, totalsList], \"sunk\", \"column\", \"m\")\ntotalsHeader = InlineHeader(\"Order total\")\ntotalsList = EntityList(totalsRows, \"default\", totalsHeaderRow, totalsFooterRow)\n\nactions = Buttons([trackBtn, supportBtn], \"row\")\ntrackBtn = Button(\"Track package\", @ToAssistant(\"Where is my order 10482?\"), \"primary\")\nsupportBtn = Button(\"Contact support\", @ToAssistant(\"I need help with order 10482\"), \"secondary\")\n\nproductNames = [\"Aurora Desk Lamp\", \"Linen Throw Blanket\"]\nquantities = [1, 2]\nunitPrices = [129.0, 45.5]\nlineAmounts = [129.0, 91.0]\n\ntotalsRows = [\n  {left: \"Subtotal\", right: \"$220.00\", rightVariant: \"number\"},\n  {left: \"Shipping\", right: \"$8.00\", rightVariant: \"number\"},\n  {left: \"Tax\", right: \"$18.70\", rightVariant: \"number\"}\n]\ntotalsHeaderRow = {left: \"Summary\", right: \"USD\", rightVariant: \"text\"}\ntotalsFooterRow = {left: \"Total\", right: \"$246.70\", rightVariant: \"number\"}",
+   "reasoning": ""
+  },
+  {
+   "id": "funnel",
+   "kind": "ui",
+   "prompt": "Show a funnel of signup, activation and retention.",
+   "ms": 2564,
+   "ttft": 1299,
+   "contentChars": 1184,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7477,
+    "completion_tokens": 339,
+    "total_tokens": 7816,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": false,
+    "codes": [
+     "type-mismatch"
+    ],
+    "messages": [
+     "type-mismatch/TextCallout: field \"/variant\" expects one of [\"neutral\", \"info\", \"warning\", \"success\", \"danger\"] but got \"error\""
+    ],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 8
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, funnelCard, notesCard],",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, funnelCard, notesCard], \"column\", \"l\")\nheader = CardHeader(\"Funnel Overview\", \"Signup → Activation → Retention\")\nsignupStage = Card([TextContent(\"Signup\", \"small\"), TextContent(\"12,480\", \"large-heavy\"), TextContent(\"100% of new users\", \"small\")], \"sunk\")\nactivationStage = Card([TextContent(\"Activation\", \"small\"), TextContent(\"5,616\", \"large-heavy\"), TextContent(\"45% of signups\", \"small\")], \"sunk\")\nretentionStage = Card([TextContent(\"Retention (D30)\", \"small\"), TextContent(\"1,685\", \"large-heavy\"), TextContent(\"13.5% of signups\", \"small\")], \"sunk\")\nfunnelCard = Card([CardHeader(\"Conversion Stages\", \"Users at each step\"), Stack([signupStage, activationStage, retentionStage], \"row\", \"m\", \"stretch\", \"center\"), funnelChart], \"card\")\nfunnelChart = HorizontalBarChart([\"Signup\", \"Activation\", \"Retention (D30)\"], [Series(\"Users\", [12480, 5616, 1685])], \"grouped\", \"Stage\", \"Users\")\nnotesCard = Card([CardHeader(\"Key Insights\", \"Where the funnel leaks\"), TextCallout(\"warning\", \"Activation gap\", \"55% of signups never activate — investigate onboarding friction.\"), TextCallout(\"error\", \"Retention gap\", \"Only 30% of activated users return at day 30.\")], \"card\")",
+   "reasoning": ""
+  },
+  {
+   "id": "filter-bar",
+   "kind": "ui",
+   "prompt": "Create a filter bar for a report: date range, region and status.",
+   "ms": 3568,
+   "ttft": 2641,
+   "contentChars": 1197,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7481,
+    "completion_tokens": 321,
+    "total_tokens": 7802,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 12
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([filterCard], \"column\", \"m\")",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([filterCard], \"column\", \"m\")\n\nfilterCard = Card([header, filterBar, actions], \"card\", \"column\", \"m\")\n\nheader = InlineHeader(\"Report Filters\", \"Narrow the report with a date range, region and status.\")\n\nfilterBar = Stack([dateField, regionField, statusField], \"row\", \"m\", \"end\", \"start\", true)\n\ndateField = FormControl(\"Date range\", DatePicker(\"dateRange\", \"range\", {required: true}))\n\nregionField = FormControl(\"Region\", Select(\"region\", regionItems, \"All regions\", {required: true}))\n\nstatusField = FormControl(\"Status\", Select(\"status\", statusItems, \"Any status\"))\n\nactions = Buttons([applyButton, resetButton], \"row\")\n\napplyButton = Button(\"Apply filters\", @ToAssistant(\"Apply these report filters\"), \"primary\", \"normal\", \"medium\")\n\nresetButton = Button(\"Reset\", @ToAssistant(\"Reset the report filters\"), \"secondary\", \"normal\", \"medium\")\n\nregionItems = [\n  SelectItem(\"all\", \"All regions\"),\n  SelectItem(\"na\", \"North America\"),\n  SelectItem(\"emea\", \"EMEA\"),\n  SelectItem(\"apac\", \"APAC\"),\n  SelectItem(\"latam\", \"LATAM\")\n]\n\nstatusItems = [\n  SelectItem(\"any\", \"Any status\"),\n  SelectItem(\"open\", \"Open\"),\n  SelectItem(\"in_progress\", \"In progress\"),\n  SelectItem(\"closed\", \"Closed\")\n]",
+   "reasoning": ""
+  },
+  {
+   "id": "overview-cards",
+   "kind": "ui",
+   "prompt": "Show an overview card set with four metrics and their week-over-week change.",
+   "ms": 3113,
+   "ttft": 1786,
+   "contentChars": 1353,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7481,
+    "completion_tokens": 399,
+    "total_tokens": 7880,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 23
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, metrics], \"column\",",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, metrics], \"column\", \"l\")\n\nheader = CardHeader(\"Overview\", \"Key metrics with week-over-week change\")\n\nmetrics = OverviewCardBlock([revenueCard, usersCard, ordersCard, churnCard], \"grid\", true, null, \"m\")\n\nrevenueCard = OverviewCardItem(\"revenue\", revTop, revMetric)\nrevTop = IconText(revIcon, \"success\", \"md\", \"Revenue\", \"This week\")\nrevIcon = Icon(\"dollar-sign\")\nrevMetric = MetricIndicatorInline(\"$48.2k\", \"vs last week\", revTrend)\nrevTrend = {direction: \"up\", value: 12.4}\n\nusersCard = OverviewCardItem(\"users\", usersTop, usersMetric)\nusersTop = IconText(usersIcon, \"info\", \"md\", \"Active Users\", \"This week\")\nusersIcon = Icon(\"users\")\nusersMetric = MetricIndicatorInline(\"3,912\", \"vs last week\", usersTrend)\nusersTrend = {direction: \"up\", value: 5.8}\n\nordersCard = OverviewCardItem(\"orders\", ordersTop, ordersMetric)\nordersTop = IconText(ordersIcon, \"warning\", \"md\", \"Orders\", \"This week\")\nordersIcon = Icon(\"shopping-cart\")\nordersMetric = MetricIndicatorInline(\"1,204\", \"vs last week\", ordersTrend)\nordersTrend = {direction: \"down\", value: 3.1}\n\nchurnCard = OverviewCardItem(\"churn\", churnTop, churnMetric)\nchurnTop = IconText(churnIcon, \"danger\", \"md\", \"Churn Rate\", \"This week\")\nchurnIcon = Icon(\"user-minus\")\nchurnMetric = MetricIndicatorInline(\"2.7%\", \"vs last week\", churnTrend)\nchurnTrend = {direction: \"down\", value: 0.4}",
+   "reasoning": ""
+  },
+  {
+   "id": "tabs-charts",
+   "kind": "ui",
+   "prompt": "Compare a bar chart and a line chart for the same data, in tabs.",
+   "ms": 12868,
+   "ttft": 11881,
+   "contentChars": 921,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7482,
+    "completion_tokens": 278,
+    "total_tokens": 7760,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 16
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, tabs], \"column\",",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, tabs], \"column\", \"l\")\n\nheader = CardHeader(\"Quarterly Revenue Comparison\", \"Same data shown as a bar chart and a line chart — switch tabs to compare.\")\n\ntabs = Tabs([tabBar, tabLine, tabCombined])\n\ntabBar = TabItem(\"bar\", \"Bar Chart\", [barCard])\ntabLine = TabItem(\"line\", \"Line Chart\", [lineCard])\ntabCombined = TabItem(\"data\", \"Data Table\", [dataCard])\n\nbarCard = Card([barChart], null, \"column\", \"m\")\nlineCard = Card([lineChart], null, \"column\", \"m\")\ndataCard = Card([dataTable], null, \"column\", \"m\")\n\nbarChart = BarChart(labels, [Series(\"Revenue\", values)], \"grouped\", \"Quarter\", \"USD (thousands)\")\nlineChart = LineChart(labels, [Series(\"Revenue\", values)], \"natural\", \"Quarter\", \"USD (thousands)\")\n\ndataTable = Table([quarterCol, revenueCol])\n\nquarterCol = Col(\"Quarter\", labels)\nrevenueCol = Col(\"Revenue ($k)\", values, \"number\")\n\nlabels = [\"Q1\", \"Q2\", \"Q3\", \"Q4\"]\nvalues = [120, 185, 160, 230]",
+   "reasoning": ""
+  },
+  {
+   "id": "invoice",
+   "kind": "ui",
+   "prompt": "Show an invoice with line items and a total.",
+   "ms": 2930,
+   "ttft": 1266,
+   "contentChars": 1493,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7476,
+    "completion_tokens": 468,
+    "total_tokens": 7944,
+    "prompt_tokens_details": {
+     "cached_tokens": 7296
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 20
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, lineItemsCard, totalsCard,",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, lineItemsCard, totalsCard, actionsCard], \"column\", \"l\")\nheader = CardHeader(\"Invoice #INV-2041\", \"Issued Mar 14, 2024 · Due Apr 13, 2024\")\nlineItemsCard = Card([lineItemsHeader, lineItemsTable], \"card\", \"column\", \"m\")\nlineItemsHeader = InlineHeader(\"Line Items\", \"3 services billed this period\")\nlineItemsTable = Table([descCol, qtyCol, rateCol, amountCol])\ndescCol = Col(\"Description\", lineItems.description)\nqtyCol = Col(\"Qty\", lineItems.qty, \"number\")\nrateCol = Col(\"Rate\", lineItems.rate)\namountCol = Col(\"Amount\", lineItems.amount, \"number\")\nlineItems = {description: [\"Brand identity design\", \"Website UI/UX design\", \"Design system handoff\"], qty: [1, 1, 1], rate: [\"$4,500.00\", \"$6,200.00\", \"$1,800.00\"], amount: [\"$4,500.00\", \"$6,200.00\", \"$1,800.00\"]}\ntotalsCard = Card([totalsList], \"card\", \"column\", \"m\")\ntotalsList = EntityList([subtotalRow, taxRow, totalRow], \"default\", totalsHeader)\ntotalsHeader = {left: \"Summary\", right: \"Amount\"}\nsubtotalRow = {left: \"Subtotal\", right: \"$12,500.00\", rightVariant: \"number\"}\ntaxRow = {left: \"Tax (8%)\", right: \"$1,000.00\", rightVariant: \"number\"}\ntotalRow = {left: \"Total Due\", right: \"$13,500.00\", rightVariant: \"number\"}\nactionsCard = Card([actionsButtons], \"clear\", \"row\", \"m\")\nactionsButtons = Buttons([payButton, downloadButton])\npayButton = Button(\"Pay Invoice\", @ToAssistant(\"Pay invoice INV-2041\"), \"primary\")\ndownloadButton = Button(\"Download PDF\", @ToAssistant(\"Download invoice INV-2041 as PDF\"), \"secondary\")",
+   "reasoning": ""
+  },
+  {
+   "id": "timeline",
+   "kind": "ui",
+   "prompt": "Show a timeline of the last five releases.",
+   "ms": 3029,
+   "ttft": 1739,
+   "contentChars": 1110,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7475,
+    "completion_tokens": 327,
+    "total_tokens": 7802,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 9
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 5,
+    "worstShingle": "null, \"View release\", @ToAssistant(\"Show me",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, timelineCard], \"column\", \"l\")\n\nheader = CardHeader(\"Release Timeline\", \"The last five releases, newest first\")\n\ntimelineCard = Card([releaseList], null, \"column\", \"m\")\n\nreleaseList = ListBlock([rel5, rel4, rel3, rel2, rel1], \"number\")\n\nrel1 = ListItem(\"v2.8.0 — Current\", \"Released today · Performance improvements and new dashboard widgets\", null, \"View release\", @ToAssistant(\"Show me the details of release v2.8.0\"))\nrel2 = ListItem(\"v2.7.0\", \"Released 3 weeks ago · Added dark mode and export to CSV\", null, \"View release\", @ToAssistant(\"Show me the details of release v2.7.0\"))\nrel3 = ListItem(\"v2.6.2\", \"Released 1 month ago · Bug fixes for mobile layout and login flow\", null, \"View release\", @ToAssistant(\"Show me the details of release v2.6.2\"))\nrel4 = ListItem(\"v2.6.0\", \"Released 6 weeks ago · Introduced team workspaces and roles\", null, \"View release\", @ToAssistant(\"Show me the details of release v2.6.0\"))\nrel5 = ListItem(\"v2.5.0\", \"Released 2 months ago · Redesigned settings and faster search\", null, \"View release\", @ToAssistant(\"Show me the details of release v2.5.0\"))",
+   "reasoning": ""
+  },
+  {
+   "id": "chart-table",
+   "kind": "ui",
+   "prompt": "Show the same monthly numbers twice: once as a bar chart, once as a table.",
+   "ms": 3041,
+   "ttft": 2194,
+   "contentChars": 837,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7484,
+    "completion_tokens": 261,
+    "total_tokens": 7745,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 14
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([header, Card([revenueLabel, barChart],",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([header, Card([revenueLabel, barChart], null, \"column\", \"m\"), Card([tableLabel, numbersTable], null, \"column\", \"m\")], \"column\", \"l\")\nheader = CardHeader(\"Monthly Numbers\", \"The same data, two ways\")\nrevenueLabel = InlineHeader(\"Bar chart\", \"Monthly revenue by region\")\nbarChart = BarChart(months, [northSeries, southSeries], \"grouped\", \"Month\", \"Revenue ($k)\")\ntableLabel = InlineHeader(\"Table\", \"Monthly revenue by region ($k)\")\nnumbersTable = Table([monthCol, northCol, southCol])\nmonthCol = Col(\"Month\", months)\nnorthCol = Col(\"North\", northValues, \"number\")\nsouthCol = Col(\"South\", southValues, \"number\")\nmonths = [\"Jan\", \"Feb\", \"Mar\", \"Apr\", \"May\", \"Jun\"]\nnorthValues = [42, 48, 55, 61, 58, 67]\nsouthValues = [30, 33, 39, 44, 47, 52]\nnorthSeries = Series(\"North\", northValues)\nsouthSeries = Series(\"South\", southValues)",
+   "reasoning": ""
+  },
+  {
+   "id": "no-such-component",
+   "kind": "ui",
+   "prompt": "Show a map of our offices with pins on a world map.",
+   "ms": 4693,
+   "ttft": 1318,
+   "contentChars": 2900,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7479,
+    "completion_tokens": 875,
+    "total_tokens": 8354,
+    "prompt_tokens_details": {
+     "cached_tokens": 7296
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": false,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": true,
+    "hasRoot": false,
+    "statements": 31
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 2,
+    "worstShingle": "= Tag(\"Europe\", null, \"sm\", \"neutral\")",
+    "sentences": 3
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": false,
+   "content": "I can't render an interactive map here — openui-lang has no map component. What I can do is a map-style visual (image block if you have a static map URL) plus a proper office directory with locations, so pins can be read at a glance.\n\nroot = Stack([header, mapCard, officeCards, noteCallout], \"column\", \"l\")\n\nheader = CardHeader(\"Our Offices\", \"Global locations at a glance\")\n\nmapCard = Card([mapHeader, mapImage, mapHint], \"card\", \"column\", \"s\")\n\nmapHeader = InlineHeader(\"World Map\", \"Pins are represented in the office list below\")\n\nmapImage = ImageBlock(\"https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg\", \"World map\")\n\nmapHint = TextContent(\"To get real pins, export a static map image from a mapping service and we can swap this in.\", \"small\")\n\nofficeCards = Stack([sfCard, lonCard, berCard, sgpCard, sydCard], \"row\", \"m\")\n\nsfCard = Card([CardHeader(\"San Francisco\", \"HQ\"), officeDetails, officeTag], \"card\", \"column\", \"s\")\n\nlonCard = Card([CardHeader(\"London\", \"EMEA\"), lonDetails, lonTag], \"card\", \"column\", \"s\")\n\nberCard = Card([CardHeader(\"Berlin\", \"EMEA\"), berDetails, berTag], \"card\", \"column\", \"s\")\n\nsgpCard = Card([CardHeader(\"Singapore\", \"APAC\"), sgpDetails, sgpTag], \"card\", \"column\", \"s\")\n\nsydCard = Card([CardHeader(\"Sydney\", \"APAC\"), sydDetails, sydTag], \"card\", \"column\", \"s\")\n\nofficeDetails = EntityList(officeRows, \"small\")\n\nlonDetails = EntityList(lonRows, \"small\")\n\nberDetails = EntityList(berRows, \"small\")\n\nsgpDetails = EntityList(sgpRows, \"small\")\n\nsydDetails = EntityList(sydRows, \"small\")\n\nofficeRows = [{left: \"Latitude\", right: \"37.7749\"}, {left: \"Longitude\", right: \"-122.4194\"}, {left: \"Team\", right: \"142\"}]\n\nlonRows = [{left: \"Latitude\", right: \"51.5074\"}, {left: \"Longitude\", right: \"-0.1278\"}, {left: \"Team\", right: \"58\"}]\n\nberRows = [{left: \"Latitude\", right: \"52.5200\"}, {left: \"Longitude\", right: \"13.4050\"}, {left: \"Team\", right: \"31\"}]\n\nsgpRows = [{left: \"Latitude\", right: \"1.3521\"}, {left: \"Longitude\", right: \"103.8198\"}, {left: \"Team\", right: \"24\"}]\n\nsydRows = [{left: \"Latitude\", right: \"-33.8688\"}, {left: \"Longitude\", right: \"151.2093\"}, {left: \"Team\", right: \"17\"}]\n\nofficeTag = Tag(\"Americas\", null, \"sm\", \"info\")\n\nlonTag = Tag(\"Europe\", null, \"sm\", \"neutral\")\n\nberTag = Tag(\"Europe\", null, \"sm\", \"neutral\")\n\nsgpTag = Tag(\"Asia\", null, \"sm\", \"success\")\n\nsydTag = Tag(\"Oceania\", null, \"sm\", \"warning\")\n\nnoteCallout = TextCallout(\"info\", \"Want a real map?\", \"Share a static map image URL (Google Static Maps, Mapbox, etc.) with your office coordinates and I'll place it with pins annotated.\")\n\nopenSheet = Button(\"Open office sheet\", @ToAssistant(\"Open the office directory spreadsheet\"))\n\nsheetAction = Card([InlineHeader(\"Directory\", \"Full details, addresses and timezones\"), Buttons([openSheet])], \"sunk\", \"column\", \"s\")\n\nnoteCallout2 = TextCallout(\"neutral\", \"Coverage\", \"5 offices · 272 people across 4 regions\")",
+   "reasoning": ""
+  },
+  {
+   "id": "math",
+   "kind": "text",
+   "prompt": "What is 2 + 2?",
+   "ms": 1439,
+   "ttft": 1217,
+   "contentChars": 135,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7474,
+    "completion_tokens": 41,
+    "total_tokens": 7515,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 2
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([answerCard], \"column\", \"m\")",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([answerCard], \"column\", \"m\")\n\nanswerCard = Card([CardHeader(\"2 + 2\"), TextContent(\"The answer is **4**.\", \"large-heavy\")])",
+   "reasoning": ""
+  },
+  {
+   "id": "haiku",
+   "kind": "text",
+   "prompt": "Write a haiku about rain.",
+   "ms": 1666,
+   "ttft": 1016,
+   "contentChars": 405,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7473,
+    "completion_tokens": 110,
+    "total_tokens": 7583,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 7
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Card([header, poem, note])",
+    "sentences": 1
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Card([header, poem, note])\nheader = CardHeader(\"A Haiku on Rain\", \"Three lines, seventeen syllables\")\npoem = Stack([line1, line2, line3], \"column\", \"s\")\nline1 = TextContent(\"Soft rain on the roof\", \"large\")\nline2 = TextContent(\"Petals bow beneath the drops\", \"large\")\nline3 = TextContent(\"Earth drinks deep and still\", \"large\")\nnote = TextContent(\"A quiet moment caught in falling water.\", \"small\")",
+   "reasoning": ""
+  },
+  {
+   "id": "who",
+   "kind": "text",
+   "prompt": "Who are you?",
+   "ms": 3541,
+   "ttft": 2405,
+   "contentChars": 981,
+   "reasoningChars": 0,
+   "usage": {
+    "prompt_tokens": 7470,
+    "completion_tokens": 256,
+    "total_tokens": 7726,
+    "prompt_tokens_details": {
+     "cached_tokens": 7424
+    },
+    "completion_tokens_details": {
+     "reasoning_tokens": 0
+    }
+   },
+   "finish": "stop",
+   "httpError": null,
+   "parsed": {
+    "ok": true,
+    "codes": [],
+    "messages": [],
+    "unresolved": 0,
+    "orphaned": 0,
+    "incomplete": false,
+    "hasRoot": true,
+    "statements": 4
+   },
+   "rep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 1,
+    "worstShingle": "root = Stack([introCard, identityCard, capabilityCard])",
+    "sentences": 2
+   },
+   "reasoningRep": {
+    "maxLineRun": 1,
+    "maxPeriodRun": 1,
+    "period": 0,
+    "topShingle": 0,
+    "worstShingle": "",
+    "sentences": 0
+   },
+   "fenced": false,
+   "startsWithRoot": true,
+   "content": "root = Stack([introCard, identityCard, capabilityCard])\nintroCard = Card([CardHeader(\"I'm an AI assistant\", \"Designed for rich, structured UI responses\"), TextContent(\"I respond entirely in openui-lang, a declarative UI language. Instead of plain text, I build interfaces — cards, tables, charts, forms and more — so information is presented clearly and interactively.\", \"default\")])\nidentityCard = Card([InlineHeader(\"How I work\"), EntityList([{left: \"Response format\", right: \"Valid openui-lang only\", rightVariant: \"text\"}, {left: \"Entry point\", right: \"root = Stack(...)\", rightVariant: \"text\"}, {left: \"Layout engine\", right: \"Declarative components\", rightVariant: \"text\"}, {left: \"Streaming\", right: \"Progressive top-down reveal\", rightVariant: \"text\"}], \"default\")])\ncapabilityCard = Card([InlineHeader(\"What I can build\", \"A few examples of the building blocks available\"), TagBlock([\"Layouts\", \"Tables\", \"Charts\", \"Forms\", \"Cards\", \"Callouts\", \"Tabs\", \"Actions\"], \"md\")])",
+   "reasoning": ""
+  }
+ ]
+}
