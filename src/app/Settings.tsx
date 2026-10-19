@@ -166,6 +166,42 @@ export function SettingsModal({
             <p style={{ fontSize: 13, color: test.ok ? 'var(--c-ok)' : 'var(--c-danger)' }}>{test.msg}</p>
           )}
 
+          {/*
+           * ————— الواجهة التوليدية —————
+           *
+           * مقيس على ٢٧ طلبًا (`specs/openui-eval/REPORT.md`): مع التفكير
+           * ٢٦–٢٧ ردًّا سليمًا، وبإطفائه ١٩. و`inlineMode` يجعل النموذج
+           * **يختار**: نثرٌ ثم واجهة في سياج، أو نثرٌ فقط إن لم تلزم واجهة.
+           */}
+          <div>
+            <p className="mb-2" style={{ fontSize: 13, fontWeight: 600 }}>
+              Generative UI
+            </p>
+            <div className="flex gap-2">
+              {([false, true] as const).map((on) => (
+                <button
+                  key={String(on)}
+                  type="button"
+                  onClick={() => set('genui', on)}
+                  className="rounded-lg px-3 py-1.5"
+                  style={{
+                    fontSize: 12,
+                    background: draft.genui === on ? C.active : C.raised,
+                    color: draft.genui === on ? C.text : C.muted,
+                    border: `1px solid ${C.line}`,
+                  }}
+                >
+                  {on ? 'On — OpenUI' : 'Off'}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1.5" style={{ fontSize: 11, color: C.dim, lineHeight: '16px' }}>
+              {draft.genui
+                ? 'The model may answer with a rendered interface — tables, charts, forms, cards. It appears as a card in the thread, with a Canvas button to widen it. The system prompt below is not sent while this is on: OpenUI ships its own, and two competing instructions would fight.'
+                : 'Answers are prose and Markdown only. Measured on 27 prompts: 26–27 produce a valid interface with thinking on, 19 with it off, and 2 answer in prose because the model decided prose was enough.'}
+            </p>
+          </div>
+
           {/* ————— تعليمات النظام ————— */}
           <div>
             <div className="mb-2 flex items-center justify-between">
@@ -205,10 +241,14 @@ export function SettingsModal({
               }}
             />
             <p className="mt-1" style={{ fontSize: 11, color: C.dim }}>
-              {draft.systemPrompt.trim()
-                ? `${draft.systemPrompt.length} characters sent as one system message before the conversation.`
-                : 'No system message is sent — the model receives the conversation alone.'}
-              {draft.systemPrompt === DEFAULT_SYSTEM_PROMPT ? ' (default)' : ''}
+              {draft.genui ? (
+                <span style={{ color: 'var(--c-danger)' }}>Not sent — Generative UI is on and uses OpenUI’s own prompt.</span>
+              ) : draft.systemPrompt.trim() ? (
+                `${draft.systemPrompt.length} characters sent as one system message before the conversation.`
+              ) : (
+                'No system message is sent — the model receives the conversation alone.'
+              )}
+              {!draft.genui && draft.systemPrompt === DEFAULT_SYSTEM_PROMPT ? ' (default)' : ''}
             </p>
           </div>
 

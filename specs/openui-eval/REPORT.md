@@ -108,50 +108,107 @@ extractor used `[a-zA-Z]*` for the language tag and missed `openui-lang`, so it
 reported 0 readable fences on 24 responses that all had one. Same data, fixed
 extractor, not a fresh run.
 
-## And the loop: not reproduced
+## The loop: found, and it was not a loop
 
-The reported loop — *"Let me do it. Let me write. Let me call."* — did not appear
-once in 45 two-turn conversations built to provoke it (`tools/loop-probe.mjs`),
-across three variants (replaying `reasoning_content` in history, stripping it,
-and thinking off) and two effort levels.
+**Correction.** The first version of this report said the loop did not reproduce.
+Then the conversation turned up in the database — I had looked before it was
+there. Here is what it actually is.
 
-Both hypotheses I had are unsupported:
+### The evidence
 
-- **Reasoning replay causes it** — no. Replaying `reasoning_content` actually
-  produced *shorter* replies (503 vs 799 chars) and was faster (2.3s vs 4.0s).
-- **Our "you have no tools" system prompt provokes it** — no. Five prompts
-  designed to invite tool calls ("search the web", "read /etc/hosts", "call the
-  weather API") never looped.
+The stored assistant message had `content: 0` and `reasoning: 16,804` — sixteen
+thousand characters of thinking and **not one character of answer**. The user had
+pressed Stop (`stopped: 1`).
 
-What is left: it is rare (a tail event 45 samples cannot rule out), it needed a
-longer conversation than two turns, or it was a transient on the provider side.
-**Without the original conversation I am guessing, and I would rather say so.**
-The messages were gone from the database by the time I looked.
+The user prompt was 7,611 characters asking for something impossible: *"Produce
+the actual video using Hyper Frames and the available video-generation, animation,
+editing, and audio capabilities."* Our system prompt says the model has no tools
+and no internet. So it could not do it — and instead of saying so, it did all the
+work **inside the reasoning channel**: the script, the Arabic captions with
+timestamps, and the full HTML and Remotion code.
 
-### One thing the loop hunt did produce
+### Re-run to measure it
 
-The first loop detector was wrong. It counted how often any 5-word sequence
-repeated anywhere in a response, which flagged **4 of 27 perfectly good replies** —
-all of them tables and card blocks, where rows repeat by nature
-(`{left: "Opened", right: ...}` × 10). *Resemblance is not a loop.*
+Same prompt, same system prompt, no stop:
 
-The corrected metric (`tools/loopiness.mjs`) measures **consecutive** repetition:
-a run of identical lines, or a repeat at a period of 1–5 sentences — which is the
-shape of the reported loop. On the same 27 stored responses it reports 0/27.
+| | |
+|---|---|
+| wall clock | **156 seconds** |
+| first byte | 1,558 ms |
+| reasoning | 46,468 chars · 14,936 reasoning tokens |
+| visible answer | 33,786 chars |
+| `finish_reason` | `stop` |
+| `Let me …` in the reasoning | **36 times** |
+| `loopiness` on the reasoning | `periodRun=1`, `lineRun=1` → **not a loop** |
 
-That metric is now validated in both directions: it fires on nothing legitimate,
-and it is the one to build a guard on.
+The answer it finally wrote opens with exactly the right thing:
+
+> ## 1. Capability check (honest, read this first)
+> | Requested | Status here |
+> | Hyper Frames project / renderer | **Not available.** I have no tools, no shell,
+> no filesystem, no renderer in this chat…
+
+### So what the user saw
+
+*"Let me do it. Let me write. Let me call."* is not repetition. It is **36
+different planning steps** — *let me think about Kimi*, *let me design the HTML*,
+*let me write the JS*, *let me write out the full HTML*, *let me produce the final
+answer* — streaming past for two and a half minutes while the answer stayed at
+zero characters. Stopping it at that point is entirely reasonable, and it is why
+`content` was empty.
+
+Three things follow, and none of them is a loop guard:
+
+1. **The metric was right.** `loopiness` reports `periodRun=1` on the real
+   incident. Resemblance is not a loop — now validated against a true positive
+   case as well as against 27 healthy responses.
+2. **The real symptom is time-to-answer, not repetition.** 156 seconds with no
+   output is indistinguishable from being stuck, because nothing on screen says
+   otherwise. A thinking counter — elapsed time and reasoning tokens — would have
+   made it obviously alive.
+3. **The trigger is a request that exceeds the model, and the fix is in the
+   system prompt.** It already says "you have no tools". It does not say *"if a
+   request needs something you do not have, say so on the first line and offer
+   what you can do — do not plan a way around it."* That one sentence turns a
+   156-second silence into a two-second answer, and the model already writes that
+   capability check unprompted when it finally gets there.
+
+My 45-conversation probe missed it because every prompt in it was answerable. The
+trigger is not conversation length or reasoning replay — it is **a task the model
+cannot do**. That is a much narrower and more useful finding than "it sometimes
+loops".
+
+The earlier hypotheses stay dead: `reasoning_content` replay made replies shorter
+and faster, and our "no tools" line is not the cause by itself — the missing half
+is that it never says what to do instead.
 
 ## Recommendation
 
-**Worth building, as a panel beside the reply, with `inlineMode` on.**
+**Worth building — and it is now built, as a card in the thread with a Canvas.**
 
-- `inlineMode` + the two rules is the configuration: 24/27 render a UI block,
-  2/27 correctly answer in prose, 1/27 breaks. The model picks the shape itself.
-- Keep thinking on for this feature. It is the difference between 96% and 70%,
-  and it is what pays for the argument order.
-- Do not replace the thread's Markdown with a component tree. Prose stays prose;
-  the fenced block gets a panel — which is also what ChatGPT does with Artifacts,
-  so the design parity this project is built on survives.
-- Do build the loop guard, on the consecutive metric. The failure is cheap to
-  detect and expensive to show.
+`inlineMode` + the two rules is the configuration: 24/27 render a UI block, 2/27
+correctly answer in prose, 1/27 breaks. The model picks the shape itself.
+
+What shipped:
+
+- `src/generated/openui-prompt.txt` — the OpenUI prompt with the rules, generated
+  at build time by `tools/openui-prompt.mjs`, so the 2 MB library is not needed to
+  *send* a system prompt.
+- `src/app/GenUI.tsx` — the renderer, lazy-loaded. `src/app/genui-shared.tsx` —
+  the context and `isGenUILang`, tiny, so `Markdown.tsx` does not pull the weight.
+- A ```openui-lang fence renders as a card with **Code** and **Canvas**.
+- `@ToAssistant` sends a message, `@OpenUrl` opens the tab.
+- Settings → **Generative UI**. It replaces the system prompt rather than adding
+  to it, because two competing instructions fight.
+
+Measured on the built app: the library is not requested until a UI block actually
+arrives (0 requests on load, 3 after), 13/13 assertions, 0 page errors, and a
+clicked button starts a real turn.
+
+Keep thinking on for this feature. It is the difference between 96% and 70%, and
+it is what pays for the argument order.
+
+### Still open
+
+The thinking counter and the capability-check rule from the section above are not
+built yet. They are the two things that would have prevented the incident.

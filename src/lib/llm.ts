@@ -7,6 +7,7 @@
  */
 
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_PARAMS } from './prompt';
+import GENUI_PROMPT from '../generated/openui-prompt.txt?raw';
 
 export interface Config {
   baseUrl: string;
@@ -31,6 +32,14 @@ export interface Config {
    * تقول `off: null` — أي أنّها تُعلن عدم الدعم ويقبله الخادم فعلًا.
    */
   reasoningEffort: ReasoningEffort;
+  /**
+   * الواجهة التوليدية — تُبدّل نصّ النظام كلّه بنصّ OpenUI.
+   *
+   * ولا تُضاف إليه: نصّ OpenUI يقول «ردّك كلّه openui-lang» وهو تعليم
+   * كامل قائم بذاته (٣١ ألف حرف)، فحقنه داخل نصّنا يُنتج تعليمين متضاربين.
+   * و`inlineMode` مُشعل فيه، فيجيب النموذج نثرًا ثم يضع الواجهة في سياج.
+   */
+  genui: boolean;
 }
 
 export type ReasoningEffort = 'auto' | 'off' | 'low' | 'high' | 'max';
@@ -84,6 +93,7 @@ export const DEFAULT_CONFIG: Config = {
   maxTokens: DEFAULT_PARAMS.maxTokens,
   topP: DEFAULT_PARAMS.topP,
   reasoningEffort: 'auto',
+  genui: false,
 };
 
 /** الإعداد محفوظ في المتصفح، والافتراضي من متغيرات البيئة */
@@ -112,6 +122,7 @@ export function loadConfig(): Config {
       maxTokens: typeof saved.maxTokens === 'number' ? saved.maxTokens : DEFAULT_CONFIG.maxTokens,
       topP: typeof saved.topP === 'number' ? saved.topP : DEFAULT_CONFIG.topP,
       reasoningEffort: (saved.reasoningEffort as ReasoningEffort) || DEFAULT_CONFIG.reasoningEffort,
+      genui: saved.genui === true,
     };
   } catch {
     return { ...DEFAULT_CONFIG };
@@ -174,8 +185,8 @@ export class ChatStream {
            * تعليمات النظام تُقدَّم أولًا — وهذا ما كان غائبًا كليًا.
            * و`messages` المرسلة لا تحتوي رسائل system، فلا تكرار.
            */
-          messages: config.systemPrompt?.trim()
-            ? [{ role: 'system', content: config.systemPrompt }, ...messages]
+          messages: (config.genui ? GENUI_PROMPT : config.systemPrompt)?.trim()
+            ? [{ role: 'system', content: config.genui ? GENUI_PROMPT : config.systemPrompt }, ...messages]
             : messages,
           stream: true,
           stream_options: { include_usage: true },

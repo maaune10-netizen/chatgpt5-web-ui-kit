@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { C, FONT, T } from '../lib/tokens';
+import { GenUIBlock, isGenUILang } from './genui-shared';
 
 /**
  * عرض ردود النموذج.
@@ -14,6 +15,8 @@ interface Block {
   text?: string;
   items?: string[];
   lang?: string;
+  /** هل أُغلق السياج؟ — أثناء البثّ لا يزال مفتوحًا، فالبرنامج ناقص بطبيعته */
+  closed?: boolean;
   rows?: string[][];
 }
 
@@ -29,15 +32,24 @@ function parse(src: string): Block[] {
   while (i < lines.length) {
     const line = lines[i];
 
-    /* كتلة كود */
-    const fence = /^\s*```(\w*)\s*$/.exec(line);
+    /*
+     * كتلة كود. و`[\w-]*` لا `\w*`: وسم السياج الذي يكتبه النموذج هو
+     * `openui-lang` وفيه شرطة، فـ`\w*` لا يطابقه — فكانت الكتلة تُقرأ
+     * ككود عادي بلا وسم. وهو نفس الخطأ الذي وقع في أداة القياس.
+     */
+    const fence = /^\s*```([\w-]*)\s*$/.exec(line);
     if (fence) {
       const lang = fence[1] || '';
       const buf: string[] = [];
       i++;
       while (i < lines.length && !/^\s*```\s*$/.test(lines[i])) buf.push(lines[i++]);
+      /*
+       * و«أُغلق» ليس تفصيلًا: أثناء البثّ يكون السياج مفتوحًا والبرنامج
+       * ناقصًا — وظهور «٣ أخطاء» في أثناء الكتابة كذبٌ يختفي بعد ثانية.
+       */
+      const closed = i < lines.length;
       i++;
-      out.push({ kind: 'code', text: buf.join('\n'), lang });
+      out.push({ kind: 'code', text: buf.join('\n'), lang, closed });
       continue;
     }
 
@@ -195,7 +207,25 @@ export function Markdown({ text, mono }: { text: string; mono?: boolean }) {
           case 'hr':
             return <hr key={i} style={{ border: 0, borderTop: `1px solid ${C.line}`, margin: '16px 0' }} />;
           case 'code':
-            return <CodeBlock key={i} text={b.text || ''} lang={b.lang} />;
+            /*
+             * كتلة `openui-lang` ليست كودًا يُقرأ بل واجهةٌ تُرسم.
+             * و`Suspense` لأنّ العارض يُحمَّل عند الطلب — فمن لا يرى
+             * واجهة لا يحمّل مكتبتها.
+             */
+            return isGenUILang(b.lang) ? (
+              <Suspense
+                key={i}
+                fallback={
+                  <div className="my-3 rounded-2xl px-3 py-6 text-center" style={{ border: `1px solid ${C.line}`, fontSize: 12, color: C.muted }}>
+                    Loading the UI renderer…
+                  </div>
+                }
+              >
+                <GenUIBlock code={b.text || ''} complete={b.closed} />
+              </Suspense>
+            ) : (
+              <CodeBlock key={i} text={b.text || ''} lang={b.lang} />
+            );
           case 'quote':
             return (
               <blockquote key={i} style={{ borderLeft: `3px solid ${C.line}`, margin: '12px 0', padding: '2px 0 2px 14px', color: C.muted }}>

@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { Renderer, createParser } from '@openuidev/react-lang';
 import { ThemeProvider, openuiChatLibrary, openuiComponentGroups, openuiLibrary } from '@openuidev/react-ui';
 import '@openuidev/react-ui/layered/styles/index.css';
 import { C, FONT } from '../lib/tokens';
+import { useResolvedMode } from '../lib/useThemeMode';
 import { Icon } from './Icon';
 import { OPENUI_CHAT_SAMPLES, OPENUI_SAMPLES, type OpenUISample } from '../lib/openui-samples';
 
@@ -95,22 +96,6 @@ function buildCatalog(lib: Lib): { groups: Array<{ name: string; notes: string[]
   });
   const total = groups.reduce((n, g) => n + g.entries.length, 0);
   return { groups, total };
-}
-
-/** يقرأ الوضع الفعلي من الجذر — فالصفحة تتبع ثيم التطبيق بلا نسخة ثانية */
-function useResolvedMode(): 'light' | 'dark' {
-  const [mode, setMode] = useState<'light' | 'dark'>(
-    () => (typeof document !== 'undefined' && document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'),
-  );
-  useEffect(() => {
-    const el = document.documentElement;
-    const read = () => setMode(el.dataset.theme === 'light' ? 'light' : 'dark');
-    read();
-    const obs = new MutationObserver(read);
-    obs.observe(el, { attributes: true, attributeFilter: ['data-theme'] });
-    return () => obs.disconnect();
-  }, []);
-  return mode;
 }
 
 function Chip({ children, tone = 'muted' }: { children: ReactNode; tone?: 'muted' | 'ok' | 'bad' }) {

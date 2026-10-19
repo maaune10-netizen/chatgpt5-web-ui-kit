@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './Icon';
 import { Sidebar } from './Sidebar';
 import { Composer } from './Composer';
@@ -8,6 +8,7 @@ import { AccountMenu } from './AccountMenu';
 import { ModelMenu, SettingsModal } from './Settings';
 import { LoginModal, SearchModal, ShareModal, UpgradeModal } from './Modals';
 import { Library, ImageViewer, FileViewer, ProjectPage } from './Library';
+import { GenUIContext, GenUIPanel } from './genui-shared';
 import { useStore, type Citation, type LibraryItem, type Message } from './store';
 import { C, L } from '../lib/tokens';
 import { ChatStream, loadConfig, saveConfig, isConfigured, type Config, type ChatMessage } from '../lib/llm';
@@ -84,6 +85,8 @@ export function ChatApp({
   const [loginOpen, setLoginOpen] = useState(false);
   const [viewer, setViewer] = useState<{ src: string; title: string } | null>(null);
   const [fileViewer, setFileViewer] = useState<LibraryItem | null>(null);
+  /** برنامج OpenUI مفتوح في اللوحة الواسعة */
+  const [canvas, setCanvas] = useState<string | null>(null);
   const [config, setConfig] = useState<Config>(loadConfig);
   const streamRef = useRef<ChatStream | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -303,6 +306,12 @@ export function ChatApp({
 
   const shareTarget = useMemo(() => state.conversations.find((c) => c.id === shareFor) ?? null, [shareFor, state.conversations]);
 
+  /* أفعال الواجهة المولَّدة — ثابتة ما لم يتغيّر `send`، فلا يُعاد رسم الشجرة */
+  const genuiActions = useMemo(
+    () => ({ onSend: (t: string) => void send(t), onExpand: (code: string) => setCanvas(code) }),
+    [send],
+  );
+
   const composer = (
     <Composer
       value={input}
@@ -317,6 +326,12 @@ export function ChatApp({
   );
 
   return (
+    /*
+     * الجسر إلى عارض OpenUI: زرّ في واجهة مولَّدة يُرسل رسالة،
+     * و«Canvas» يفتح البرنامج على عرض أوسع. والسياق بلا وزن —
+     * العارض نفسه يُحمَّل عند الطلب.
+     */
+    <GenUIContext.Provider value={genuiActions}>
     <div className="flex h-full" style={{ background: C.body, color: C.text }}>
       {/*
        * الشريط يظهر في الوضعين. كنت أخفيه لغير المسجَّل اعتمادًا على شاشة
@@ -561,6 +576,12 @@ export function ChatApp({
       )}
       {viewer && <ImageViewer src={viewer.src} title={viewer.title} onClose={() => setViewer(null)} />}
       {fileViewer && <FileViewer key={fileViewer.id} item={fileViewer} onClose={() => setFileViewer(null)} />}
+      {canvas && (
+        <Suspense fallback={null}>
+          <GenUIPanel code={canvas} onClose={() => setCanvas(null)} />
+        </Suspense>
+      )}
     </div>
+    </GenUIContext.Provider>
   );
 }
