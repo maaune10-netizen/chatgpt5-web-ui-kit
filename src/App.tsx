@@ -11,11 +11,13 @@ import { C } from './lib/tokens';
  * من يريد محادثة. فلا يصل المتصفّح إلا من فتح `#openui`.
  */
 const OpenUIGallery = lazy(() => import('./app/OpenUIGallery').then((m) => ({ default: m.OpenUIGallery })));
+/* خريطة الصفحات — رسم تفاعليّ، يُحمَّل عند الطلب مثل المعرض */
+const FlowMap = lazy(() => import('./app/FlowMap').then((m) => ({ default: m.FlowMap })));
 
-type Mode = 'app' | 'design' | 'openui';
+type Mode = 'app' | 'design' | 'openui' | 'flow';
 
 /* العنوان هو المصدر: #design و#openui و#app */
-const modeFromHash = (h: string): Mode => (h === 'design' ? 'design' : h === 'openui' ? 'openui' : 'app');
+const modeFromHash = (h: string): Mode => (h === 'design' ? 'design' : h === 'openui' ? 'openui' : h === 'flow' ? 'flow' : 'app');
 
 /**
  * غلاف التطبيق: وضعان.
@@ -38,7 +40,7 @@ export default function App() {
   const [devMode, setDevMode] = useState(
     () =>
       typeof location !== 'undefined' &&
-      (location.hash.includes('design') || location.hash.includes('openui') || new URLSearchParams(location.search).has('dev')),
+      (location.hash.includes('design') || location.hash.includes('openui') || location.hash.includes('flow') || new URLSearchParams(location.search).has('dev')),
   );
 
   const [theme, setTheme] = useState<'dark' | 'light' | 'auto'>(
@@ -95,6 +97,11 @@ export default function App() {
     <div className="h-full" style={{ background: C.body, color: C.text }}>
       {mode === 'app' && <ChatApp theme={theme} onTheme={setTheme} />}
       {mode === 'design' && <DesignViewer />}
+      {mode === 'flow' && (
+        <Suspense fallback={<div className="grid h-full place-items-center" style={{ color: C.muted, fontSize: 13 }}>Loading the map…</div>}>
+          <FlowMap onBack={() => setMode('app')} />
+        </Suspense>
+      )}
       {mode === 'openui' && (
         <Suspense
           fallback={
@@ -121,6 +128,7 @@ export default function App() {
             [
               ['app', 'App', 'The working chat app'],
               ['design', 'Design', 'The 24 extracted Figma screens'],
+              ['flow', 'Map', 'The page inventory and flow, drawn'],
               ['openui', 'OpenUI', 'Every component of @openuidev/react-ui, rendered'],
             ] as Array<[Mode, string, string]>
           ).map(([m, label, title]) => (
