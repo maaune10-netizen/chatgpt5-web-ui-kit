@@ -187,7 +187,13 @@
       assetUrls.add(new URL(u, location.href).href);
     } catch {}
   };
-  for (const r of performance.getEntriesByType('resource')) if (ASSET_RE.test(r.name)) noteUrl(r.name);
+  /*
+   * لا تعتمد على الامتداد: أصول ChatGPT تحمل بصمات بلا امتداد
+   * (`UcC73....woff2` نعم، لكن غيرها لا). فنجمع بالنوع أيضًا.
+   */
+  for (const r of performance.getEntriesByType('resource')) {
+    if (ASSET_RE.test(r.name) || /^(img|css|font|other|link)$/.test(r.initiatorType)) noteUrl(r.name);
+  }
 
   /* ————————————————— لقطة حالة ————————————————— */
   const SURFACES = '[role="dialog"],[aria-expanded="true"],[data-state="open"],[popover],dialog[open]';
@@ -201,6 +207,9 @@
       if (elements.length >= 1400 || depth > 70) return;
       const tag = el.tagName;
       if (/^(SCRIPT|STYLE|NOSCRIPT|PATH|USE|G|DEFS|SYMBOL|META|LINK|HEAD|TITLE)$/.test(tag)) return;
+      /* لوحة الأداة نفسها ليست من الصفحة — وكانت تُسجَّل وتُفسد الفروق */
+      if (el.id && el.id.startsWith('__cap')) return;
+      if (el.closest && el.closest('#__cap_panel')) return;
       const cs = getComputedStyle(el);
       if (cs.display === 'none' || cs.visibility === 'hidden') return;
 

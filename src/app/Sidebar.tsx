@@ -560,7 +560,7 @@ export function Sidebar({
 
         {/* المحادثات — تختفي كليًا حين لا حساب، كما في الموقع */}
         <div
-          className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-2"
+          className="min-h-0 flex-1 overflow-y-auto px-2.5 pb-2"  /* مقيس: الصفّ 220 = 240 − 20، فالحشو 10 */
           style={{ display: state.signedIn ? undefined : 'none' }}
         >
           <SectionLabel
