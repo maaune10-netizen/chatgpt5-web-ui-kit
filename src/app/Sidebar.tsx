@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './Icon';
+import { Tip } from './ui';
 import { C, ITEM, MENU_SHADOW } from '../lib/tokens';
 import { CHATGPT_WORDMARK } from '../lib/wordmark';
 import type { Store, Conversation } from './store';
@@ -423,7 +424,7 @@ export function Sidebar({
           </button>
           <div className="flex items-center gap-0.5">
             {/* البحث أيقونةً في الترويسة — من اللقطة، لا صفًّا في القائمة */}
-            <button
+            <Tip label="Search chats"><button
               type="button"
               onClick={onOpenSearch}
               title="Search chats  (Ctrl+K)"
@@ -432,8 +433,8 @@ export function Sidebar({
               style={{ color: C.muted, width: 36, height: 36, marginTop: 0 }}
             >
               <Icon name="search" size={18} />
-            </button>
-            <button
+            </button></Tip>
+            <Tip label="Close sidebar"><button
               type="button"
               onClick={onToggleCollapsed}
               title="Close sidebar"
@@ -441,7 +442,7 @@ export function Sidebar({
               className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
             >
               <Icon name="sidebar" size={20} />
-            </button>
+            </button></Tip>
           </div>
         </div>
 
