@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from './Icon';
+import { Tip } from './ui';
 import { C, FONT, INPUT_SHADOW, L } from '../lib/tokens';
 
 /**
@@ -241,6 +242,7 @@ export function Composer({
         */}
         {onThinking && (
           <div className="relative shrink-0 self-end">
+            <Tip label="Get a smarter answer">
             <button
               type="button"
               onClick={() => setThinkOpen((o) => !o)}
@@ -252,7 +254,7 @@ export function Composer({
             >
               <Icon name="think" size={16} />
               Think
-            </button>
+            </button></Tip>
             {thinkOpen && (
               <>
                 <div className="fixed inset-0 z-[60]" onClick={() => setThinkOpen(false)} />
@@ -284,13 +286,16 @@ export function Composer({
           </div>
         )}
 
-        <button
-          type="button"
-          title="Dictate"
-          className="grid h-8 w-8 shrink-0 place-items-center self-end rounded-full hover:bg-white/10"
-        >
-          <Icon name="microphone" size={20} />
-        </button>
+        <Tip label="Start Voice">
+          <button
+            type="button"
+            title="Dictate"
+            aria-label="Start Voice"
+            className="grid h-8 w-8 shrink-0 place-items-center self-end rounded-full hover:bg-white/10"
+          >
+            <Icon name="microphone" size={20} />
+          </button>
+        </Tip>
 
         {streaming ? (
           <button
