@@ -370,15 +370,28 @@ export function Sidebar({
           >
             ChatGPT
           </button>
-          <button
-            type="button"
-            onClick={onToggleCollapsed}
-            title="Close sidebar"
-            aria-label="Close sidebar"
-            className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
-          >
-            <Icon name="sidebar" size={20} />
-          </button>
+          <div className="flex items-center gap-0.5">
+            {/* البحث أيقونةً في الترويسة — من اللقطة، لا صفًّا في القائمة */}
+            <button
+              type="button"
+              onClick={onOpenSearch}
+              title="Search chats  (Ctrl+K)"
+              aria-label="Search chats"
+              className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
+              style={{ color: C.muted }}
+            >
+              <Icon name="search" size={18} />
+            </button>
+            <button
+              type="button"
+              onClick={onToggleCollapsed}
+              title="Close sidebar"
+              aria-label="Close sidebar"
+              className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
+            >
+              <Icon name="sidebar" size={20} />
+            </button>
+          </div>
         </div>
 
         {/*
@@ -390,10 +403,19 @@ export function Sidebar({
         <div className="px-1.5 pt-1">
           {state.signedIn ? (
             <>
-              <Row icon="create" label="New Chat" trailing="Ctrl + Shift + O" compact={compact} onClick={() => void store.newChat()} />
-              <Row icon="search" label="Search chats" onClick={onOpenSearch} />
-              <Row icon="images" label="Library" onClick={() => store.go('library')} />
-              <Row icon="temporaryChat" label="Temporary chat" onClick={() => void store.newChat(null, true)} />
+              {/*
+                الترتيب من لقطة `chatgpt2.com`:
+                New chat · Images · Scheduled · Library · Plugins · Codex · Explore
+                والبحث انتقل أيقونةً في الترويسة، والمحادثة المؤقّتة إلى قائمة
+                الحساب — فليست في الشريط في اللقطة.
+              */}
+              <Row icon="create" label="New chat" trailing="Ctrl + Shift + O" compact={compact} onClick={() => void store.newChat()} />
+              <Row icon="images" label="Images" compact={compact} onClick={() => store.go('images')} />
+              <Row icon="time" label="Scheduled" compact={compact} onClick={() => store.go('scheduled')} />
+              <Row icon="book" label="Library" compact={compact} onClick={() => store.go('library')} />
+              <Row icon="connectedApps" label="Plugins" compact={compact} onClick={() => store.go('plugins')} />
+              <Row icon="codexAgentUpgraded" label="Codex" compact={compact} onClick={() => store.go('codex')} />
+              <Row icon="explore" label="Explore" compact={compact} onClick={() => store.go('explore')} />
             </>
           ) : (
             <>
@@ -402,8 +424,9 @@ export function Sidebar({
               <Row icon="integration" label="Plugins" onClick={() => store.go('library')} />
               <Row icon="research" label="Deep research" onClick={() => store.go('library')} />
               <Row icon="billing" label="See plans and pricing" external onClick={onUpgrade} />
-              <Row icon="help" label="Help" external onClick={() => store.go('library')} />
+              {/* الترتيب من اللقطة: Settings ثم Help — وكانا معكوسين */}
               <Row icon="settings" label="Settings" onClick={onSettings} />
+              <Row icon="help" label="Help" external onClick={() => store.go('library')} />
             </>
           )}
         </div>
@@ -461,7 +484,7 @@ export function Sidebar({
           style={{ display: state.signedIn ? undefined : 'none' }}
         >
           <SectionLabel open={isOpen('chats')} onToggle={() => toggle('chats')}>
-            Chats
+            Recents
           </SectionLabel>
           {/* ولا نصّ «لا محادثات» — ChatGPT يُظهر قسمًا فارغًا صامتًا */}
           {isOpen('chats') && rest.map((c) => chatRow(c))}

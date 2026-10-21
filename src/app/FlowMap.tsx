@@ -20,6 +20,8 @@ interface PageData extends Record<string, unknown> {
   title: string;
   sub: string;
   status: Status;
+  /** ما ينقصه بعد — يُعرض سطرًا رابعًا، فلا يبقى «متقادم» بلا سبب */
+  needs?: string;
 }
 
 const STATUS: Record<Status, { color: string; label: string }> = {
@@ -62,6 +64,9 @@ function PageNode({ data }: NodeProps<Node<PageData>>) {
       </div>
       <div style={{ fontSize: 10.5, color: C.muted, lineHeight: '14px', marginTop: 2 }}>{data.sub}</div>
       <div style={{ fontSize: 9.5, color: st.color, marginTop: 3, letterSpacing: 0.2 }}>{st.label}</div>
+      {data.needs && (
+        <div style={{ fontSize: 9.5, color: 'var(--c-dim)', marginTop: 2, lineHeight: '13px' }}>يحتاج: {data.needs}</div>
+      )}
       <Handle type="source" position={Position.Right} style={{ opacity: 0, width: 1, height: 1, border: 0, minWidth: 0, minHeight: 0 }} />
     </div>
   );
@@ -81,11 +86,11 @@ const nodeTypes = { page: PageNode, lane: Lane };
 const COL = { a: 0, b: 268, c: 536, d: 804, e: 1072, f: 1340 };
 const ROW = 88;
 
-const P = (id: string, col: number, row: number, title: string, sub: string, status: Status): Node<PageData> => ({
+const P = (id: string, col: number, row: number, title: string, sub: string, status: Status, needs?: string): Node<PageData> => ({
   id,
   type: 'page',
   position: { x: col, y: 58 + row * ROW },
-  data: { title, sub, status },
+  data: { title, sub, status, needs },
 });
 
 const L = (id: string, col: number, text: string, sub: string): Node => ({
@@ -106,47 +111,44 @@ const NODES: Node[] = [
   L('l6', COL.f, 'Overlays', 'نوافذ'),
 
   /* ————— الزائر ————— */
-  P('v-home', COL.a, 0, '/', 'New chat · شريط أيقونات · «Where should we begin?»', 'stale'),
-  P('v-images', COL.a, 1, '/images', '«Describe a new image» — شريط توليد صور', 'missing'),
-  P('v-plugins', COL.a, 2, '/plugins', 'دليل الإضافات — Popular · New · Small Business', 'missing'),
-  /*
-   * بلا سهم `↗`: الحرف مع مُحدِّد التنويع يُعامَل كإيموجي فيُرسم مربّعًا فارغًا —
-   * وهو نفس ما حدث في الشريط الجانبي سابقًا. فالكلمة بدل الرمز.
-   */
-  P('v-links', COL.a, 3, 'Sidebar links', 'Deep research · Plans · Help (خارجيّة)', 'missing'),
-  P('v-modal', COL.a, 4, 'Login modal', 'موجود · لكن بترويسة ١٩٧px ليست في التصميم', 'stale'),
+  P('v-home', COL.a, 0, '/', 'New chat · «Where should we begin?» · ٣ اقتراحات', 'live'),
+  P('v-sidebar', COL.a, 1, 'Sidebar (زائر)', '٧ عناصر بالترتيب الصحيح', 'live'),
+  P('v-images', COL.a, 2, '/images', '«Describe a new image»', 'missing', 'لقطة — الشريط يصل إلى صفحة صريحة'),
+  P('v-plugins', COL.a, 3, '/plugins', 'دليل الإضافات', 'missing', 'لقطة'),
+  P('v-modal', COL.a, 4, 'Login modal', 'AuthForm · بلا ترويسة · مطابق', 'live'),
 
   /* ————— البوابة ————— */
-  P('login', COL.b, 0, '/auth/login', 'صفحة كاملة · «Log in or sign up»', 'missing'),
-  P('social', COL.b, 1, 'Google · Apple · phone', 'ثلاثة أزرار بإطار + فاصل or', 'missing'),
-  P('email', COL.b, 2, 'Email + Continue', 'حقل · زرّ أسود · «Try it first»', 'missing'),
+  P('login', COL.b, 0, '/auth/login', 'صفحة كاملة · AuthForm جاهز', 'missing', 'صفحة تغلّف AuthForm'),
+  P('social', COL.b, 1, 'Google · Apple · phone', 'مبنيّ داخل AuthForm', 'live'),
+  P('email', COL.b, 2, 'Email + Continue', 'مبنيّ داخل AuthForm', 'live'),
 
   /* ————— مسجَّل: المحادثة ————— */
-  P('home', COL.c, 0, '/', '«What\'s on your mind today?» · Chat|Work · Think', 'stale'),
-  P('thread', COL.c, 1, '/c/:id', 'الخيط والردود والأفعال — الأقرب للمطابقة', 'live'),
-  P('s-images', COL.c, 2, '/images', 'صفحة توليد صور', 'missing'),
-  P('scheduled', COL.c, 3, '/scheduled', 'محادثات مجدولة', 'missing'),
-  P('library', COL.c, 4, '/library', '٥ تبويبات · بحث · New', 'stale'),
-  P('plugins', COL.c, 5, '/plugins', 'Plugins | Skills · Installed · Public/Personal', 'missing'),
-  P('codex', COL.c, 6, '/codex', 'سطح Codex', 'missing'),
-  P('explore', COL.c, 7, '/explore', 'Explore', 'missing'),
+  P('home', COL.c, 0, '/', 'What\'s on your mind · Chat|Work · ✦Upgrade · Think', 'live'),
+  P('thread', COL.c, 1, '/c/:id', 'الخيط والردود والأفعال', 'live'),
+  P('s-sidebar', COL.c, 2, 'Sidebar (مسجَّل)', '٧ عناصر + Recents + بحث في الترويسة', 'live'),
+  P('s-images', COL.c, 3, '/images', 'صفحة توليد صور', 'missing', 'لقطة — تُعرض صفحة صريحة الآن'),
+  P('scheduled', COL.c, 4, '/scheduled', 'محادثات مجدولة', 'missing', 'لقطة — تُعرض صفحة صريحة الآن'),
+  P('library', COL.c, 5, '/library', '٥ تبويبات · بحث · New', 'stale', 'Suggested · Favorites · Folders · Images · All'),
+  P('plugins', COL.c, 6, '/plugins', 'Plugins | Skills · Installed', 'missing', 'لقطة — تُعرض صفحة صريحة الآن'),
+  P('codex', COL.c, 7, '/codex', 'سطح Codex', 'missing', 'لقطة — تُعرض صفحة صريحة الآن'),
+  P('explore', COL.c, 8, '/explore', 'Explore', 'missing', 'لقطة — تُعرض صفحة صريحة الآن'),
 
   /* ————— مشاريع وبروفايل ————— */
   P('projects', COL.d, 0, 'Projects', 'قسم في الشريط · «No projects»', 'live'),
-  P('newproj', COL.d, 1, 'Create project', 'اسم · ٧ ألوان · شبكة أيقونات', 'missing'),
-  P('profile', COL.d, 2, '/u/:handle', 'إحصاءات · Showcase · Token activity', 'missing'),
-  P('showcase', COL.d, 3, 'Showcase', 'بطاقات المواقع على البروفايل', 'missing'),
+  P('newproj', COL.d, 1, 'Create project', 'اسم · ٧ ألوان · شبكة أيقونات', 'missing', 'لقطة أوضح للنافذة'),
+  P('profile', COL.d, 2, '/u/:handle', 'إحصاءات · Showcase · Token activity', 'missing', 'لقطة (موجودة)'),
+  P('showcase', COL.d, 3, 'Showcase', 'بطاقات المواقع', 'missing', 'لقطة'),
 
   /* ————— إعدادات ————— */
-  P('settings', COL.e, 0, '/settings/*', 'شريط أيسر ٣٣٥px + بحث + Back to app', 'missing'),
-  P('s-account', COL.e, 1, 'Account', 'Name · Email · Age · Delete', 'stale'),
-  P('s-appearance', COL.e, 2, 'Appearance', 'Mode (٣ صور) · Accent · Background · Foreground', 'stale'),
-  P('s-usage', COL.e, 3, 'Usage', 'Overview/Analytics · Plan limits · Resets', 'missing'),
-  P('s-storage', COL.e, 4, 'Storage', '2.67 of 512 MB · Files / Images', 'missing'),
-  P('s-more', COL.e, 5, '١٤ صفحة أخرى', 'Notifications · Security · Pets · Billing · Data controls…', 'missing'),
+  P('settings', COL.e, 0, '/settings/*', 'شريط أيسر ٣٣٥px + بحث', 'missing', 'هيكل + ١٧ صفحة'),
+  P('s-account', COL.e, 1, 'Account', 'Name · Email · Age · Delete', 'stale', 'صفوف داخل صفحة لا نافذة'),
+  P('s-appearance', COL.e, 2, 'Appearance', 'Mode ٣ صور · Accent · Background', 'stale', 'ثلاثة عناصر ناقصة'),
+  P('s-usage', COL.e, 3, 'Usage', 'Overview/Analytics · Limits', 'missing', 'لقطة (موجودة)'),
+  P('s-storage', COL.e, 4, 'Storage', '2.67 of 512 MB', 'missing', 'لقطة (موجودة)'),
+  P('s-more', COL.e, 5, '١٤ صفحة أخرى', 'Notifications · Security · Pets…', 'missing', 'لقطات'),
 
   /* ————— نوافذ ————— */
-  P('o-search', COL.f, 0, 'Search chats', 'بحث · في الموقع صار أيقونة في الترويسة', 'live'),
+  P('o-search', COL.f, 0, 'Search chats', 'بحث · في الموقع أيقونة في الترويسة', 'live'),
   P('o-share', COL.f, 1, 'Share', 'نافذة مشاركة', 'live'),
   P('o-chatmenu', COL.f, 2, 'Chat menu', 'تسمية · تثبيت · أرشفة', 'live'),
   P('o-upgrade', COL.f, 3, 'Upgrade', 'الخطط', 'live'),

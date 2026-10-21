@@ -13,6 +13,7 @@ export function AccountMenu({
   onLibrary,
   onLogout,
   onUpgrade,
+  onTemporary,
   email,
 }: {
   anchor: DOMRect;
@@ -21,6 +22,8 @@ export function AccountMenu({
   onLibrary: () => void;
   onLogout: () => void;
   onUpgrade: () => void;
+  /** المحادثة المؤقّتة — من قائمة الحساب بعد أن غادرت الشريط */
+  onTemporary: () => void;
   email: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -76,7 +79,12 @@ export function AccountMenu({
       <Divider />
 
       <Item icon="group" label="Manage workspace" onClick={() => onLibrary()} />
-      <Item icon="folder" label="My GPTs" onClick={() => onLibrary()} />
+      {/*
+        «My GPTs» أُزيل من المنتج — فحذفه ليس نقصًا بل تصحيح.
+        وحلّ محلّه «Temporary chat»، التي كانت صفًّا في الشريط وليست فيه
+        في اللقطة. فبقي الوصول إليها بلا مخالفة التصميم.
+      */}
+      <Item icon="temporaryChat" label="Temporary chat" onClick={onTemporary} />
       <Item icon="personalization" label="Customize ChatGPT" onClick={onSettings} />
       <Item icon="settings" label="Settings" onClick={onSettings} />
 

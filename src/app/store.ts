@@ -79,7 +79,7 @@ export interface AppState {
   /** المحادثة المفتوحة */
   activeId: string | null;
   /** المسار المعروض */
-  view: 'chat' | 'library' | 'project' | 'image';
+  view: 'chat' | 'library' | 'project' | 'image' | 'images' | 'scheduled' | 'plugins' | 'codex' | 'explore';
   viewArg: string | null;
   signedIn: boolean;
   email: string;
@@ -484,7 +484,10 @@ export function useStore() {
       },
 
       /* ————— تنقّل ————— */
-      go(view: 'chat' | 'library' | 'project' | 'image', arg: string | null = null) {
+      go(
+        view: 'chat' | 'library' | 'project' | 'image' | 'images' | 'scheduled' | 'plugins' | 'codex' | 'explore',
+        arg: string | null = null,
+      ) {
         patch((s) => ({ ...s, view, viewArg: arg }));
       },
       reload: load,

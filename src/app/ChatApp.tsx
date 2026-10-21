@@ -9,6 +9,7 @@ import { ModelMenu, SettingsModal } from './Settings';
 import { LoginModal, SearchModal, ShareModal, UpgradeModal } from './Modals';
 import { Library, ImageViewer, FileViewer, ProjectPage } from './Library';
 import { GenUIContext, GenUIPanel, preloadGenUI } from './genui-shared';
+import { NotBuilt } from './NotBuilt';
 import { useStore, type Citation, type LibraryItem, type Message } from './store';
 import { C, L } from '../lib/tokens';
 import { ChatStream, loadConfig, saveConfig, isConfigured, type Config, type ChatMessage } from '../lib/llm';
@@ -497,7 +498,29 @@ export function ChatApp({
           {modelOpen && <ModelMenu config={config} onConfig={setCfg} onClose={() => setModelOpen(false)} />}
         </header>
 
-        {state.view === 'library' ? (
+        {(['images', 'scheduled', 'plugins', 'codex', 'explore'] as const).includes(state.view as never) ? (
+          <NotBuilt
+            title={
+              {
+                images: '/images — توليد الصور',
+                scheduled: '/scheduled — المحادثات المجدولة',
+                plugins: '/plugins — دليل الإضافات',
+                codex: '/codex',
+                explore: '/explore',
+              }[state.view as 'images']
+            }
+            needs={
+              {
+                images: 'لقطة للصفحة — عندنا `/library` فقط، وهي ليست هي',
+                scheduled: 'لقطة للصفحة',
+                plugins: 'لقطة — والمسار فيه ١١٦ رابطًا و١٦٦ تابًا',
+                codex: 'لقطة للصفحة',
+                explore: 'لقطة للصفحة',
+              }[state.view as 'images']
+            }
+            onLibrary={() => store.go('library')}
+          />
+        ) : state.view === 'library' ? (
           <Library store={store} onOpenImage={(src, title) => setViewer({ src, title })} onOpenFile={(it) => setFileViewer(it)} />
         ) : state.view === 'project' && state.viewArg ? (
           <ProjectPage store={store} projectId={state.viewArg} onOpenChat={(id) => store.openChat(id)} />
@@ -577,6 +600,10 @@ export function ChatApp({
           onLibrary={() => {
             setAccountAt(null);
             store.go('library');
+          }}
+          onTemporary={() => {
+            setAccountAt(null);
+            void store.newChat(null, true);
           }}
           onUpgrade={() => {
             setAccountAt(null);
