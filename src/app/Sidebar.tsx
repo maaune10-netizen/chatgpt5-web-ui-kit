@@ -252,9 +252,9 @@ function SectionLabel({
  */
 function CollapsedRail({ store, onToggle, active }: { store: Store; onToggle: () => void; active?: string }) {
   const items = [
-    { key: 'new', icon: 'create', label: 'New chat', run: () => void store.newChat() },
+    { key: 'new', icon: 'create', site: 'square-and-pencil-light-20', label: 'New chat', run: () => void store.newChat() },
     { key: 'search', icon: 'search', label: 'Search', run: () => {} },
-    { key: 'pinned', icon: 'cc-pinned', label: 'Pinned', run: () => {} },
+    { key: 'pinned', icon: 'cc-pinned', site: 'pin-light-20', label: 'Pinned', run: () => {} },
     { key: 'recents', icon: 'cc-recents', label: 'Recents', run: () => {} },
     { key: 'library', icon: 'book', label: 'Library', run: () => store.go('library') },
   ];
@@ -295,7 +295,8 @@ function CollapsedRail({ store, onToggle, active }: { store: Store; onToggle: ()
               color: C.text,
             }}
           >
-            <Icon name={it.icon} size={20} />
+            {/* أيقونة الموقع المضمَّنة: سماكتها من الشريحة، لا من قناع */}
+            {it.site ? <SiteIcon name={it.site as any} size={20} /> : <Icon name={it.icon} size={20} />}
           </button>
         </Tip>
       ))}
@@ -917,7 +918,7 @@ function ChatMenu({
           <button
             type="button"
             className={item}
-            style={{ ...style, color: confirm ? 'var(--c-danger)' : undefined }}
+            style={{ ...style, /* لا أحمر: كان يظهر عند السحب */ }}
             onClick={() => {
               if (!confirm) return setConfirm(true);
               void store.deleteChat(id);

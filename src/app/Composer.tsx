@@ -324,7 +324,7 @@ export function Composer({
                 : undefined
             }
             disabled={!canSend}
-            className="grid h-9 w-9 shrink-0 place-items-center self-end rounded-full transition-colors"
+            className="grid h-9 w-9 shrink-0 place-items-center self-end rounded-full"
             style={{
               /* مقيس من capture: rgb(44,103,197) — غامق لا فاتح (#3a83f7) */
               background: canSend ? 'var(--c-text)' : 'rgb(44, 103, 197)',
