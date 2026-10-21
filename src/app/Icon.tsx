@@ -1,4 +1,5 @@
 import { ICONS } from '../lib/icon-map';
+import { CAPTURE_ICONS } from '../lib/icon-capture';
 import { useIconsReady } from '../lib/icons';
 
 /**
@@ -25,7 +26,11 @@ export function Icon({
   style?: React.CSSProperties;
 }) {
   const ready = useIconsReady();
-  const file = ICONS[name];
+  /*
+   * الأيقونة المأخوذة من الموقع تتقدّم على أيقونة الـKit: تلك من عهد GPT-5،
+   * وهذه من الصفحة الحيّة. والمصدر في `icon-capture.ts` مولَّد لا مكتوب.
+   */
+  const file = CAPTURE_ICONS[name] ?? ICONS[name];
   /*
    * قيمة فيها شرطة مائلة = مسار كامل (أيقونة مرسومة يدويًا في app-icons).
    * وما عداها اسم ملف داخل مجلد المولَّد.

@@ -13,9 +13,14 @@
  *   • `<use href="#icon-…">`   → يأخذ مراجع الـ sprite (وأيقونات الموقع
  *                                 غالبًا sprite واحد)
  *
+ * **والمهمّ:** أيقونات ChatGPT كلها في ملفّ sprite واحد
+ * (`/cdn/assets/icons-*.svg`)، والـ`<use href="…#books-light-20">` يشير إليه.
+ * فالسكربت **يجلب ذلك الملفّ ويضمّ نصّه** — لأنّ رموزه هي الأيقونات الحقيقية،
+ * ومنها `books` (Library) و`codex` و`brain` (Think) و`voice` (Start Voice).
+ *
  * ولا يحتاج أي مكتبة، ولا يرسل شيئًا إلى أي مكان: يُنزّل ملفًّا عندك فقط.
  */
-(() => {
+(async () => {
   const sizeOf = (el) => {
     const r = el.getBoundingClientRect();
     return `${Math.round(el.getAttribute('width') || r.width)}x${Math.round(el.getAttribute('height') || r.height)}`;
@@ -64,6 +69,22 @@
       symbols: [...s.querySelectorAll('symbol')].map((x) => ({ id: x.id, viewBox: x.getAttribute('viewBox'), html: x.innerHTML })),
     }));
 
+  /* ————— جلب ملفّات الـsprite المشار إليها —————
+   * نفس الأصل، فـ`fetch` مسموح. ونُزيل الـ`#fragment` لأنّه موضع رمز لا ملفّ.
+   */
+  const spriteUrls = [...new Set(uses.map((u) => u.split('#')[0]).filter((u) => u && !u.startsWith('data:')))];
+  const spriteFiles = [];
+  for (const u of spriteUrls) {
+    try {
+      const abs = new URL(u, location.href).href;
+      const r = await fetch(abs);
+      const text = await r.text();
+      spriteFiles.push({ url: abs, bytes: text.length, text });
+    } catch (e) {
+      spriteFiles.push({ url: u, error: String(e && e.message) });
+    }
+  }
+
   const out = {
     url: location.href,
     at: new Date().toISOString(),
@@ -75,6 +96,7 @@
     imgs,
     uses,
     sprites,
+    spriteFiles,
   };
 
   const blob = new Blob([JSON.stringify(out, null, 1)], { type: 'application/json' });
@@ -85,7 +107,8 @@
   a.click();
   a.remove();
 
+  const spriteInfo = spriteFiles.map((f) => (f.error ? `فشل: ${f.error}` : `${f.bytes} حرفًا`)).join(' · ') || 'لا شيء';
   console.log(
-    `✓ أُنزل chatgpt-icons.json — SVG مضمَّن: ${icons.length} · صور SVG: ${imgs.length} · مراجع sprite: ${uses.length} · رموز sprite: ${out.spriteSymbols}`,
+    `✓ أُنزل chatgpt-icons.json — SVG مضمَّن: ${icons.length} · مراجع sprite: ${uses.length} · ملفّات sprite: ${spriteInfo}`,
   );
 })();
