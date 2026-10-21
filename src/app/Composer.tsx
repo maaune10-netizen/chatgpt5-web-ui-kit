@@ -293,7 +293,8 @@ export function Composer({
             type="button"
             title="Dictate"
             aria-label="Start Voice"
-            className="grid h-8 w-8 shrink-0 place-items-center self-end rounded-full hover:bg-white/10"
+            /* مقيس: 36×36 — وكان 32، أي 4 أقلّ و5 أسفل */
+            className="grid h-9 w-9 shrink-0 place-items-center self-center rounded-full hover:bg-white/10"
           >
             <SiteIcon name="microphone-light-20" size={20} />
           </button>
