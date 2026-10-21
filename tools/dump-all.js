@@ -187,6 +187,28 @@
       svgs.push(rec);
       if (svgs.length >= 300) break;
     }
+
+    /*
+     * و`<use>` — وهو ما كان `extract-icons.js` يحلّه ولا شيء else.
+     * أيقونة على شكل `<use href="#i-plus">` لا تُقرأ من `outerHTML`: هو
+     * مرجع لا شكل. فنحلّ المرجع إلى `symbol`/`defs` ونحفظ الشكل الحقيقي.
+     */
+    const uses = [];
+    for (const node of document.querySelectorAll('use')) {
+      const href = node.getAttribute('href') || node.getAttribute('xlink:href') || '';
+      if (!href.startsWith('#')) continue;
+      const id = href.slice(1);
+      const target = document.getElementById(id) || document.querySelector(`[id="${id}"]`);
+      const host = node.closest('svg');
+      const box = host ? host.getBoundingClientRect() : { width: 0, height: 0 };
+      uses.push({
+        id,
+        box: { w: +box.width.toFixed(1), h: +box.height.toFixed(1) },
+        resolved: target ? target.outerHTML.replace(/\s+/g, ' ').slice(0, 30000) : null,
+      });
+      if (uses.length >= 200) break;
+    }
+    svgs.uses = uses;
   }
 
   /* ————— ٢) متغيّرات CSS من أوراق الأنماط ————— */
@@ -230,7 +252,7 @@
     },
     compact: COMPACT,
     stats,
-    counts: { elements: elements.length, svgs: svgs.length, tokens: Object.keys(tokens).length },
+    counts: { elements: elements.length, svgs: svgs.length, uses: (svgs.uses || []).length, tokens: Object.keys(tokens).length },
     palette: {
       text: toObj(palette.text),
       bg: toObj(palette.bg),
@@ -258,7 +280,7 @@
   a.remove();
 
   console.log(
-    `✓ ${a.download} — عناصر ${elements.length} · أيقونات ${svgs.length} · متغيّرات CSS ${Object.keys(tokens).length} · ألوان: نصّ ${palette.text.size} · خلفية ${palette.bg.size} · حدّ ${palette.border.size}`,
+    `✓ ${a.download} — عناصر ${elements.length} · أيقونات ${svgs.length} (use ${(svgs.uses || []).length}) · متغيّرات CSS ${Object.keys(tokens).length} · ألوان: نصّ ${palette.text.size} · خلفية ${palette.bg.size} · حدّ ${palette.border.size}`,
   );
   console.log('  أكثر ١٠ ألوان نصًّا:', toObj(palette.text).slice(0, 10).map((c) => `${c.value}×${c.count}`).join(' · '));
 })();
