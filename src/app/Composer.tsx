@@ -28,6 +28,8 @@ export function Composer({
   onPasteImage,
   tall,
   showDisclaimer = true,
+  thinking,
+  onThinking,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -46,10 +48,14 @@ export function Composer({
   /** الوضع غير المسجَّل: 768x102 لا 56 — من New Chat - Logged Out */
   tall?: boolean;
   showDisclaimer?: boolean;
+  /** جهد التفكير الحالي — يُعرض في مفتاح `Think` */
+  thinking?: 'auto' | 'off' | 'low' | 'high' | 'max';
+  onThinking?: (v: 'auto' | 'off' | 'low' | 'high' | 'max') => void;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
+  const [thinkOpen, setThinkOpen] = useState(false);
   /*
    * النصّ الطويل الملصوق لا يدخل الصندوق بل يصير «مرفقًا» فوقه.
    *
@@ -223,6 +229,55 @@ export function Composer({
           disabled={disabled}
         />
 
+        {/*
+          `Think` — في الموقع مفتاح ظاهر دائمًا في الشريط، لا إعداد مخفيّ.
+          ومقيس من اللقطة: أيقونة + كلمة، بلا خلفية حتى يُفتح.
+        */}
+        {onThinking && (
+          <div className="relative shrink-0 self-end">
+            <button
+              type="button"
+              onClick={() => setThinkOpen((o) => !o)}
+              title={`Thinking effort: ${thinking ?? 'auto'}`}
+              aria-haspopup="menu"
+              aria-expanded={thinkOpen}
+              className="flex h-8 items-center gap-1.5 rounded-full px-2 transition-colors hover:bg-white/10"
+              style={{ color: thinking === 'off' ? C.dim : C.muted, fontSize: 13 }}
+            >
+              <Icon name="think" size={16} />
+              Think
+            </button>
+            {thinkOpen && (
+              <>
+                <div className="fixed inset-0 z-[60]" onClick={() => setThinkOpen(false)} />
+                <div
+                  className="absolute bottom-10 end-0 z-[61] w-40 overflow-hidden rounded-xl py-1"
+                  style={{ background: C.menu, border: `1px solid ${C.line}`, boxShadow: 'var(--c-shadow-menu)' }}
+                  role="menu"
+                >
+                  {(['auto', 'off', 'low', 'high', 'max'] as const).map((v) => (
+                    <button
+                      key={v}
+                      type="button"
+                      role="menuitemradio"
+                      aria-checked={thinking === v}
+                      onClick={() => {
+                        onThinking(v);
+                        setThinkOpen(false);
+                      }}
+                      className="flex w-full items-center justify-between px-3 py-1.5 text-start capitalize transition-colors hover:bg-[var(--c-hover)]"
+                      style={{ fontSize: 13, color: C.text }}
+                    >
+                      {v}
+                      {thinking === v && <Icon name="check" size={14} style={{ opacity: 0.8 }} />}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
         <button
           type="button"
           title="Dictate"
@@ -256,7 +311,9 @@ export function Composer({
             disabled={!canSend}
             className="grid h-9 w-9 shrink-0 place-items-center self-end rounded-full transition-colors"
             style={{
-              background: canSend ? '#ffffff' : 'var(--c-active)',
+              /* مقيس من اللقطة: #3a83f7 */
+              background: canSend ? 'var(--c-text)' : 'var(--c-blue)',
+              color: canSend ? 'var(--c-body)' : '#ffffff',
               cursor: canSend ? 'pointer' : 'default',
             }}
           >

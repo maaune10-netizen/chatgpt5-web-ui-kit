@@ -328,6 +328,8 @@ export function ChatApp({
       onAttach={(f) => void onAttach(f)}
       onAttachText={(t) => void attachText(t)}
       onPasteImage={pasteImage}
+      thinking={config.reasoningEffort}
+      onThinking={(v: Config['reasoningEffort']) => setCfg({ ...config, reasoningEffort: v })}
     />
   );
 
@@ -393,31 +395,65 @@ export function ChatApp({
             </button>
           </div>
 
-          {/* «Get Plus» موسّطة في الترويسة — Upsell Button 123x36 عند x=528 من 1180 */}
+          {/*
+            المفتاح المقطعي `Chat | Work` — موسّط في الترويسة.
+            ومقيس من اللقطة: الحاوية #f4f4f4، والقرص النشط أبيض بظلّ خفيف.
+            و«Work» مُعطَّل: ليس سطحًا في هذه النسخة، ولا نُظهر سطحًا وهميًّا.
+          */}
           {signedIn && (
-            <button
-              type="button"
-              onClick={() => setUpgradeOpen(true)}
-              className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full px-3 py-2 hover:brightness-110 sm:flex"
-              style={{ background: C.upsell, height: 36, color: '#ffffff' }}
+            <div
+              className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-0.5 rounded-full p-0.5 sm:flex"
+              style={{ background: C.segment }}
+              role="tablist"
+              aria-label="Chat mode"
             >
-              <Icon name="upgradeSparkleSolid" size={20} style={{ opacity: 1 }} />
-              <span style={{ fontSize: 14 }}>Get Plus</span>
-              <Icon name="close" size={14} />
-            </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected
+                className="rounded-full px-4 text-sm font-medium"
+                style={{ height: 32, background: 'var(--c-modal)', color: C.text, boxShadow: '0 1px 2px rgba(0,0,0,0.10)' }}
+              >
+                Chat
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={false}
+                disabled
+                title="Work is not available in this clone"
+                className="flex items-center gap-1.5 rounded-full px-3.5 text-sm"
+                style={{ height: 32, color: C.dim, cursor: 'not-allowed' }}
+              >
+                <Icon name="upgradeSparkle" size={14} style={{ opacity: 0.7 }} />
+                Work
+              </button>
+            </div>
           )}
 
           <div className="flex items-center gap-2">
             {signedIn ? (
               <>
+                {/* ✦ Upgrade — نصّ أزرق لا قرص بنفسجي، كما في اللقطة */}
                 <button
                   type="button"
-                  onClick={() => conv && setShareFor(conv.id)}
-                  className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm hover:bg-white/10"
+                  onClick={() => setUpgradeOpen(true)}
+                  className="flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium hover:bg-white/[0.07]"
+                  style={{ color: C.blue }}
                 >
-                  <Icon name="share" size={18} />
-                  Share
+                  <Icon name="upgradeSparkleSolid" size={17} style={{ opacity: 1 }} />
+                  Upgrade
                 </button>
+                {conv && (
+                  <button
+                    type="button"
+                    onClick={() => setShareFor(conv.id)}
+                    className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm hover:bg-white/10"
+                  >
+                    <Icon name="share" size={18} />
+                    Share
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => setSettingsOpen(true)}
@@ -478,6 +514,8 @@ export function ChatApp({
               onAttach={(f) => void onAttach(f)}
               onAttachText={(t) => void attachText(t)}
               onPasteImage={pasteImage}
+              thinking={config.reasoningEffort}
+              onThinking={(v: Config['reasoningEffort']) => setCfg({ ...config, reasoningEffort: v })}
             />
             <div className="shrink-0 px-4 pb-3 text-center" style={{ fontSize: 12, color: C.muted, lineHeight: '16px' }}>
               {signedIn

@@ -24,6 +24,10 @@ export const C = {
   faint: 'var(--c-muted)',
 
   accent: 'var(--c-accent)', // .User Profile Icon
+  /** أزرق الإجراء — مقيس من لقطة الموقع: #3a83f7 */
+  blue: 'var(--c-blue)',
+  /** سطح المفتاح المقطعي Chat | Work — مقيس: #f4f4f4 */
+  segment: 'var(--c-segment)',
   avatar: 'var(--c-accent)', // .User Profile Icon
   upsell: 'var(--c-upsell)',
   userBubble: 'var(--c-user-bubble)',

@@ -45,7 +45,14 @@ export function Icon({
       className={className}
       style={{
         display: 'block',
-        flex: '0 0 auto',
+        /*
+         * تفصيلًا لا اختصارًا: `flex: '0 0 auto'` مع `flexShrink` التي يمرّرها
+         * المستدعي في `style` تُنتج تحذير React «خلط اختصار بتفصيل»، وكان
+         * يُطلق خمس مرّات في الشاشة الرئيسية.
+         */
+        flexGrow: 0,
+        flexShrink: 0,
+        flexBasis: 'auto',
         width: size,
         height: size,
         backgroundColor: 'currentColor',

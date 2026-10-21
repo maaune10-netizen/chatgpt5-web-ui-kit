@@ -15,11 +15,17 @@ import { C, L, T } from '../lib/tokens';
  * قليلًا كما في التصميم.
  */
 
+/**
+ * الاقتراحات — **ثلاثة أسطر بأيقونات، للزائر فقط**.
+ *
+ * وكانت أربع بطاقات للجميع. واللقطة تقول غير ذلك:
+ *   • الزائر: ثلاثة أسطر (قلم · كتاب · علامة سؤال) تحت الصندوق.
+ *   • المسجَّل: **لا شيء** — الشاشة فارغة تحت الصندوق.
+ */
 const SUGGESTIONS = [
-  { icon: 'image', title: 'Create an image', sub: 'of a cat riding a bike' },
-  { icon: 'think', title: 'Brainstorm', sub: 'names for a coffee shop' },
-  { icon: 'edit', title: 'Help me write', sub: 'a thank-you note' },
-  { icon: 'code', title: 'Write code', sub: 'to reverse a string' },
+  { icon: 'edit', text: 'Make this message easier to follow' },
+  { icon: 'book', text: 'Teach me something in 5 minutes' },
+  { icon: 'help', text: 'Create a five question trivia challenge' },
 ];
 
 export function NewChat({
@@ -33,6 +39,8 @@ export function NewChat({
   onAttach,
   onAttachText,
   onPasteImage,
+  thinking,
+  onThinking,
 }: {
   signedIn: boolean;
   value: string;
@@ -44,6 +52,8 @@ export function NewChat({
   onAttach?: (files: File[]) => void;
   onAttachText?: (text: string) => void;
   onPasteImage?: (src: string) => void;
+  thinking?: 'auto' | 'off' | 'low' | 'high' | 'max';
+  onThinking?: (v: 'auto' | 'off' | 'low' | 'high' | 'max') => void;
 }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -56,8 +66,8 @@ export function NewChat({
             className="text-center"
             style={{ fontSize: T.h1.size, lineHeight: `${T.h1.lh}px`, fontWeight: 600 }}
           >
-            {/* من الموقع الحقيقي: غير المسجَّل يرى «Where should we begin?» */}
-            {signedIn ? 'Ready when you are.' : 'Where should we begin?'}
+            {/* من اللقطة: المسجَّل «What's on your mind today?» · الزائر «Where should we begin?» */}
+            {signedIn ? "What's on your mind today?" : 'Where should we begin?'}
           </h1>
 
           {/*
@@ -73,44 +83,40 @@ export function NewChat({
               onStop={onStop}
               streaming={streaming}
               placeholder="Ask ChatGPT"
-              tall={!signedIn}
+              /*
+               * لا `tall` بعد اليوم: الـKit رسم صندوق الزائر 768x102، واللقطة
+               * تقول ٤٤ سطرًا واحدًا. والصندوق هنا واحد في الحالتين.
+               */
+              tall={false}
               onAttach={onAttach}
               onAttachText={onAttachText}
               onPasteImage={onPasteImage}
               showDisclaimer={false}
+              /* `Think` للمسجَّل فقط — الزائر لا يراه في اللقطة */
+              thinking={signedIn ? thinking : undefined}
+              onThinking={signedIn ? onThinking : undefined}
             />
           </div>
 
-          {/* الاقتراحات تحت صندوق الإدخال — موضعها في التصميم y=509 */}
-          <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {SUGGESTIONS.map((s) => (
-              <button
-                key={s.title}
-                type="button"
-                onClick={() => onSuggestion(`${s.title} ${s.sub}`)}
-                /*
-                 * كانت ساكنة تمامًا: لا حدّ يتغيّر ولا سطح يرتفع، فلا يُعرف
-                 * أنّها تُضغط. والآن ترتفع قليلًا ويُضيء حدّها.
-                 */
-                className="group rounded-2xl px-3 py-2.5 text-start transition-all duration-150 hover:-translate-y-px hover:bg-[var(--c-hover)] active:translate-y-0"
-                style={{ border: `1px solid ${C.line}` }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--c-divider)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--c-line)';
-                }}
-              >
-                <span className="flex items-center gap-2">
-                  <Icon name={s.icon} size={16} />
-                  <span style={{ fontSize: 13, fontWeight: 500 }}>{s.title}</span>
-                </span>
-                <span className="mt-0.5 block truncate" style={{ fontSize: 12, color: 'var(--c-muted)' }}>
-                  {s.sub}
-                </span>
-              </button>
-            ))}
-          </div>
+          {/*
+            الاقتراحات للزائر فقط، أسطرًا لا بطاقات — كما في لقطة `/`.
+            والمسجَّل لا يرى شيئًا تحتها.
+          */}
+          {!signedIn && (
+            <div className="mt-4 flex flex-col">
+              {SUGGESTIONS.map((s) => (
+                <button
+                  key={s.text}
+                  type="button"
+                  onClick={() => onSuggestion(s.text)}
+                  className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-start transition-colors hover:bg-[var(--c-hover)]"
+                >
+                  <Icon name={s.icon} size={18} style={{ color: C.muted, flexShrink: 0 }} />
+                  <span style={{ fontSize: 14, lineHeight: '20px', color: C.text }}>{s.text}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

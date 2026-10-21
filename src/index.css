@@ -29,6 +29,10 @@
   --c-active: rgba(255, 255, 255, 0.10);
 
   --c-accent: #3c6ac3;
+  /* أزرق الإجراء — مقيس من اللقطة عند زرّ الصوت: #3a83f7 */
+  --c-blue: #3a83f7;
+  /* سطح المفتاح المقطعي Chat | Work — مقيس: #f4f4f4 */
+  --c-segment: #f4f4f4;
   --c-upsell: #373669;
   --c-user-bubble: #303030;
   --c-code: #2f2f2f;
@@ -52,8 +56,9 @@
 }
 
 [data-theme='light'] {
-  --c-body: #ffffff;
-  --c-sidebar: #f9f9f9;
+  /* مقيس من اللقطة: الشريط والمحتوى كلاهما #fcfcfc — يفترقان بحدّ ١px فقط */
+  --c-body: #fcfcfc;
+  --c-sidebar: #fcfcfc;
   --c-input: #ffffff;
   --c-menu: #ffffff;
   --c-raised: #ececec;
@@ -68,6 +73,8 @@
   --c-active: rgba(0, 0, 0, 0.08);
 
   --c-accent: #3c6ac3;
+  --c-blue: #3a83f7;
+  --c-segment: #f4f4f4;
   --c-upsell: #5d5bd0;
   --c-user-bubble: #ececec;
   --c-code: #f2f2f2;

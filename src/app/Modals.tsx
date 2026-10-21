@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from './Icon';
-import { C, FONT, MENU_SHADOW, T } from '../lib/tokens';
+import { C, FONT, MENU_SHADOW } from '../lib/tokens';
+import { AuthForm } from './Auth';
 
 /* ————— غلاف النافذة ————— */
 function Overlay({
@@ -38,42 +39,25 @@ function Overlay({
   );
 }
 
-/* ————— نافذة تسجيل الدخول — 448x368 من Figma ————— */
-export function LoginModal({ onClose, onLogin, hero }: { onClose: () => void; onLogin: () => void; hero?: string }) {
+/* ————— نافذة تسجيل الدخول — من لقطة chatgpt.com1 (٢١ أكتوبر) —————
+ *
+ * ولا ترويسة مصوّرة: كان في نسختنا مستطيل ١٩٧ بكسل، وليس في التصميم.
+ * والمحتوى كله من `AuthForm` — وهو نفس ما ستستعمله صفحة `/auth/login`.
+ */
+export function LoginModal({ onClose, onLogin }: { onClose: () => void; onLogin: () => void }) {
   return (
     <Overlay onClose={onClose} width={448}>
-      {/*
-        الترويسة كانت `#1d1d1d` مثبّتًا — مستطيل أسود في الوضع الفاتح.
-        وصارت سطحًا يتبع الثيم. والرسمة نفسها تأتي من `hero` حين تُمرَّر.
-      */}
-      <div style={{ height: 197, background: 'var(--c-raised)', overflow: 'hidden' }}>
-        {hero ? (
-          <img src={hero} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-        ) : null}
-      </div>
-      <div className="px-6 py-5">
-        <h2 style={{ fontSize: 18, lineHeight: '28px', fontWeight: 600 }}>Try advanced features for free</h2>
-        <p className="mt-2" style={{ fontSize: T.bodySm.size, lineHeight: '20px', color: C.muted }}>
-          Get smarter responses, upload files, create images, and more by logging in.
-        </p>
-        <div className="mt-5 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onLogin}
-            className="rounded-full px-4 py-2 text-sm font-semibold transition-transform active:scale-[0.98]"
-            style={{ background: 'var(--c-text)', color: 'var(--c-body)' }}
-          >
-            Log In
-          </button>
-          <button
-            type="button"
-            onClick={onLogin}
-            className="rounded-full px-4 py-2 text-sm font-semibold transition-colors hover:bg-white/10"
-            style={{ border: `1px solid ${C.line}` }}
-          >
-            Sign up for free
-          </button>
-        </div>
+      <div className="relative py-9">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute end-3 top-3 grid h-8 w-8 place-items-center rounded-lg hover:bg-white/10"
+          style={{ color: C.muted }}
+        >
+          <Icon name="close" size={18} />
+        </button>
+        <AuthForm onContinue={onLogin} />
       </div>
     </Overlay>
   );
