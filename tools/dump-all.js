@@ -16,7 +16,18 @@
  * ولا يحتاج مكتبة، ولا يرسل شيئًا: يُنزّل ملفًّا عندك فقط.
  */
 (async () => {
-  const MAX = 3000;
+  /*
+   * `COMPACT` — الوضع المضغوط: لا يُسقط شيئًا مهمًّا، بل يُسقط **الحاويات
+   * الفارغة** (بلا نصّ ولا خلفية ولا حدّ ولا أيقونة). وهي الأغلبية الساحقة
+   * في أي صفحة، ولا تُضيف معلومة: صندوقها يُستنتج من أبنائها.
+   *
+   * والملفّ ينزل من عدّة ميجابايت إلى بضع مئات الكيلوبايت، ويبقى فيه:
+   * كل لون · كل خطّ · كل متغيّر CSS · وكل عنصر له شكل أو كلام.
+   *
+   * اجعلها `false` إن أردت **كل** عقدة بلا استثناء.
+   */
+  const COMPACT = true;
+  const MAX = COMPACT ? 1200 : 3000;
 
   const px = (v) => (v === 'normal' ? null : v);
   const sides = (cs, p) => [cs[p + 'Top'], cs[p + 'Right'], cs[p + 'Bottom'], cs[p + 'Left']];
@@ -113,6 +124,16 @@
       add(pads, style.space.pad.join(' '));
       add(gaps, style.space.gap);
 
+      /*
+       * في الوضع المضغوط: نتخطّى الحاوية التي لا نصّ لها ولا سطح ولا حدّ
+       * ولا أيقونة — فهي صندوق فارغ لا يُقاس منه شيء.
+       */
+      const surface = (style.color.bg && style.color.bg !== 'rgba(0, 0, 0, 0)') || style.color.border || mask;
+      if (COMPACT && !own && !surface) {
+        for (const c of el.children) walk(c, depth + 1);
+        return;
+      }
+
       elements.push({
         depth,
         tag,
@@ -168,6 +189,7 @@
       bodyFont: getComputedStyle(document.body).fontFamily.split(',')[0],
       rootFontSize: getComputedStyle(document.documentElement).fontSize,
     },
+    compact: COMPACT,
     stats,
     counts: { elements: elements.length, tokens: Object.keys(tokens).length },
     palette: {
