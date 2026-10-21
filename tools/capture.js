@@ -95,7 +95,8 @@
     let cur = bodyBg && bodyBg.a > 0.9 ? bodyBg : { r: 0, g: 0, b: 0, a: 1 };
     /* من الأبعد إلى الأقرب — ترتيب الرسم نفسه */
     for (let i = stack.length - 1; i >= 0; i--) cur = blend(stack[i], cur);
-    return cur;
+    /* أعداد صحيحة: rgb(20.400000000000002) لا تُقرأ */
+    return { r: Math.round(cur.r), g: Math.round(cur.g), b: Math.round(cur.b), a: 1 };
   };
 
   const ratio = (fg, bg) => {
