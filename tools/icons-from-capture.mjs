@@ -1,16 +1,22 @@
 #!/usr/bin/env node
 /**
- * يحوّل `chatgpt-icons.json` (من سكربت الـConsole) إلى أيقونات في المشروع.
+ * أيقونات chatgpt.com → ملفّات في المشروع.
  *
- *   node tools/icons-from-capture.mjs <ملفّ.json>
+ *   node tools/icons-from-capture.mjs <chatgpt-icons.json>
  *
- * والفكرة: **الاسم الحقيقي يُطابَق باسمنا**، فلا نعدّل أي مكوّن. فحين يصل
- * `New chat` من الموقع يُكتب باسم `create`، فتأخذه كل مواضعه تلقائيًا.
+ * ويأخذها من مصدرين، بالأولوية:
+ *
+ *   ١) **ملفّ الـsprite** — ٩٠٥ رموز في ملفّ واحد (`/cdn/assets/icons-*.svg`).
+ *      وهذا هو الأصل: كل أيقونات الموقع فيه بأسمائها (`books-light-20`
+ *      هي Library، و`brain-regular-20` هي Think).
+ *   ٢) **الـSVG المضمَّن** — للأيقونات التي ليست في الـsprite (شعار ChatGPT مثلًا).
+ *
+ * ولماذا لا يكفي «انسخ HTML العنصر»: الأيقونة = الشكل + الأنماط + الـsprite.
+ * ولون الأيقونة يأتي من ورقة أنماط الصفحة، فـ`outerHTML` بلا `stroke` ولا
+ * `fill` = **لا شيء يُرسم**. فالمولّد يضع اللون صريحًا على الجذر.
  *
  * والمكتوب في `public/app-icons/chatgpt/` — لا في `generated-icons`، لأنّ ذلك
  * يُمسَح عند كل توليد من Figma.
- *
- * والملفّات تُسمّى بالمحتوى (hash) فلا تتضارب النسخ.
  */
 import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
@@ -29,70 +35,76 @@ if (!file) {
 const data = JSON.parse(readFileSync(file, 'utf8'));
 
 /**
- * اسم الموقع ← اسمنا. والقيمة `null` تعني «لا تُركَّب» (زخرفية أو مكرّرة).
+ * اسمنا ← رمز الـsprite. كل رمز هنا **متحقَّق من وجوده** في الملفّ؛
+ * وما لا يوجد يُطبع في التقرير ولا يُكتب.
  */
-const ALIAS = {
-  'New chat': 'create',
-  Search: 'search',
-  Library: 'book',
-  'Hide sidebar': 'sidebar',
-  'Show sidebar': 'sidebar',
-  'Chat actions': 'overflow',
-  'Pin chat': 'pin',
-  'Unpin chat': 'pinFilled',
-  'Add new project': 'add',
-  Upgrade: 'upgradeSparkleSolid',
-  'Temporary chat': 'temporaryChat',
-  Think: 'think',
-  Dictate: 'microphone',
-  'Start Voice': 'voice',
-  'Add files and more': 'add',
-  'Dismiss suggestion': 'close',
-  'Composer mode': 'chevronDown',
-  'Filter chats and work': 'filter',
-  'Chat history': 'chatThread',
+const SPRITE_MAP = {
+  images: 'photo-light-20',
+  time: 'clock-light-20',
+  book: 'books-light-20',
+  integration: 'plugin-light-20',
+  connectedApps: 'plugin-light-20',
+  image: 'photo-light-20',
+  settings: 'gear-light-20',
+  codexAgentUpgraded: 'codex-light-20',
+  explore: 'ellipsis-horizontal-light-20',
+  sidebar: 'sidebar-light-20',
+  upgradeSparkleSolid: 'sparkle-fill-light-20',
+  add: 'plus-lg-regular-20',
+  plus: 'plus-lg-regular-16',
+  think: 'brain-regular-20',
+  microphone: 'microphone-light-20',
+  voice: 'voice-regular-20',
+  close: 'xmark-md-light-20',
+  chevronDown: 'chevron-down-md-light-16',
+  overflow: 'ellipsis-horizontal-light-16',
+  pin: 'pin-light-16',
+  pinFilled: 'pin-fill-light-16',
+  filter: 'filter-light-16',
+  temporaryChat: 'chat-bubble-dashed-light-20',
+  archive: 'archive-light-20',
+  folder: 'folder-light-16',
+  document: 'document-light-20',
+  delete: 'trash-light-20',
+  stop: 'stop-fill-light-20',
+  edit: 'pencil-light-20',
+  help: 'circle-questionmark-light-16',
+  billing: 'credit-card-light-20',
+  research: 'flask-light-20',
+  globe: 'globe-light-20',
+  link: 'link-light-20',
 };
 
-/** اختيار الأفضل عند التكرار: مقاس ٢٠ ثم الأكبر */
-function better(a, b) {
-  const s = (i) => (i.size?.startsWith('20') ? 1000 : 0) + (i.html?.length || 0);
-  return s(a) >= s(b) ? a : b;
-}
+/** اسم الموقع ← اسمنا، للأيقونات المضمَّنة (غير الموجودة في الـsprite). */
+const INLINE_ALIAS = {
+  'New chat': 'create',
+  Search: 'search',
+  'Chat history': 'chatThread',
+  ChatGPT: 'cc-chatgpt',
+  Pinned: 'cc-pinned',
+  Recents: 'cc-recents',
+};
 
-/* ————— رموز الـsprite ————— *
- * كثير من الأيقونات ليست مسارات، بل `<use href="#books-light-20"/>` يشير إلى
- * ملفّ sprite. وملفّ مستقلّ فيه `<use>` **لا يرسم شيئًا** — وهذا ما جعل
- * أيقونة Library والطيّ تختفي. فحين يكون نصّ الـsprite عندنا نستبدل الـ`use`
- * بمحتوى الرمز؛ وحين لا يكون، **نتخطّى الأيقونة** بدل أن نكتب فراغًا.
- */
+/* ————— الـsprite ————— */
 const symbols = new Map();
 for (const f of data.spriteFiles || []) {
   if (!f.text) continue;
   for (const m of f.text.matchAll(/<symbol\b([^>]*)>([\s\S]*?)<\/symbol>/g)) {
     const id = /\bid="([^"]+)"/.exec(m[1])?.[1];
     if (!id) continue;
-    symbols.set(id, { viewBox: /\bviewBox="([^"]+)"/.exec(m[1])?.[1], inner: m[2] });
+    symbols.set(id, { viewBox: /\bviewBox="([^"]+)"/.exec(m[1])?.[1] || '0 0 20 20', inner: m[2] });
   }
 }
 
-/** يستبدل `<use>` بمحتوى الرمز. ويعيد null إن تعذّر. */
-function resolveUse(svg) {
-  const m = /<use\b[^>]*href="[^"#]*#([^"]+)"[^>]*\/?>/.exec(svg) || /<use\b[^>]*xlink:href="[^"#]*#([^"]+)"[^>]*\/?>/.exec(svg);
-  if (!m) return svg;
-  const sym = symbols.get(m[1]);
-  if (!sym) return null;
-  const vb = sym.viewBox ? `viewBox="${sym.viewBox}"` : (svg.match(/viewBox="([^"]+)"/)?.[0] || '');
-  return `<svg xmlns="http://www.w3.org/2000/svg" ${vb} fill="none">${sym.inner}</svg>`;
-}
-
-const chosen = new Map();
-for (const icon of data.icons || []) {
-  const raw = (icon.name || '').trim();
-  if (!raw) continue;
-  const mine = ALIAS[raw] ?? (ALIAS[raw] === null ? null : 'cc-' + raw.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
-  if (!mine) continue;
-  const entry = { ...icon, _raw: raw };
-  chosen.set(mine, chosen.has(mine) ? better(chosen.get(mine), entry) : entry);
+/** يبني ملفّ SVG من رمز. واللون صريح لأنّ ورقة أنماط الصفحة لا ترافقنا. */
+function symbolToSvg(id, sym) {
+  const filled = /-fill|-regular/.test(id);
+  const inner = sym.inner
+    .replace(/fill="(?!none)[^"]*"/g, 'fill="currentColor"')
+    .replace(/stroke="(?!none)[^"]*"/g, 'stroke="currentColor"');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${sym.viewBox}" fill="${filled ? 'currentColor' : 'none'}"${
+    filled ? '' : ' stroke="currentColor"'
+  }>${inner}</svg>`;
 }
 
 /* امسح القديم: الملفّات تُسمّى بالهاش فتبقى نسخ ميتة */
@@ -100,57 +112,67 @@ if (existsSync(OUT_DIR)) rmSync(OUT_DIR, { recursive: true, force: true });
 mkdirSync(OUT_DIR, { recursive: true });
 
 const map = {};
-const skipped = [];
-for (const [name, icon] of chosen) {
-  let svg = resolveUse(icon.html);
-  if (!svg) {
-    skipped.push(`${name} (${icon._raw}) — <use> بلا sprite`);
-    continue;
-  }
-  /* ضمان viewBox: القناع يحتاج مساحة إحداثيات */
-  if (!/viewBox=/.test(svg) && icon.viewBox) svg = svg.replace('<svg', `<svg viewBox="${icon.viewBox}"`);
+const report = { sprite: [], inline: [], missing: [] };
 
-  /*
-   * **المشكلة الحقيقية:** أيقونات الموقع تأخذ لونها من CSS في الصفحة
-   * (`stroke: currentColor` في ورقة أنماط)، و`outerHTML` لا يحمل الأنماط.
-   * فالملفّ المستقلّ يخرج بلا `stroke` ولا `fill` — أي **لا يُرسم**، وهو ما
-   * جعل «New chat» و«Search» فراغًا.
-   *
-   * فنتحقّق: هل هي أيقونة خطوط (فيها stroke-width أو fill="none") أم مسارات
-   * معبّأة؟ ونضع الخاصية على الجذر ليرثها الأبناء.
-   */
-  const isStroke = /stroke-width|stroke-linecap|stroke-linejoin|fill="none"/.test(svg);
-  svg = svg
-    .replace(/fill="(?!none)[^"]*"/g, 'fill="currentColor"')
-    .replace(/stroke="(?!none)[^"]*"/g, 'stroke="currentColor"');
-  if (!/\bfill=/.test(svg.split('>')[0])) {
-    svg = svg.replace('<svg', `<svg fill="${isStroke ? 'none' : 'currentColor'}"`);
-  }
-  if (isStroke && !/\bstroke=/.test(svg.split('>')[0])) {
-    svg = svg.replace('<svg', '<svg stroke="currentColor"');
-  }
-  const hash = createHash('sha1').update(svg).digest('hex').slice(0, 8);
-  const slug = name.replace(/^cc-/, 'cc-');
-  writeFileSync(join(OUT_DIR, `${slug}-${hash}.svg`), svg);
+function write(name, svg) {
+  const clean = svg.replace(/<symbol\b[^>]*>|<\/symbol>/g, '');
+  const hash = createHash('sha1').update(clean).digest('hex').slice(0, 8);
+  const slug = name.replace(/[^a-zA-Z0-9-]/g, '-');
+  writeFileSync(join(OUT_DIR, `${slug}-${hash}.svg`), clean);
   map[name] = `app-icons/chatgpt/${slug}-${hash}`;
 }
 
+/* ١) من الـsprite */
+for (const [name, id] of Object.entries(SPRITE_MAP)) {
+  const sym = symbols.get(id);
+  if (!sym) {
+    report.missing.push(`${name} ← ${id}`);
+    continue;
+  }
+  write(name, symbolToSvg(id, sym));
+  report.sprite.push(name);
+}
+
+/* ٢) المضمَّنة — لما ليس في الـsprite */
+const picked = new Map();
+for (const icon of data.icons || []) {
+  const mine = INLINE_ALIAS[(icon.name || '').trim()];
+  if (!mine) continue;
+  if (picked.has(mine)) continue;
+  let svg = icon.html;
+  if (/<use[\s>]/i.test(svg)) {
+    report.missing.push(`${mine} (${icon.name}) — <use> بلا رمز`);
+    continue;
+  }
+  if (!/viewBox=/.test(svg) && icon.viewBox) svg = svg.replace('<svg', `<svg viewBox="${icon.viewBox}"`);
+  const isStroke = /stroke-width|stroke-linecap|stroke-linejoin|fill="none"/.test(svg);
+  svg = svg.replace(/fill="(?!none)[^"]*"/g, 'fill="currentColor"').replace(/stroke="(?!none)[^"]*"/g, 'stroke="currentColor"');
+  const root = svg.slice(0, svg.indexOf('>'));
+  if (!/\bfill=/.test(root)) svg = svg.replace('<svg', `<svg fill="${isStroke ? 'none' : 'currentColor'}"`);
+  if (isStroke && !/\bstroke=/.test(root)) svg = svg.replace('<svg', '<svg stroke="currentColor"');
+  picked.set(mine, svg);
+}
+for (const [name, svg] of picked) {
+  write(name, svg);
+  report.inline.push(name);
+}
+
 const header = `/**
- * أيقونات مأخوذة من chatgpt.com نفسه — مولَّدة بـ\`tools/icons-from-capture.mjs\`.
+ * أيقونات مأخوذة من chatgpt.com — مولَّدة بـ\`tools/icons-from-capture.mjs\`.
  * لا تُحرّرها بيدك. وهي **تتقدّم على** \`icon-map.ts\` في \`Icon\`.
  *
  * المصدر: ${data.url || 'chatgpt.com'}
  * وقت السحب: ${data.at || '—'}
- * المجموع: ${Object.keys(map).length}
+ * من الـsprite: ${report.sprite.length} · مضمَّنة: ${report.inline.length}
  */
 
 export const CAPTURE_ICONS: Record<string, string> = `;
-writeFileSync(MAP_FILE, header + JSON.stringify(map, null, 2) + ';\n');
+writeFileSync(MAP_FILE, header + JSON.stringify(map, null, 1) + ';\n');
 
-console.log(`  كُتب ${Object.keys(map).length} أيقونة في ${OUT_DIR.replace(ROOT + '/', '')}`);
-if (skipped.length) {
-  console.log(`  تُخطّيت ${skipped.length} (تحتاج ملفّ الـsprite):`);
-  for (const s of skipped) console.log('     · ' + s);
+console.log(`\n  رموز الـsprite المتاحة: ${symbols.size}`);
+console.log(`  كُتب ${Object.keys(map).length} أيقونة (${report.sprite.length} من الـsprite · ${report.inline.length} مضمَّنة)`);
+if (report.missing.length) {
+  console.log(`  لم تُوجد (${report.missing.length}):`);
+  for (const m of report.missing) console.log('     · ' + m);
 }
-console.log(`  و ${MAP_FILE.replace(ROOT + '/', '')}`);
-for (const [n] of chosen) console.log(`    ${n}`);
+console.log('');
