@@ -180,6 +180,31 @@ if (j.hovers?.length) {
   }
 }
 
+/* ————— الأيقونة ← عنصرها ————— */
+const bound = [];
+for (const st of states) for (const e of st.elements) if (e.icon) bound.push(e);
+const uniqIcon = new Map();
+for (const e of bound) {
+  const k = (e.text || e.label || e.tag).slice(0, 40) + '|' + (e.iconViewBox || '') + '|' + e.iconBox.w;
+  if (!uniqIcon.has(k)) uniqIcon.set(k, e);
+}
+if (uniqIcon.size) {
+  console.log(`\n══ الأيقونة ← عنصرها (${uniqIcon.size}) ══`);
+  for (const [k, e] of [...uniqIcon].slice(0, 24)) {
+    const name = (e.text || e.label || e.tag).slice(0, 26);
+    console.log(`  ${pad(name, 28)} ${pad(e.iconBox.w + '×' + e.iconBox.h, 9)} vb=${pad(e.iconViewBox || '-', 15)} paths=${e.iconPaths} widths=${JSON.stringify(e.iconWidths).slice(0, 12)}`);
+  }
+  if (ICONS) {
+    let n = 0;
+    for (const [, e] of uniqIcon) {
+      const safe = (e.text || e.label || e.tag).replace(/[^\w\u0600-\u06FF-]/g, '-').slice(0, 30);
+      writeFileSync(join(ICONS, `icon-${safe}-${createHash('sha1').update(e.icon).digest('hex').slice(0, 6)}.svg`), e.icon);
+      n++;
+    }
+    console.log(`  ⤓ ${n} أيقونة مسمّاة كُتبت في ${ICONS}`);
+  }
+}
+
 /* ————— النقرات ————— */
 if (j.clicks?.length) {
   const withMsg = j.clicks.filter((c) => c.appeared?.length);

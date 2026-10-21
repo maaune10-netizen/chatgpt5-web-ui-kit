@@ -407,6 +407,23 @@
         } catch {}
       }
 
+      /*
+       * الأيقونة **تُنسَب إلى عنصرها**.
+       * وكانت تُجمع في قائمة منفصلة (`svgs`) بلا إحداثيّات، فتُفقد النسبة:
+       * ٧٥ أيقونة، ولا يُعرف أيّها لـ«Search the web». وهذا سبب أنّ أيقوناتنا
+       * للاقتراحات خطأ.
+       */
+      const iconNode = el.tagName === 'svg' ? el : el.querySelector('svg');
+      if (iconNode) {
+        const ir = iconNode.getBoundingClientRect();
+        rec.icon = iconNode.outerHTML.replace(/\s+/g, ' ').slice(0, 40000);
+        rec.iconBox = { x: +ir.x.toFixed(0), y: +ir.y.toFixed(0), w: +ir.width.toFixed(1), h: +ir.height.toFixed(1) };
+        rec.iconViewBox = iconNode.getAttribute('viewBox');
+        rec.iconWidths = [...new Set([...iconNode.querySelectorAll('[stroke-width]')].map((n) => n.getAttribute('stroke-width')))];
+        rec.iconPaths = iconNode.querySelectorAll('path').length;
+        rec.iconFill = getComputedStyle(iconNode).fill;
+      }
+
       const bgImg = urlFromCss(cs.backgroundImage);
       const maskImg = urlFromCss(cs.maskImage !== 'none' ? cs.maskImage : cs.webkitMaskImage);
       if (bgImg) noteUrl(bgImg);
@@ -428,7 +445,7 @@
       const r = node.getBoundingClientRect();
       if (r.width < 4 || r.height < 4) continue;
       svgs.push({
-        box: { w: +r.width.toFixed(1), h: +r.height.toFixed(1) },
+        box: { x: +r.x.toFixed(1), y: +r.y.toFixed(1), w: +r.width.toFixed(1), h: +r.height.toFixed(1) },
         viewBox: node.getAttribute('viewBox'),
         strokeWidth: getComputedStyle(node).strokeWidth,
         widths: [...new Set([...node.querySelectorAll('[stroke-width]')].map((n) => n.getAttribute('stroke-width')))],
@@ -481,7 +498,7 @@
       })),
       mediaMatched: [...breakpoints].filter((m) => { try { return matchMedia(m).matches; } catch { return false; } }),
       scrollContainers: elements.filter((e) => e.scroll.sh > e.scroll.ch + 4 || e.scroll.sw > e.scroll.cw + 4).map((e) => ({ tag: e.tag, box: e.box, scroll: e.scroll })),
-      counts: { elements: elements.length, svgs: svgs.length, pseudo: pseudo.length },
+      counts: { elements: elements.length, svgs: svgs.length, iconsBound: elements.filter((e) => e.icon).length, pseudo: pseudo.length },
       elements,
       svgs,
       uses,
