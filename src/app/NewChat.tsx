@@ -138,7 +138,7 @@ export function NewChat({
             الاقتراحات في **الحالتين** — والمقيس من capture على `/` لِحساب
             مسجَّل: الصفوف موجودة. وكانت للزائر فقط، وهذا خطأ قراءة لقطة.
           */}
-          <div className="flex flex-col" style={{ marginTop: 11 }}>  {/* مقيس: صندوق ينتهي 261 · أوّل صفّ يبدأ 272 */}
+          <div className="flex flex-col" style={{ marginTop: 24 }}>  {/* مقيس عند 1912×922: الصندوق ينتهي 439.2 · أوّل صفّ 463.2 ← 24 */}
             {SUGGESTIONS.map((s) => (
               <div key={s.text} className="group flex items-center" style={{ height: 52 }}>
                 <button
