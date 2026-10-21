@@ -201,6 +201,42 @@
     if (ASSET_RE.test(r.name) || /^(img|css|font|other|link)$/.test(r.initiatorType)) noteUrl(r.name);
   }
 
+  /* ————————————————— مُراكِم الحركات —————————————————
+   *
+   * `getAnimations()` تُرجع **الجارية الآن** فقط. واللقطة تُؤخذ عند استقرار
+   * الحالة، أي بعد أن تنتهي الحركة — فتُرجع صفرًا.
+   *
+   * فيُسأل كل ٢٠٠ مللي، ويُحفظ كل شكل جديد بمرّته الأولى: فيُجمع ما لا تلتقطه
+   * لحظةٌ واحدة.
+   */
+  const motion = new Map();
+  const motionTick = () => {
+    try {
+      for (const a of document.getAnimations()) {
+        const t = a.effect && a.effect.target;
+        if (!t || (t.closest && t.closest('#__cap_panel'))) continue;
+        const timing = (a.effect.getTiming && a.effect.getTiming()) || {};
+        const name = a.animationName || a.transitionProperty || '?';
+        const label = (t.getAttribute('aria-label') || ownText(t) || t.tagName).slice(0, 60);
+        const key = name + '|' + label + '|' + timing.duration + '|' + (timing.easing || '');
+        if (motion.has(key)) continue;
+        motion.set(key, {
+          name,
+          kind: a.constructor.name,
+          target: { tag: t.tagName, label },
+          duration: timing.duration,
+          delay: timing.delay,
+          easing: timing.easing,
+          iterations: timing.iterations,
+          keyframes: (a.effect.getKeyframes ? a.effect.getKeyframes() : []).slice(0, 6).map((k) =>
+            Object.fromEntries(Object.entries(k).filter(([x]) => x !== 'offset' && x !== 'computedOffset'))),
+          at: new Date().toISOString(),
+        });
+      }
+    } catch {}
+  };
+  const motionPoll = setInterval(motionTick, 200);
+
   /* ————————————————— التحويم والتلميحات —————————————————
    *
    * `:hover` لا تُفعَّل بالأحداث الصناعيّة — تُفعَّل بالمؤشّر الحقيقي وحده.
@@ -558,6 +594,34 @@
       })),
       mediaMatched: [...breakpoints].filter((m) => { try { return matchMedia(m).matches; } catch { return false; } }),
       scrollContainers: elements.filter((e) => e.scroll.sh > e.scroll.ch + 4 || e.scroll.sw > e.scroll.cw + 4).map((e) => ({ tag: e.tag, box: e.box, scroll: e.scroll })),
+      /*
+       * الحركات **الجارية الآن** — لا قواعد CSS وحدها.
+       * `getAnimations()` يعطي ما يتحرّك في هذه اللحظة: العنصر، والخاصيّة،
+       * والمدّة، ومنحنى التوقيت، والإطارات الفعلية.
+       */
+      animations: (() => {
+        try {
+          return document.getAnimations().slice(0, 300).map((a) => {
+            const t = a.effect && a.effect.target;
+            const timing = (a.effect && a.effect.getTiming && a.effect.getTiming()) || {};
+            const kf = (a.effect && a.effect.getKeyframes && a.effect.getKeyframes()) || [];
+            return {
+              kind: a.constructor.name,
+              animationName: a.animationName || null,
+              transitionProperty: a.transitionProperty || null,
+              target: t ? { tag: t.tagName, label: (t.getAttribute('aria-label') || '').slice(0, 80) || null, text: ownText(t).slice(0, 60) || null } : null,
+              duration: timing.duration,
+              delay: timing.delay,
+              easing: timing.easing,
+              iterations: timing.iterations,
+              currentTime: a.currentTime,
+              keyframes: kf.slice(0, 8).map((k) => Object.fromEntries(Object.entries(k).filter(([x]) => x !== 'offset' && x !== 'computedOffset'))),
+            };
+          });
+        } catch {
+          return [];
+        }
+      })(),
       counts: { elements: elements.length, svgs: svgs.length, iconsBound: elements.filter((e) => e.icon).length, pseudo: pseudo.length },
       /*
        * الشريط الجانبيّ وحده — لأنّ سلوك الطيّ يختلف عنّا: الأصل يُظهر شريطًا
@@ -705,11 +769,14 @@
         assetCount: Object.keys(assets).length,
         assetBytes: total,
         hovers: hovers.length,
+        motion: motion.size,
         clicks: clicks.length,
         styleTableSize: styleTable.size,
       },
       styles: Object.fromEntries([...styleTable].map(([h, v]) => [h, v.props])),
       css: cssRules,
+      /* كل حركة رُئيت في الجلسة، لا لحظة اللقطة */
+      motion: [...motion.values()],
       hovers,
       clicks,
       states,
@@ -770,6 +837,19 @@
   history.pushState = function (...a) { const r = ps.apply(this, a); onNav(); return r; };
   history.replaceState = function (...a) { const r = rs.apply(this, a); onNav(); return r; };
 
+  /*
+   * مراقبة الرابط بالاستقصاء.
+   * بعض الموجّهات تُغيّر التاريخ بلا استدعاء `pushState` يمكن اعتراضه، أو
+   * تُغيّر المسار بعد جلب. فالاستقصاء كلّ ٢٥٠ مللي يضمن ألّا تفوت صفحة —
+   * ومنها صفحات الإعدادات التي تُفتح بلا رابط ظاهر.
+   */
+  let lastUrl = location.href;
+  const urlPoll = setInterval(() => {
+    if (location.href === lastUrl) return;
+    lastUrl = location.href;
+    if (running) setTimeout(() => capture('url'), 400);
+  }, 250);
+
   const interval = setInterval(() => {
     if (!running) return;
     if (Date.now() - t0 > MAX_MS) { running = false; render(); return; }
@@ -786,6 +866,8 @@
     stop: () => {
       running = false;
       clearInterval(interval);
+      clearInterval(urlPoll);
+      clearInterval(motionPoll);
       mo.disconnect();
       window.removeEventListener('resize', onResize);
       window.removeEventListener('popstate', onNav);
