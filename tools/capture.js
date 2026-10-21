@@ -25,6 +25,12 @@
   const MAX_MS = 5 * 60 * 1000;
   const FETCH_CAP_BYTES = 90 * 1024 * 1024;
 
+  /*
+   * مدخل الطابور: الملفّ يُرسَل من هنا مباشرة، فيصل إلى `inbox/` مرتّبًا
+   * باسمه الزمنيّ — بلا رفع يدويّ وبلا انتظار.
+   */
+  const UPLOAD = 'https://bahr-vps.tail18374c.ts.net:8445/api/capture';
+
   const t0 = Date.now();
   const states = [];
   const appearance = new Map(); // key -> Set(width)
@@ -565,10 +571,12 @@
       <span>🔴 <b>${states.length}</b> حالة</span>
       <span style="color:#7a7a7a">${secs}s · ${siteMap.size} صفحة · <b id="__cap_h">${hovers.length}</b> تحويمًا · <b id="__cap_c">${clicks.length}</b> نقرة · ~${estimate()}</span>
       <button id="__cap_s" style="all:unset;cursor:pointer;background:${running ? '#2f2f2f' : '#1f6f3f'};padding:5px 9px;border-radius:6px">${running ? '⏸ إيقاف' : '▶ متابعة'}</button>
-      <button id="__cap_d" style="all:unset;cursor:pointer;background:#3a83f7;color:#fff;padding:5px 9px;border-radius:6px">⬇ تنزيل</button>`;
+      <button id="__cap_u" style="all:unset;cursor:pointer;background:#1f6f3f;color:#fff;padding:5px 9px;border-radius:6px">⬆ إرسال</button>
+      <button id="__cap_d" style="all:unset;cursor:pointer;background:#333;color:#ededed;padding:5px 9px;border-radius:6px">⬇ تنزيل</button>`;
     hoverCount = panel.querySelector('#__cap_h');
     panel.querySelector('#__cap_s').onclick = () => { running = !running; render(); if (running) capture('resume'); };
-    panel.querySelector('#__cap_d').onclick = () => download();
+    panel.querySelector('#__cap_d').onclick = () => download('download');
+    panel.querySelector('#__cap_u').onclick = () => download('upload');
   };
 
   /* ————————————————— التنزيل ————————————————— */
@@ -587,9 +595,9 @@
       r.readAsDataURL(blob);
     });
 
-  const download = async () => {
+  const download = async (mode = 'download') => {
     const btn = panel.querySelector('#__cap_d');
-    if (btn) btn.textContent = '… جمع الأصول';
+    if (btn) btn.textContent = mode === 'upload' ? '… جمع الأصول' : '… جمع الأصول';
 
     const assets = {};
     let total = 0;
@@ -644,9 +652,25 @@
     };
 
     const blob = new Blob([JSON.stringify(out)], { type: 'application/json' });
-    dl(blob, `capture-${out.meta.states}s-${(blob.size / 1048576).toFixed(1)}mb.json`);
-    if (btn) btn.textContent = `⬇ تنزيل (${(blob.size / 1048576).toFixed(0)} MB)`;
-    console.log(`✓ ${states.length} حالة · ${Object.keys(assets).length} أصل · ${cssRules.length} قاعدة · ${(blob.size / 1048576).toFixed(1)} ميجا`);
+    const mb = (blob.size / 1048576).toFixed(1);
+
+    if (mode === 'upload') {
+      if (btn) btn.textContent = `… إرسال ${mb} MB`;
+      try {
+        const res = await fetch(UPLOAD, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: blob });
+        const r = await res.json();
+        if (btn) btn.textContent = r.ok ? `✓ أُرسل ${mb} MB` : `✗ فشل ${res.status}`;
+        console.log(r.ok ? `↑ أُرسل ${r.name} · ${mb} ميجا` : `✗ ${JSON.stringify(r).slice(0, 120)}`);
+      } catch (e) {
+        if (btn) btn.textContent = '✗ الشبكة';
+        console.log('✗ فشل الإرسال:', String(e).slice(0, 120));
+      }
+      return;
+    }
+
+    dl(blob, `capture-${out.meta.states}s-${mb}mb.json`);
+    if (btn) btn.textContent = `⬇ تنزيل (${mb} MB)`;
+    console.log(`✓ ${states.length} حالة · ${Object.keys(assets).length} أصل · ${cssRules.length} قاعدة · ${mb} ميجا`);
   };
 
   /* ————————————————— المحرّكات ————————————————— */
