@@ -461,11 +461,23 @@
       });
       if (svgs.length >= 400) break;
     }
-    const uses = [...document.querySelectorAll('use')].slice(0, 300).map((u) => {
+    /*
+     * `<use>` — وقد تكون **خارجيّة**: `<use href="/cdn/assets/icons-….svg#id">`.
+     * وحينها الشكل في ملفّ آخر، فلا يُقرأ من الصفحة إطلاقًا.
+     * فالمرجع الخارجيّ يُسجَّل كاملًا (الملفّ + المعرّف) ليُجلب لاحقًا.
+     */
+    const uses = [...document.querySelectorAll('use')].slice(0, 400).map((u) => {
       const href = u.getAttribute('href') || u.getAttribute('xlink:href') || '';
-      const id = href.startsWith('#') ? href.slice(1) : null;
-      const t = id && document.getElementById(id);
-      return { id, resolved: t ? t.outerHTML.replace(/\s+/g, ' ').slice(0, 40000) : null };
+      const [file, frag] = href.split('#');
+      const id = frag || null;
+      const local = !file ? (id && document.getElementById(id)) : null;
+      const sprite = file ? new URL(file, location.href).href : null;
+      if (sprite) noteUrl(sprite); /* يدخل قائمة الأصول، فيُجلب ببياناته */
+      return {
+        id,
+        sprite,
+        resolved: local ? local.outerHTML.replace(/\s+/g, ' ').slice(0, 40000) : null,
+      };
     });
 
     /* الروابط */
