@@ -139,7 +139,7 @@ function Row({
             opacity: active || muted ? undefined : 0.85,
           }}
         >
-          {label}
+          <span className="nav-label">{label}</span>
         </span>
         {external ? (
           <Icon name="linkExternal" size={16} style={{ color: C.dim, flexShrink: 0 }} />
@@ -205,7 +205,7 @@ function SectionLabel({
         type="button"
         onClick={collapsible ? onToggle : undefined}
         disabled={!collapsible}
-        className={'flex items-center gap-1 ' + (collapsible ? 'hover:text-white/80' : 'cursor-default')}
+        className={'side-section flex items-center gap-1 ' + (collapsible ? 'hover:text-white/80' : 'cursor-default')}
         style={{ fontSize: 14, lineHeight: '18px', fontWeight: 500, color: C.muted }}
         aria-expanded={collapsible ? open : undefined}
       >
@@ -387,14 +387,19 @@ export function Sidebar({
     <aside
       className={'flex h-full flex-col ' + (overlay ? 'fixed inset-y-0 start-0 z-[90] transition-transform duration-200' : 'relative shrink-0')}
       style={{
-        width: overlay ? Math.min(width, 320) : collapsed ? 0 : width,
+        /*
+         * مقيس من capture: المطويّ **٥٢ بكسل** لا صفرًا — شريط أيقونات رفيع.
+         * وأقلّ من ٦٣٧ يُخفى كليًّا (`overlay`).
+         */
+        width: overlay ? Math.min(width, 320) : collapsed ? 52 : width,
         background: C.sidebar,
         borderRight: !overlay && !collapsed ? `1px solid ${C.line}` : 'none',
-        overflow: !overlay && collapsed ? 'hidden' : undefined,
+        overflow: 'hidden',
         boxShadow: overlay ? '0 12px 40px rgba(0,0,0,0.6)' : undefined,
         transform: overlay ? `translateX(${collapsed ? '-100%' : '0'})` : undefined,
       }}
       aria-hidden={collapsed}
+      data-collapsed={collapsed ? 'true' : 'false'}
     >
       <div className="flex h-full flex-col" style={{ width: overlay ? Math.min(width, 320) : width }}>
         {/* الترويسة */}
@@ -418,6 +423,7 @@ export function Sidebar({
             {/* الشعار SVG بعرض 77×18 — لا نصًّا. مقيس من الموقع. */}
             <span
               aria-hidden="true"
+              className="side-brand"
               style={{ display: 'block', width: 77.13, height: 18, color: C.text }}
               dangerouslySetInnerHTML={{ __html: CHATGPT_WORDMARK }}
             />

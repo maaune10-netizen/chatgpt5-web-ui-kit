@@ -211,3 +211,11 @@ input:focus-visible,
  * فكان العنوان يظهر مقطوع البداية («شر الصناعي في جملين»).
  */
 [dir='rtl'], [lang='ar'] { text-align: start; }
+
+
+/* الشريط المطويّ ٥٢ بكسل: أيقونات بلا تسميات — كما في الموقع. */
+aside[data-collapsed='true'] .nav-label,
+aside[data-collapsed='true'] .side-brand,
+aside[data-collapsed='true'] .side-section {
+  display: none !important;
+}
