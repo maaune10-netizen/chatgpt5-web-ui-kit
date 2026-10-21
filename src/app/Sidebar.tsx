@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './Icon';
 import { C, ITEM, MENU_SHADOW } from '../lib/tokens';
+import { CHATGPT_WORDMARK } from '../lib/wordmark';
 import type { Store, Conversation } from './store';
 
 /**
@@ -32,7 +33,6 @@ function Row({
   onTogglePin,
   external,
   muted,
-  bold,
   renaming,
   onRename,
   onRenameCancel,
@@ -132,7 +132,8 @@ function Row({
           style={{
             fontSize: ITEM.labelSize,
             lineHeight: `${ITEM.labelLh}px`,
-            fontWeight: bold ? 500 : 400,
+            /* مقيس: حتى الصفّ النشط w400 — وكان 500 فيبدو أثخن */
+            fontWeight: 400,
             /* النصّ غير النشط ٨٥٪ — مقيس: oklab(…/0.85). والنشط كامل. */
             opacity: active || muted ? undefined : 0.85,
           }}
@@ -414,7 +415,11 @@ export function Sidebar({
             style={{ height: 36, paddingInline: 8 }}
           >
             {/* الشعار SVG بعرض 77×18 — لا نصًّا. مقيس من الموقع. */}
-            <Icon name="cc-chatgpt" size={18} w={77} />
+            <span
+              aria-hidden="true"
+              style={{ display: 'block', width: 77.13, height: 18, color: C.text }}
+              dangerouslySetInnerHTML={{ __html: CHATGPT_WORDMARK }}
+            />
           </button>
           <div className="flex items-center gap-0.5">
             {/* البحث أيقونةً في الترويسة — من اللقطة، لا صفًّا في القائمة */}
