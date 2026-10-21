@@ -238,6 +238,62 @@ function SectionLabel({
 }
 
 /* ————— الشريط ————— */
+
+/**
+ * `CollapsedRail` — الشريط المطويّ ٥٢ بكسل، مقيسًا من capture (حالة 0، 1912×922):
+ *
+ *   8,8    36×36  زرّ الطيّ — والشعار 24×24 داخلَه، يتحوّل إليه عند التحويم
+ *   60,8   36×35  New chat   (نشط: bg rgba(255,255,255,0.1))
+ *   96,8   36×35  Search
+ *   132,8  36×35  Pinned
+ *   ++36   36×35  Recents · Library
+ *
+ *  وهو **شريط آخر**، لا الشريط الكبير مقصوصًا: كانت هذه غلطتنا.
+ */
+function CollapsedRail({ store, onToggle, active }: { store: Store; onToggle: () => void; active?: string }) {
+  const items = [
+    { key: 'new', icon: 'create', label: 'New chat', run: () => void store.newChat() },
+    { key: 'search', icon: 'search', label: 'Search', run: () => {} },
+    { key: 'pinned', icon: 'cc-pinned', label: 'Pinned', run: () => {} },
+    { key: 'recents', icon: 'cc-recents', label: 'Recents', run: () => {} },
+    { key: 'library', icon: 'book', label: 'Library', run: () => store.go('library') },
+  ];
+  return (
+    <div className="flex h-full flex-col items-center" style={{ width: 52, paddingTop: 8, gap: 0 }}>
+      <Tip label="Toggle sidebar">
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label="Show sidebar"
+          className="grid place-items-center rounded-lg transition-colors hover:bg-[var(--c-hover)]"
+          style={{ width: 36, height: 36, color: C.text }}
+        >
+          <Icon name="sidebar" size={24} />
+        </button>
+      </Tip>
+      {items.map((it) => (
+        <Tip key={it.key} label={it.label}>
+          <button
+            type="button"
+            onClick={it.run}
+            aria-label={it.label}
+            className="grid place-items-center rounded-lg transition-colors hover:bg-[var(--c-hover)]"
+            style={{
+              width: 36,
+              height: 35,
+              marginTop: it.key === 'new' ? 16 : 1,
+              background: active === it.key ? 'rgba(255,255,255,0.10)' : undefined,
+              color: C.text,
+            }}
+          >
+            <Icon name={it.icon} size={20} />
+          </button>
+        </Tip>
+      ))}
+    </div>
+  );
+}
+
 export function Sidebar({
   store,
   onOpenSearch,
@@ -401,6 +457,10 @@ export function Sidebar({
       aria-hidden={collapsed}
       data-collapsed={collapsed ? 'true' : 'false'}
     >
+      {collapsed && !overlay ? (
+        <CollapsedRail store={store} onToggle={onToggleCollapsed} active={newChatActive ? 'new' : undefined} />
+      ) : (
+      <>
       <div className="flex h-full flex-col" style={{ width: overlay ? Math.min(width, 320) : width }}>
         {/* الترويسة */}
         {/*
@@ -755,7 +815,9 @@ export function Sidebar({
           onShare={() => onShare(menuFor.id)}
         />
       )}
-    </aside>
+          </>
+      )}
+</aside>
   );
 }
 
