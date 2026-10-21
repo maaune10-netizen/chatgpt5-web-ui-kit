@@ -73,7 +73,7 @@ export function ChatApp({
    */
   const [sidebarW, setSidebarW] = useState(() => {
     const v = typeof localStorage !== 'undefined' ? Number(localStorage.getItem('gpt5.sidebar.width')) : 0;
-    return v >= 200 && v <= 460 ? v : 260;
+    return v >= 200 && v <= 460 ? v : 240; // ٢٤٠ = مقيس من الموقع
   });
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);

@@ -37,6 +37,7 @@ function Row({
   onRename,
   onRenameCancel,
   compact,
+  height,
 }: {
   icon?: string;
   label: string;
@@ -55,6 +56,8 @@ function Row({
   onRenameCancel?: () => void;
   /** الشريط ضيّق: الاختصار يُخفى بدل أن يزاحم الاسم */
   compact?: boolean;
+  /** ارتفاع مخصّص — صفّ المحادثة ٣٧ لا ٣٥، مقيسًا من الموقع */
+  height?: number;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -105,17 +108,19 @@ function Row({
          * الحشو الأيمن يحجز مكان **زرّين** (تثبيت + المزيد) لا زرّ واحد.
          * كان 32px والزرّان يشغلان 58 — فيركب السهم على آخر الكلام.
          */
-        className="flex w-full items-center gap-2 rounded-[10px] ps-2.5 text-start transition-colors hover:bg-white/[0.07]"
+        className="flex w-full items-center rounded-[8px] ps-2.5 text-start transition-colors hover:bg-white/[0.07]"
         data-actions={onMenu || onTogglePin ? '2' : '0'}
         style={{
-          height: ITEM.h,
+          height: height ?? ITEM.h,
+          gap: ITEM.gap,
           /* زرّان (٢٨+٢+٢٨) + هامش ٤ = ٦٢. والحشو ٦٠ كان يترك تراكبًا بكسلين */
           paddingInlineEnd: onMenu && onTogglePin ? 64 : onMenu || onTogglePin ? 34 : 10,
           background: active ? 'var(--c-active)' : undefined,
           color: muted ? C.muted : C.text,
         }}
       >
-        {icon ? <Icon name={icon} size={ITEM.icon} /> : <span style={{ width: ITEM.icon }} />}
+        {/* صفّ المحادثة في الموقع بلا أيقونة **وبلا حجز مكانها** — فالنصّ يبدأ عند الحشو */}
+        {icon ? <Icon name={icon} size={ITEM.icon} /> : null}
         {/*
          * `dir="auto"` يترك المتصفّح يختار الاتجاه من أوّل حرف.
          * بلا هذا كان العنوان العربيّ في حاوية LTR يُقطع من **أوّله** فيظهر
@@ -124,7 +129,13 @@ function Row({
         <span
           className="flex-1 truncate"
           dir="auto"
-          style={{ fontSize: ITEM.labelSize, lineHeight: `${ITEM.labelLh}px`, fontWeight: bold ? 500 : 400 }}
+          style={{
+            fontSize: ITEM.labelSize,
+            lineHeight: `${ITEM.labelLh}px`,
+            fontWeight: bold ? 500 : 400,
+            /* النصّ غير النشط ٨٥٪ — مقيس: oklab(…/0.85). والنشط كامل. */
+            opacity: active || muted ? undefined : 0.85,
+          }}
         >
           {label}
         </span>
@@ -187,13 +198,13 @@ function SectionLabel({
 }) {
   const collapsible = typeof open === 'boolean' && onToggle;
   return (
-    <div className="group/sec flex items-center justify-between ps-2.5 pe-1 pt-3">
+    <div className="group/sec flex items-center justify-between ps-2.5 pe-1" style={{ paddingTop: 30 }}>
       <button
         type="button"
         onClick={collapsible ? onToggle : undefined}
         disabled={!collapsible}
-        className={'flex items-center gap-1 rounded-md py-0.5 ' + (collapsible ? 'hover:text-white/80' : 'cursor-default')}
-        style={{ fontSize: 13, color: C.dim }}
+        className={'flex items-center gap-1 ' + (collapsible ? 'hover:text-white/80' : 'cursor-default')}
+        style={{ fontSize: 14, lineHeight: '18px', fontWeight: 500, color: C.muted }}
         aria-expanded={collapsible ? open : undefined}
       >
         {collapsible && (
@@ -342,6 +353,10 @@ export function Sidebar({
     };
   }, [state.conversations]);
 
+  /*
+   * صفّ المحادثة في الموقع **بلا أيقونة**، ونصّه يبدأ عند x=16 (لا 42)،
+   * وارتفاعه ٣٧ لا ٣٥. فمرّرنا `icon` غير معرّف وارتفاعًا مختلفًا.
+   */
   const chatRow = (c: Conversation, inPinned = false) => (
     <Row
       key={c.id}
@@ -358,6 +373,7 @@ export function Sidebar({
       onRenameCancel={() => setRenaming(null)}
       onTogglePin={() => store.togglePin(c.id)}
       onMenu={(at) => setMenuFor({ id: c.id, at })}
+      height={ITEM.chatH}
     />
   );
 
@@ -376,7 +392,11 @@ export function Sidebar({
     >
       <div className="flex h-full flex-col" style={{ width: overlay ? Math.min(width, 320) : width }}>
         {/* الترويسة */}
-        <div className="flex items-center justify-between px-2.5 pt-2">
+        {/*
+          الترويسة — مقيسة: كلمة ChatGPT عند (15, 25.5) بخطّ 18/26 w600،
+          وزرّان 36×36 عند y=8، وحافّتهما اليمنى 8px من الشريط.
+        */}
+        <div className="flex items-center justify-between" style={{ paddingInline: 8, paddingTop: 8 }}>
           {/*
             الموقع الحقيقي يستعمل **كلمة** «ChatGPT» هنا لا الأيقونة.
             وقد ظننتها أيقونة حتى رأيت اللقطة.
@@ -386,8 +406,8 @@ export function Sidebar({
             onClick={() => void store.newChat()}
             title="ChatGPT"
             aria-label="ChatGPT"
-            className="flex h-9 items-center rounded-lg px-2 hover:bg-white/10"
-            style={{ fontSize: 17, fontWeight: 600, letterSpacing: -0.2 }}
+            className="flex items-center rounded-lg hover:bg-white/10"
+            style={{ height: 36, paddingInline: 7, fontSize: 18, lineHeight: '26px', fontWeight: 600 }}
           >
             ChatGPT
           </button>
@@ -398,8 +418,8 @@ export function Sidebar({
               onClick={onOpenSearch}
               title="Search chats  (Ctrl+K)"
               aria-label="Search chats"
-              className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
-              style={{ color: C.muted }}
+              className="grid place-items-center rounded-lg hover:bg-white/10"
+              style={{ color: C.muted, width: 36, height: 36, marginTop: 0 }}
             >
               <Icon name="search" size={18} />
             </button>
@@ -421,22 +441,38 @@ export function Sidebar({
          * See plans and pricing ↗ · Help ↗ · Settings.
          * ولا بحث ولا مكتبة ولا محادثة مؤقتة، لأنّها كلها تحتاج حسابًا.
          */}
-        <div className="px-1.5 pt-1">
+        {/* الفراغ ١px: صفّ ٣٥ + ١ = ٣٦، وهذا تباعد الموقع المقيس */}
+        <div className="px-1.5 pt-4">
           {state.signedIn ? (
             <>
               {/*
                 الترتيب من لقطة `chatgpt2.com`:
                 New chat · Images · Scheduled · Library · Plugins · Codex · Explore
-                والبحث انتقل أيقونةً في الترويسة، والمحادثة المؤقّتة إلى قائمة
-                الحساب — فليست في الشريط في اللقطة.
+
+                والمسافات **صراحةً** لا بـ`space-y`: الباعد المقيس هو 36 بين
+                الصفوف (ارتفاع 35 + 1)، و39 بعد Images (مجموعة ثانية).
+                و`space-y-px` لم تُطبَّق داخل الحاوية المتداخلة، فقياس الصفوف
+                جاء 35 لا 36.
               */}
               <Row icon="create" label="New chat" trailing="Ctrl + Shift + O" compact={compact} active={newChatActive} onClick={() => void store.newChat()} />
-              <Row icon="images" label="Images" compact={compact} onClick={() => store.go('images')} />
-              <Row icon="time" label="Scheduled" compact={compact} onClick={() => store.go('scheduled')} />
-              <Row icon="book" label="Library" compact={compact} onClick={() => store.go('library')} />
-              <Row icon="connectedApps" label="Plugins" compact={compact} onClick={() => store.go('plugins')} />
-              <Row icon="codexAgentUpgraded" label="Codex" compact={compact} onClick={() => store.go('codex')} />
-              <Row icon="explore" label="Explore" compact={compact} onClick={() => store.go('explore')} />
+              <div style={{ marginTop: 1 }}>
+                <Row icon="images" label="Images" compact={compact} onClick={() => store.go('images')} />
+              </div>
+              <div style={{ marginTop: 4 }}>
+                <Row icon="time" label="Scheduled" compact={compact} onClick={() => store.go('scheduled')} />
+              </div>
+              <div style={{ marginTop: 1 }}>
+                <Row icon="book" label="Library" compact={compact} onClick={() => store.go('library')} />
+              </div>
+              <div style={{ marginTop: 1 }}>
+                <Row icon="connectedApps" label="Plugins" compact={compact} onClick={() => store.go('plugins')} />
+              </div>
+              <div style={{ marginTop: 1 }}>
+                <Row icon="codexAgentUpgraded" label="Codex" compact={compact} onClick={() => store.go('codex')} />
+              </div>
+              <div style={{ marginTop: 1 }}>
+                <Row icon="explore" label="Explore" compact={compact} onClick={() => store.go('explore')} />
+              </div>
             </>
           ) : (
             <>

@@ -35,7 +35,11 @@ export const C = {
 } as const;
 
 export const L = {
-  sidebarW: 260, // Sidebar 260x1024
+  /*
+   * ٢٤٠ لا ٢٦٠ — قِيس من الموقع الحيّ (blueprint، ٢١ أكتوبر، نافذة ١٠٩٠).
+   * والـKit كان ٢٦٠، والموقع غيّره.
+   */
+  sidebarW: 240,
   railW: 1180, // Body
   headerH: 52, // App Header 1180x52
   threadW: 768, // Chat Thread 768x850
@@ -46,16 +50,26 @@ export const L = {
   sidebarPad: 6, // صفوف متداخلة 6px
 } as const;
 
+/**
+ * مقاسات الصفّ — **مقيسة من الموقع الحيّ** لا من الـKit:
+ *   صفّ التنقّل   228/218×35 · pad 6/10 · radius 8 · gap 6 · خطّ 14/20
+ *   صفّ المحادثة  218×37
+ *   ترويسة القسم  14/18 w500 · x=16
+ * والـKit كان 36 · radius 10 · gap 8 · 14/19.74 — أي أنّه تغيّر كلّه.
+ */
 export const ITEM = {
-  h: 36, // Menu List Item Base 260x36
-  radius: 10,
-  padX: 10, // pad=6/10/6/10
+  h: 35,
+  /** صفّ المحادثة أطول ببكسلين */
+  chatH: 37,
+  radius: 8,
+  padX: 10,
+  padY: 6,
   icon: 20,
-  gap: 8,
+  gap: 6,
   labelSize: 14,
-  labelLh: 19.74,
+  labelLh: 20,
   subSize: 12,
-  subLh: 15.6,
+  subLh: 16,
 } as const;
 
 export const FONT = {
