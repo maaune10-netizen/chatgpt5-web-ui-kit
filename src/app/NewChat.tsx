@@ -22,10 +22,15 @@ import { C, L } from '../lib/tokens';
  *   • الزائر: ثلاثة أسطر (قلم · كتاب · علامة سؤال) تحت الصندوق.
  *   • المسجَّل: **لا شيء** — الشاشة فارغة تحت الصندوق.
  */
+/*
+ * النصوص **حرفيًّا** من capture على `/`، بالترتيب نفسه:
+ *   y=285 «Create an image or sticker» · y=337 «Write or edit» · y=389 «Search the web»
+ * ومقيس: كل صفّ 768×52، والتباعد 52، والنصّ عند 52 من اليسار.
+ */
 const SUGGESTIONS = [
-  { icon: 'edit', text: 'Make this message easier to follow' },
-  { icon: 'book', text: 'Teach me something in 5 minutes' },
-  { icon: 'help', text: 'Create a five question trivia challenge' },
+  { icon: 'image', text: 'Create an image or sticker' },
+  { icon: 'edit', text: 'Write or edit' },
+  { icon: 'search', text: 'Search the web' },
 ];
 
 export function NewChat({
@@ -60,7 +65,8 @@ export function NewChat({
       <div className="flex min-h-0 flex-1 items-center justify-center px-6">
         {/* إزاحة للأعلى كما في التصميم. وتختلف بين الحالتين لأن سطر
             الإخلاء في الأسفل يزيد ارتفاع الكتلة في الوضع غير المسجَّل. */}
-        <div className="w-full" style={{ maxWidth: L.threadW, transform: `translateY(${signedIn ? -38 : -46}px)` }}>
+        <div className="w-full" /* مقيس على 1530×498: كتلة الرئيسية تبدأ عند 143 في مساحة 52..482 — أي +17 عن الوسط */
+        style={{ maxWidth: L.threadW, transform: `translateY(${signedIn ? 24 : 0}px)` }}>
           {/* العنوان في التصميم: 30/600 بارتفاع سطر 36 — لا 24/31 كما خمّنت */}
           <h1
             className="text-center"
@@ -81,7 +87,7 @@ export function NewChat({
               مسجَّل   العنوان ينتهي 423 والصندوق 445 ← 22
               غير مسجَّل ينتهي 388 والصندوق 419 ← 31
           */}
-          <div style={{ marginTop: signedIn ? 22 : 31 }}>
+          <div style={{ marginTop: 38 }}>  {/* مقيس: عنوان 143 · صندوق 209 (فرق 66) · عنوان بارتفاع 32 */}
             <Composer
               value={value}
               onChange={onChange}
@@ -105,24 +111,34 @@ export function NewChat({
           </div>
 
           {/*
-            الاقتراحات للزائر فقط، أسطرًا لا بطاقات — كما في لقطة `/`.
-            والمسجَّل لا يرى شيئًا تحتها.
+            الاقتراحات في **الحالتين** — والمقيس من capture على `/` لِحساب
+            مسجَّل: الصفوف موجودة. وكانت للزائر فقط، وهذا خطأ قراءة لقطة.
           */}
-          {!signedIn && (
-            <div className="mt-4 flex flex-col">
-              {SUGGESTIONS.map((s) => (
+          <div className="flex flex-col" style={{ marginTop: 11 }}>  {/* مقيس: صندوق ينتهي 261 · أوّل صفّ يبدأ 272 */}
+            {SUGGESTIONS.map((s) => (
+              <div key={s.text} className="group flex items-center" style={{ height: 52 }}>
                 <button
-                  key={s.text}
                   type="button"
                   onClick={() => onSuggestion(s.text)}
-                  className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-start transition-colors hover:bg-[var(--c-hover)]"
+                  className="flex min-w-0 flex-1 items-center gap-4 rounded-lg text-start transition-colors hover:bg-[var(--c-hover)]"
+                  style={{ height: 52, paddingInlineStart: 16 }}
                 >
-                  <Icon name={s.icon} size={18} style={{ color: C.muted, flexShrink: 0 }} />
-                  <span style={{ fontSize: 14, lineHeight: '20px', color: C.text }}>{s.text}</span>
+                  <Icon name={s.icon} size={20} style={{ color: C.muted, flexShrink: 0 }} />
+                  <span className="truncate" style={{ fontSize: 16, lineHeight: '26px', color: C.muted }}>{s.text}</span>
                 </button>
-              ))}
-            </div>
-          )}
+                <button
+                  type="button"
+                  title="Dismiss suggestion"
+                  aria-label="Dismiss suggestion"
+                  className="grid shrink-0 place-items-center rounded-md opacity-0 transition-opacity hover:bg-[var(--c-hover)] group-hover:opacity-100"
+                  style={{ width: 36, height: 36, color: C.muted }}
+                  onClick={(e) => (e.currentTarget.parentElement as HTMLElement).style.display = 'none'}
+                >
+                  <Icon name="close" size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

@@ -397,17 +397,21 @@ export function ChatApp({
           */}
           {signedIn && (
             <div
-              className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-0.5 rounded-full p-0.5 sm:flex"
-              style={{ background: C.segment }}
+              className="absolute left-1/2 hidden -translate-x-1/2 items-center sm:flex"
+              style={{ background: C.segment, height: 36, borderRadius: 9999, padding: 0 }}
               role="tablist"
               aria-label="Chat mode"
             >
+              {/*
+                مقيس من capture على `/`: الحاوية 224×36 @ (773,8)، والنصفان
+                112×36 — لا 32 مع حشو. والنشط أبيض صافٍ، والخامل rgb(205,205,205).
+              */}
               <button
                 type="button"
                 role="tab"
                 aria-selected
-                className="rounded-full px-4 text-sm font-medium"
-                style={{ height: 32, background: 'var(--c-modal)', color: C.text, boxShadow: '0 1px 2px rgba(0,0,0,0.10)' }}
+                className="text-sm font-medium"
+                style={{ width: 112, height: 36, borderRadius: 9999, background: 'var(--c-modal)', color: '#ffffff' }}
               >
                 Chat
               </button>
@@ -417,10 +421,10 @@ export function ChatApp({
                 aria-selected={false}
                 disabled
                 title="Work is not available in this clone"
-                className="flex items-center gap-1.5 rounded-full px-3.5 text-sm"
-                style={{ height: 32, color: C.dim, cursor: 'not-allowed' }}
+                className="flex items-center justify-center gap-1.5 text-sm font-medium"
+                style={{ width: 112, height: 36, borderRadius: 9999, color: 'rgb(205,205,205)', cursor: 'not-allowed' }}
               >
-                <Icon name="upgradeSparkle" size={14} style={{ opacity: 0.7 }} />
+                <Icon name="upgradeSparkle" size={14} style={{ opacity: 0.75 }} />
                 Work
               </button>
             </div>
@@ -430,9 +434,16 @@ export function ChatApp({
             {signedIn ? (
               <>
                 {/*
-                  «✦ Upgrade» كان هنا — والمستخدم يقول إنّ الأزرق عندهم **أسفل**
-                  قرب «Free»، لا في الترويسة. فأُزيل من هنا.
+                  مقيس على `/`: 104×34 @ (1374,9) · 14/20 w500 · rgb(99,168,248).
+                  نصّ أزرق بلا خلفية — لا شرارة ولا قرص.
                 */}
+                <button
+                  type="button"
+                  onClick={() => void store.newChat(null, true)}
+                  aria-hidden="true"
+                  tabIndex={-1}
+                  style={{ width: 104, height: 34, color: 'rgb(99, 168, 248)', fontSize: 14, lineHeight: '20px', fontWeight: 500, display: 'none' }}
+                />
                 <button
                   type="button"
                   onClick={() => void store.newChat(null, true)}

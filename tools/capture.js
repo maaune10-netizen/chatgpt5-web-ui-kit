@@ -195,6 +195,60 @@
     if (ASSET_RE.test(r.name) || /^(img|css|font|other|link)$/.test(r.initiatorType)) noteUrl(r.name);
   }
 
+  /* ————————————————— التحويم والتلميحات —————————————————
+   *
+   * `:hover` لا تُفعَّل بالأحداث الصناعيّة — تُفعَّل بالمؤشّر الحقيقي وحده.
+   * فالحيلة: نستمع لـ`mousemove`، وحين يستقرّ المؤشّر على عنصر ٢٦٠ مللي
+   * نقرأ أنماطه **وهو محوَّم عليه فعلًا**، ثم نبحث عن التلميح الظاهر.
+   *
+   * وهذا يسجّل شيئًا لا تُنتجه أي لقطة ساكنة: «العقل يقول Get a smarter
+   * answer، وإطاره يتغيّر إلى كذا».
+   */
+  const hovers = [];
+  const TIP_SEL = '[role="tooltip"],[data-radix-popper-content-wrapper],.tooltip,[class*="tooltip"]';
+
+  const recordHover = (x, y) => {
+    const el = document.elementFromPoint(x, y);
+    if (!el || el.closest('#__cap_panel')) return;
+    const chain = [];
+    let n = el;
+    for (let i = 0; i < 4 && n && n !== document.body; i++) {
+      const r = n.getBoundingClientRect();
+      chain.push({
+        tag: n.tagName,
+        label: (n.getAttribute('aria-label') || '').slice(0, 120) || null,
+        title: n.getAttribute('title') || null,
+        text: ownText(n).slice(0, 80) || null,
+        box: { x: +r.x.toFixed(0), y: +r.y.toFixed(0), w: +r.width.toFixed(0), h: +r.height.toFixed(0) },
+        s: styleIdOf(getComputedStyle(n)),
+      });
+      n = n.parentElement;
+    }
+    const tip = document.querySelector(TIP_SEL);
+    const tipRect = tip ? tip.getBoundingClientRect() : null;
+    const rec = {
+      at: new Date().toISOString(),
+      x, y,
+      key: chain[0].label || chain[0].title || chain[0].text || chain[0].tag,
+      tip: tip ? tip.innerText.replace(/\s+/g, ' ').trim().slice(0, 200) : null,
+      tipBox: tipRect ? { x: +tipRect.x.toFixed(0), y: +tipRect.y.toFixed(0), w: +tipRect.width.toFixed(0), h: +tipRect.height.toFixed(0) } : null,
+      tipS: tip ? styleIdOf(getComputedStyle(tip)) : null,
+      chain,
+    };
+    /* التمريرات المكرّرة على الشيء نفسه لا تُضيف معلومة */
+    if (hovers.some((h) => h.key === rec.key && h.tip === rec.tip)) return;
+    hovers.push(rec);
+    if (hoverCount) hoverCount.textContent = hovers.length;
+  };
+
+  let hoverTimer = null;
+  const onMove = (e) => {
+    clearTimeout(hoverTimer);
+    const x = e.clientX, y = e.clientY;
+    hoverTimer = setTimeout(() => recordHover(x, y), 260);
+  };
+  window.addEventListener('mousemove', onMove, { passive: true });
+
   /* ————————————————— لقطة حالة ————————————————— */
   const SURFACES = '[role="dialog"],[aria-expanded="true"],[data-state="open"],[popover],dialog[open]';
 
@@ -384,6 +438,7 @@
   };
 
   /* ————————————————— اللوحة ————————————————— */
+  let hoverCount = null;
   const panel = document.createElement('div');
   panel.id = '__cap_panel';
   panel.style.cssText = `position:fixed;z-index:2147483647;inset-inline-start:12px;bottom:12px;background:#0b0b0b;color:#ededed;
@@ -404,9 +459,10 @@
     const secs = ((Date.now() - t0) / 1000).toFixed(0);
     panel.innerHTML = `
       <span>🔴 <b>${states.length}</b> حالة</span>
-      <span style="color:#7a7a7a">${secs}s · ${siteMap.size} صفحة · ~${estimate()}</span>
+      <span style="color:#7a7a7a">${secs}s · ${siteMap.size} صفحة · <b id="__cap_h">${hovers.length}</b> تحويمًا · ~${estimate()}</span>
       <button id="__cap_s" style="all:unset;cursor:pointer;background:${running ? '#2f2f2f' : '#1f6f3f'};padding:5px 9px;border-radius:6px">${running ? '⏸ إيقاف' : '▶ متابعة'}</button>
       <button id="__cap_d" style="all:unset;cursor:pointer;background:#3a83f7;color:#fff;padding:5px 9px;border-radius:6px">⬇ تنزيل</button>`;
+    hoverCount = panel.querySelector('#__cap_h');
     panel.querySelector('#__cap_s').onclick = () => { running = !running; render(); if (running) capture('resume'); };
     panel.querySelector('#__cap_d').onclick = () => download();
   };
@@ -463,10 +519,12 @@
         cssSkipped,
         assetCount: Object.keys(assets).length,
         assetBytes: total,
+        hovers: hovers.length,
         styleTableSize: styleTable.size,
       },
       styles: Object.fromEntries([...styleTable].map(([h, v]) => [h, v.props])),
       css: cssRules,
+      hovers,
       states,
       appearance: [...appearance].map(([key, widths]) => ({
         key,

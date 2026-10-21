@@ -165,6 +165,21 @@ for (const s of states.filter((x) => x.diff).slice(-6)) {
   for (const x of d.removed.slice(0, 2)) console.log(`      − ${x.slice(0, 60)}`);
 }
 
+/* ————— التحويم والتلميحات ————— */
+if (j.hovers?.length) {
+  console.log(`\n══ التحويم والتلميحات (${j.hovers.length}) ══`);
+  for (const h of j.hovers.slice(0, 18)) {
+    const tipStyle = h.tipS ? j.styles[h.tipS] : null;
+    console.log(`  «${(h.key || '').slice(0, 26)}» → ${h.tip ? `«${h.tip.slice(0, 42)}»` : '—'}`);
+    if (tipStyle) console.log(`      تلميح ${tipStyle['font-size']}/${tipStyle['line-height']} w${tipStyle['font-weight']} ${tipStyle['background-color']} نصّ ${tipStyle.color} r=${tipStyle['border-radius']}`);
+    const c0 = j.styles[h.chain[0].s];
+    if (c0) {
+      const tr = ['transition-property', 'transition-duration', 'transition-timing-function'].map((k) => c0[k]).filter((v) => v && v !== 'all' || v === 'all');
+      if (tr.some((v) => v && v !== 'none' && v !== '0s')) console.log(`      حركة ${c0['transition-property']?.slice(0, 50)} ${c0['transition-duration']?.slice(0, 24)} ${c0['transition-timing-function']?.slice(0, 24)}`);
+    }
+  }
+}
+
 /* ————— CSS ————— */
 const hover = (j.css || []).filter((r) => /:hover|:focus|:active/.test(r.css));
 console.log(`\n══ CSS التفاعل (${hover.length} من ${j.css.length}) ══`);
