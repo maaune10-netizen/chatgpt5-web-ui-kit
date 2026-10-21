@@ -309,12 +309,35 @@
       if (r.width < 8 || r.height < 8) continue;
       const text = n.innerText.replace(/\s+/g, ' ').trim().slice(0, 220);
       if (!text) continue;
+      /*
+       * بنود السطح — لا نصّه المسطَّح فقط.
+       * القائمة قائمةُ أوامر: كلّ بند بتلميحه وأيقونته وصندوقه. ونصّها
+       * متّصلًا لا يُظهر أين يبدأ بند وأين ينتهي.
+       */
+      const items = [...n.querySelectorAll('[role="menuitem"],[role="option"],[role="menuitemradio"],[role="menuitemcheckbox"],li,button')]
+        .slice(0, 60)
+        .map((b) => {
+          const br = b.getBoundingClientRect();
+          if (br.width < 4 || br.height < 4) return null;
+          const icon = b.querySelector('svg');
+          return {
+            text: b.innerText.replace(/\s+/g, ' ').trim().slice(0, 160),
+            hint: (b.getAttribute('aria-label') || b.getAttribute('title') || '').slice(0, 120) || null,
+            role: b.getAttribute('role') || null,
+            box: { x: +br.x.toFixed(0), y: +br.y.toFixed(0), w: +br.width.toFixed(0), h: +br.height.toFixed(0) },
+            s: styleIdOf(getComputedStyle(b)),
+            icon: icon ? icon.outerHTML.replace(/\s+/g, ' ').slice(0, 20000) : null,
+          };
+        })
+        .filter(Boolean);
+
       out.set(text, {
         text,
         tag: n.tagName,
         role: n.getAttribute('role') || null,
         box: { x: +r.x.toFixed(0), y: +r.y.toFixed(0), w: +r.width.toFixed(0), h: +r.height.toFixed(0) },
         s: styleIdOf(getComputedStyle(n)),
+        items,
       });
     }
     return out;
@@ -517,6 +540,20 @@
       mediaMatched: [...breakpoints].filter((m) => { try { return matchMedia(m).matches; } catch { return false; } }),
       scrollContainers: elements.filter((e) => e.scroll.sh > e.scroll.ch + 4 || e.scroll.sw > e.scroll.cw + 4).map((e) => ({ tag: e.tag, box: e.box, scroll: e.scroll })),
       counts: { elements: elements.length, svgs: svgs.length, iconsBound: elements.filter((e) => e.icon).length, pseudo: pseudo.length },
+      /*
+       * الشريط الجانبيّ وحده — لأنّ سلوك الطيّ يختلف عنّا: الأصل يُظهر شريطًا
+       * رفيعًا بشعار، لا إخفاءً كاملًا.
+       */
+      chrome: (() => {
+        const aside = document.querySelector('aside,nav[aria-label*="istory"],nav[aria-label*="hat"]');
+        const brand = document.querySelector('a[aria-label="ChatGPT"], a[href="/"] svg, svg[viewBox*="77"]');
+        const ar = aside ? aside.getBoundingClientRect() : null;
+        const br = brand ? brand.getBoundingClientRect() : null;
+        return {
+          aside: ar ? { x: Math.round(ar.x), w: Math.round(ar.width), h: Math.round(ar.height) } : null,
+          brand: br ? { x: Math.round(br.x), y: Math.round(br.y), w: +br.width.toFixed(1), h: +br.height.toFixed(1) } : null,
+        };
+      })(),
       elements,
       svgs,
       uses,
