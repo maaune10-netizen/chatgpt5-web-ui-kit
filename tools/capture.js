@@ -244,7 +244,14 @@
       });
       n = n.parentElement;
     }
-    const tip = document.querySelector(TIP_SEL);
+    /*
+     * التلميح المرئيّ **يُضاف إلى `<body>`** بعد مهلة، وغالبًا في portal.
+     * فبدل البحث بمحدّد نجهله: نقارن أبناء `<body>` قبل وبعد.
+     * (وكان الخطأ أخذ `aria-describedby`، وهو نصّ مخفيّ 1×1 لا يُرى.)
+     */
+    const tip = [...document.body.children].find(
+      (n) => !n.dataset.capSeen && n.getBoundingClientRect().width > 20 && n.innerText && n.innerText.trim().length > 1,
+    ) || document.querySelector(TIP_SEL);
     const tipRect = tip ? tip.getBoundingClientRect() : null;
     const rec = {
       at: new Date().toISOString(),
@@ -263,9 +270,15 @@
 
   let hoverTimer = null;
   const onMove = (e) => {
+    /* بصمة أبناء body الآن — كل ما يُضاف بعدها هو سطح جديد */
+    for (const n of document.body.children) if (n.id !== '__cap_panel') n.dataset.capSeen = '1';
     clearTimeout(hoverTimer);
     const x = e.clientX, y = e.clientY;
-    hoverTimer = setTimeout(() => recordHover(x, y), 260);
+    /*
+     * ٩٠٠ مللي: التلميحات في ChatGPT تتأخّر. وبـ٢٦٠ كُنّا نلتقط «Think» بلا
+     * تلميح إطلاقًا.
+     */
+    hoverTimer = setTimeout(() => recordHover(x, y), 900);
   };
   window.addEventListener('mousemove', onMove, { passive: true });
 
