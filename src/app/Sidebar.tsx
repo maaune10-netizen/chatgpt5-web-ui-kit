@@ -651,8 +651,16 @@ export function Sidebar({
             <button
               type="button"
               onClick={onUpgrade}
-              className="shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors hover:bg-white/15"
-              style={{ background: 'var(--c-active)', border: `1px solid ${C.line}` }}
+              className="shrink-0 rounded-full font-medium transition-opacity hover:opacity-90"
+              style={{
+                /* مقيس: 69.22×28 · 12/16 w500 · والأزرق في التذييل لا في الترويسة */
+                height: 28,
+                paddingInline: 12,
+                background: C.blue,
+                color: '#ffffff',
+                fontSize: 12,
+                lineHeight: '16px',
+              }}
             >
               Upgrade
             </button>

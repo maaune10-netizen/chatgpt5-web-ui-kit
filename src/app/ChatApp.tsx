@@ -429,16 +429,10 @@ export function ChatApp({
           <div className="flex items-center gap-2">
             {signedIn ? (
               <>
-                {/* ✦ Upgrade — نصّ أزرق لا قرص بنفسجي، كما في اللقطة */}
-                <button
-                  type="button"
-                  onClick={() => setUpgradeOpen(true)}
-                  className="flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium hover:bg-white/[0.07]"
-                  style={{ color: C.blue }}
-                >
-                  <Icon name="upgradeSparkleSolid" size={17} style={{ opacity: 1 }} />
-                  Upgrade
-                </button>
+                {/*
+                  «✦ Upgrade» كان هنا — والمستخدم يقول إنّ الأزرق عندهم **أسفل**
+                  قرب «Free»، لا في الترويسة. فأُزيل من هنا.
+                */}
                 <button
                   type="button"
                   onClick={() => void store.newChat(null, true)}

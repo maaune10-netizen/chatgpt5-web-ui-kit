@@ -19,7 +19,8 @@
   --c-menu: #353535;
   --c-raised: #424242;
 
-  --c-text: #ffffff;
+  /* مقيس من الموقع في الوضع الغامق: rgb(237,237,237) */
+  --c-text: #ededed;
   --c-muted: #afafaf;
   --c-dim: #696969;
 

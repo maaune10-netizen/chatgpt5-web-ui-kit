@@ -67,7 +67,12 @@ export function NewChat({
             style={{ fontSize: T.h1.size, lineHeight: `${T.h1.lh}px`, fontWeight: 600 }}
           >
             {/* من اللقطة: المسجَّل «What's on your mind today?» · الزائر «Where should we begin?» */}
-            {signedIn ? "What's on your mind today?" : 'Where should we begin?'}
+            {/*
+              المستخدم يرى على الموقع «Where should we begin?» في الحالتين.
+              ولقطة سابقة أظهرت «What's on your mind today?» — فقد يكون اختبارًا
+              متغيّرًا عندهم. اتّبعنا ما يراه الآن، والقياس القادم يحسم.
+            */}
+            Where should we begin?
           </h1>
 
           {/*
