@@ -249,8 +249,9 @@ export function Composer({
               title={`Thinking effort: ${thinking ?? 'auto'}`}
               aria-haspopup="menu"
               aria-expanded={thinkOpen}
-              className="flex h-8 items-center gap-1.5 rounded-full px-2 transition-colors hover:bg-white/10"
-              style={{ color: thinking === 'off' ? C.dim : C.muted, fontSize: 13 }}
+              /* مقيس: الزرّ 90×36 · النصّ 16/26 — وكان 13، وهو سبب «عندهم كبيرة» */
+              className="flex items-center gap-2 rounded-full px-3 transition-colors hover:bg-white/10"
+              style={{ height: 36, color: thinking === 'off' ? C.dim : C.muted, fontSize: 16, lineHeight: '26px' }}
             >
               {/* دماغهم الحقيقيّ: sprite icons-9df9ab66 → brain-light-20 */}
               <SiteIcon name="brain-light-20" size={16} />

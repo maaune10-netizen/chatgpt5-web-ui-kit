@@ -373,7 +373,7 @@
     const pseudo = [];
     const wrapperKeys = new Set();
 
-    const walk = (el, depth) => {
+    const walk = (el, depth, parentRect, prevRect) => {
       if (elements.length >= 1400 || depth > 70) return;
       const tag = el.tagName;
       if (/^(SCRIPT|STYLE|NOSCRIPT|PATH|USE|G|DEFS|SYMBOL|META|LINK|HEAD|TITLE)$/.test(tag)) return;
@@ -391,7 +391,12 @@
 
       /* الحاويات الفارغة تُتخطّى — صندوقها يُستنتج من أبنائها */
       if (!own && !hasSurface && !hasSvg && !el.getAttribute('role') && !el.getAttribute('aria-label')) {
-        for (const c of el.children) walk(c, depth + 1);
+        let pv = null;
+        for (const c of el.children) {
+          walk(c, depth + 1, rect, pv);
+          const cr = c.getBoundingClientRect();
+          if (cr.width > 0 || cr.height > 0) pv = cr;
+        }
         return;
       }
 
@@ -419,6 +424,15 @@
         classes: el.className && typeof el.className === 'string' ? el.className.slice(0, 200) : null,
         box: { x: +rect.x.toFixed(1), y: +rect.y.toFixed(1), w: +rect.width.toFixed(1), h: +rect.height.toFixed(1) },
         scroll: { sw: el.scrollWidth, sh: el.scrollHeight, cw: el.clientWidth, ch: el.clientHeight },
+        /*
+         * المسافات — وهي ما لا تُقرأ من صندوق منفرد.
+         * «Think عندهم كبيرة وعندنا صغيرة» ليست مقاسًا فقط، بل مقاس **مع**
+         * مسافته إلى جاره وحشو أبيه.
+         */
+        rel: parentRect ? { x: +(rect.x - parentRect.x).toFixed(1), y: +(rect.y - parentRect.y).toFixed(1) } : null,
+        gap: prevRect && prevRect.height > 0
+          ? { x: +(rect.x - (prevRect.x + prevRect.width)).toFixed(1), y: +(rect.y - (prevRect.y + prevRect.height)).toFixed(1) }
+          : null,
         s: styleIdOf(cs),
         contrast,
       };
@@ -464,9 +478,14 @@
       }
 
       elements.push(rec);
-      for (const c of el.children) walk(c, depth + 1);
+      let pv = null;
+        for (const c of el.children) {
+          walk(c, depth + 1, rect, pv);
+          const cr = c.getBoundingClientRect();
+          if (cr.width > 0 || cr.height > 0) pv = cr;
+        }
     };
-    walk(document.body, 0);
+    walk(document.body, 0, null, null);
 
     /* الأيقونات */
     const svgs = [];
