@@ -1,0 +1,32 @@
+[
+ {
+  "slug": "home-dark",
+  "name": "Home — Dark",
+  "file": "/screens/ours/home-dark.png",
+  "built": true
+ },
+ {
+  "slug": "home-light",
+  "name": "Home — Light",
+  "file": "/screens/ours/home-light.png",
+  "built": true
+ },
+ {
+  "slug": "rail-collapsed",
+  "name": "Sidebar — 52px Rail",
+  "file": "/screens/ours/rail-collapsed.png",
+  "built": true
+ },
+ {
+  "slug": "sidebar-open",
+  "name": "Tooltip + Shortcut",
+  "file": "/screens/ours/sidebar-open.png",
+  "built": true
+ },
+ {
+  "slug": "work-dialog",
+  "name": "Meet ChatGPT Work",
+  "file": "/screens/ours/work-dialog.png",
+  "built": true
+ }
+]
