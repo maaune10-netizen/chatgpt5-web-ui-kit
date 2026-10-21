@@ -21,7 +21,7 @@
     document.getElementById('__cap_panel')?.remove();
   }
 
-  const MAX_STATES = 150;
+  const MAX_STATES = 500;
   const MAX_MS = 5 * 60 * 1000;
   const FETCH_CAP_BYTES = 90 * 1024 * 1024;
 
@@ -573,7 +573,16 @@
       t: Date.now() - t0,
       url: location.href,
       title: document.title,
-      viewport: { w: innerWidth, h: innerHeight, dpr: devicePixelRatio, sx: scrollX, sy: scrollY },
+      viewport: {
+        w: innerWidth,
+        h: innerHeight,
+        /* عرض المستند: يختلف عن innerWidth حين يظهر شريط تمرير */
+        docW: document.documentElement.clientWidth,
+        docH: document.documentElement.clientHeight,
+        dpr: devicePixelRatio,
+        sx: scrollX,
+        sy: scrollY,
+      },
       theme: {
         dataTheme: document.documentElement.getAttribute('data-theme') || document.documentElement.className.slice(0, 100) || null,
         prefersDark: matchMedia('(prefers-color-scheme: dark)').matches,
@@ -701,13 +710,15 @@
     const secs = ((Date.now() - t0) / 1000).toFixed(0);
     panel.innerHTML = `
       <span>🔴 <b>${states.length}</b> حالة</span>
-      <span style="color:#7a7a7a">${secs}s · ${siteMap.size} صفحة · <b id="__cap_h">${hovers.length}</b> تحويمًا · <b id="__cap_c">${clicks.length}</b> نقرة · ~${estimate()}</span>
+      <span style="color:#7a7a7a">${secs}s · ${siteMap.size} صفحة · <b id="__cap_h">${hovers.length}</b> تحويمًا · <b id="__cap_c">${clicks.length}</b> نقرة · <b>${new Set(states.map((x) => x.viewport.w)).size}</b> عرضًا · ~${estimate()}</span>
       <button id="__cap_s" style="all:unset;cursor:pointer;background:${running ? '#2f2f2f' : '#1f6f3f'};padding:5px 9px;border-radius:6px">${running ? '⏸ إيقاف' : '▶ متابعة'}</button>
+      <button id="__cap_w" style="all:unset;cursor:pointer;background:#2a3a5a;padding:5px 9px;border-radius:6px">＋ عرض</button>
       <button id="__cap_u" style="all:unset;cursor:pointer;background:#1f6f3f;color:#fff;padding:5px 9px;border-radius:6px">⬆ إرسال</button>
       <button id="__cap_d" style="all:unset;cursor:pointer;background:#333;color:#ededed;padding:5px 9px;border-radius:6px">⬇ تنزيل</button>`;
     hoverCount = panel.querySelector('#__cap_h');
     panel.querySelector('#__cap_s').onclick = () => { running = !running; render(); if (running) capture('resume'); };
     panel.querySelector('#__cap_d').onclick = () => download('download');
+    panel.querySelector('#__cap_w').onclick = () => { capture('manual-' + innerWidth); };
     panel.querySelector('#__cap_u').onclick = () => download('upload');
   };
 
@@ -772,6 +783,10 @@
         motion: motion.size,
         clicks: clicks.length,
         styleTableSize: styleTable.size,
+        /* تغطية: كل عرض، وكم حالة عليه — يسأل عنه أوّلًا */
+        coverage: Object.fromEntries(
+          [...new Set(states.map((x) => x.viewport.w))].sort((a, b) => a - b).map((w) => [w, states.filter((x) => x.viewport.w === w).length]),
+        ),
       },
       styles: Object.fromEntries([...styleTable].map(([h, v]) => [h, v.props])),
       css: cssRules,
@@ -822,7 +837,8 @@
     };
   };
   const deb = later(() => { if (running) capture('mutation'); }, 700);
-  const debR = later(() => { if (running) capture('resize'); }, 600);
+  /* ٣٥٠ مللي: سحب المقاس يولّد عرضًا كلّ بضعة أجزاء من الثانية، و٦٠٠ تُسقط الوسطى */
+  const debR = later(() => { if (running) capture('resize'); }, 350);
 
   const mo = new MutationObserver(deb);
   mo.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style', 'aria-expanded', 'data-state', 'open'] });
