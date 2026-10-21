@@ -455,14 +455,10 @@ export function ChatApp({
                     Share
                   </button>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setSettingsOpen(true)}
-                  className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
-                  aria-label="Settings"
-                >
-                  <Icon name="settings" size={18} />
-                </button>
+                {/*
+                  أيقونة الإعدادات كانت هنا — وليست في الترويسة في الموقع.
+                  والإعدادات تبقى في مكانها الطبيعي: قائمة الحساب أسفل الشريط.
+                */}
               </>
             ) : (
               /* الوضع غير المسجَّل: زرّا الدخول في الترويسة — من New Chat - Logged Out */
@@ -483,14 +479,10 @@ export function ChatApp({
                 >
                   Sign up for free
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setSettingsOpen(true)}
-                  className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
-                  aria-label="Settings"
-                >
-                  <Icon name="settings" size={18} />
-                </button>
+                {/*
+                  أيقونة الإعدادات كانت هنا — وليست في الترويسة في الموقع.
+                  والإعدادات تبقى في مكانها الطبيعي: قائمة الحساب أسفل الشريط.
+                */}
               </>
             )}
           </div>

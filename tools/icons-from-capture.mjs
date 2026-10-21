@@ -47,6 +47,7 @@ const SPRITE_MAP = {
   image: 'photo-light-20',
   settings: 'gear-light-20',
   codexAgentUpgraded: 'codex-light-20',
+  /* Explore = ثلاث نقاط — مُصحَّح من المستخدم: ما وضعته كان علامة الإضافة */
   explore: 'ellipsis-horizontal-light-20',
   sidebar: 'sidebar-light-20',
   upgradeSparkleSolid: 'sparkle-fill-light-20',

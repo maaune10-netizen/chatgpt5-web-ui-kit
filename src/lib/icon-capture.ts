@@ -4,11 +4,10 @@
  *
  * المصدر: https://chatgpt.com/
  * وقت السحب: 2026-10-21T07:37:11.509Z
- * من الـsprite: 33 · مضمَّنة: 6
+ * من الـsprite: 34 · مضمَّنة: 6
  */
 
 export const CAPTURE_ICONS: Record<string, string> = {
- "explore": "app-icons/chatgpt/explore-24a1a218",
  "images": "app-icons/chatgpt/images-8f0176f4",
  "time": "app-icons/chatgpt/time-5f133a9c",
  "book": "app-icons/chatgpt/book-dea449ec",
@@ -17,6 +16,7 @@ export const CAPTURE_ICONS: Record<string, string> = {
  "image": "app-icons/chatgpt/image-8f0176f4",
  "settings": "app-icons/chatgpt/settings-1465d4d4",
  "codexAgentUpgraded": "app-icons/chatgpt/codexAgentUpgraded-b9067c2d",
+ "explore": "app-icons/chatgpt/explore-e68f9ba8",
  "sidebar": "app-icons/chatgpt/sidebar-44ea395c",
  "upgradeSparkleSolid": "app-icons/chatgpt/upgradeSparkleSolid-b8862b7e",
  "add": "app-icons/chatgpt/add-5bdcd08f",
