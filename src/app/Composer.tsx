@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from './Icon';
-import { Tip } from './ui';
+import { Tip, SiteIcon } from './ui';
 import { C, FONT, INPUT_SHADOW, L } from '../lib/tokens';
 
 /**
@@ -252,7 +252,8 @@ export function Composer({
               className="flex h-8 items-center gap-1.5 rounded-full px-2 transition-colors hover:bg-white/10"
               style={{ color: thinking === 'off' ? C.dim : C.muted, fontSize: 13 }}
             >
-              <Icon name="think" size={16} />
+              {/* دماغهم الحقيقيّ: sprite icons-9df9ab66 → brain-light-20 */}
+              <SiteIcon name="brain-light-20" size={16} />
               Think
             </button></Tip>
             {thinkOpen && (
@@ -293,7 +294,7 @@ export function Composer({
             aria-label="Start Voice"
             className="grid h-8 w-8 shrink-0 place-items-center self-end rounded-full hover:bg-white/10"
           >
-            <Icon name="microphone" size={20} />
+            <SiteIcon name="microphone-light-20" size={20} />
           </button>
         </Tip>
 

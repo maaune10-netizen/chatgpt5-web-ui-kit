@@ -1,3 +1,4 @@
+import { SITE_ICONS, type SiteIconName } from '../lib/site-icons';
 import type { CSSProperties, ReactNode } from 'react';
 import { C } from '../lib/tokens';
 
@@ -126,5 +127,19 @@ export function Tip({ label, children, side = 'bottom' }: { label: string; child
         {label}
       </span>
     </span>
+  );
+}
+
+/**
+ * SiteIcon — أيقونة الموقع مضمَّنة لا img، لأنّ currentColor لا تعبر
+ * حدود مستند الصورة.
+ */
+export function SiteIcon({ name, size = 20, color }: { name: SiteIconName; size?: number; color?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      style={{ display: "inline-flex", width: size, height: size, flexShrink: 0, color: color || "currentColor" }}
+      dangerouslySetInnerHTML={{ __html: SITE_ICONS[name] }}
+    />
   );
 }
