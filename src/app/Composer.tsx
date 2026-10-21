@@ -237,7 +237,7 @@ export function Composer({
             title="Stop"
             onClick={onStop}
             className="grid h-9 w-9 shrink-0 place-items-center self-end rounded-full"
-            style={{ background: '#ffffff', color: '#000000' }}
+            style={{ background: 'var(--c-text)', color: 'var(--c-body)' }}
           >
             <Icon name="stop" size={18} style={{ opacity: 1 }} />
           </button>

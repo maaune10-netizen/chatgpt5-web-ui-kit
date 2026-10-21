@@ -42,7 +42,11 @@ function Overlay({
 export function LoginModal({ onClose, onLogin, hero }: { onClose: () => void; onLogin: () => void; hero?: string }) {
   return (
     <Overlay onClose={onClose} width={448}>
-      <div style={{ height: 197, background: '#1d1d1d', overflow: 'hidden' }}>
+      {/*
+        الترويسة كانت `#1d1d1d` مثبّتًا — مستطيل أسود في الوضع الفاتح.
+        وصارت سطحًا يتبع الثيم. والرسمة نفسها تأتي من `hero` حين تُمرَّر.
+      */}
+      <div style={{ height: 197, background: 'var(--c-raised)', overflow: 'hidden' }}>
         {hero ? (
           <img src={hero} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         ) : null}
@@ -57,7 +61,7 @@ export function LoginModal({ onClose, onLogin, hero }: { onClose: () => void; on
             type="button"
             onClick={onLogin}
             className="rounded-full px-4 py-2 text-sm font-semibold transition-transform active:scale-[0.98]"
-            style={{ background: '#ffffff', color: '#000000' }}
+            style={{ background: 'var(--c-text)', color: 'var(--c-body)' }}
           >
             Log In
           </button>
@@ -249,7 +253,7 @@ export function UpgradeModal({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={onClose}
           className="mt-4 w-full rounded-full py-2.5 text-sm font-medium"
-          style={{ background: '#ffffff', color: '#000' }}
+          style={{ background: 'var(--c-text)', color: 'var(--c-body)' }}
         >
           Close
         </button>

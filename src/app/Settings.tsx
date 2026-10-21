@@ -427,7 +427,7 @@ export function SettingsModal({
                 onClose();
               }}
               className="rounded-full px-4 py-2 text-sm font-semibold"
-              style={{ background: '#fff', color: '#000' }}
+              style={{ background: 'var(--c-text)', color: 'var(--c-body)' }}
             >
               Save
             </button>

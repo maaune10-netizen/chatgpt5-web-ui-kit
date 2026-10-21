@@ -434,7 +434,7 @@ export function ChatApp({
                   type="button"
                   onClick={() => setLoginOpen(true)}
                   className="h-9 rounded-full px-4 text-sm font-semibold"
-                  style={{ background: '#ffffff', color: '#000000' }}
+                  style={{ background: 'var(--c-text)', color: 'var(--c-body)' }}
                 >
                   Log in
                 </button>
