@@ -463,16 +463,11 @@ export function ChatApp({
                   <Icon name="temporaryChat" size={20} />
                 </button>
                 </Tip>
-                {conv && (
-                  <button
-                    type="button"
-                    onClick={() => setShareFor(conv.id)}
-                    className="flex h-9 items-center gap-2 rounded-lg px-3 text-sm hover:bg-white/10"
-                  >
-                    <Icon name="share" size={18} />
-                    Share
-                  </button>
-                )}
+                {/*
+                  «Share» كان هنا — **وليس في الموقع**. وأقصى الطرف هو
+                  `Temporary chat` ولا شيء بعده. والمشاركة تبقى في قائمة
+                  المحادثة، لا في الترويسة.
+                */}
                 {/*
                   أيقونة الإعدادات كانت هنا — وليست في الترويسة في الموقع.
                   والإعدادات تبقى في مكانها الطبيعي: قائمة الحساب أسفل الشريط.
@@ -542,7 +537,11 @@ export function ChatApp({
               onSend={(t) => void send(t)}
               onStop={() => streamRef.current?.stop()}
               streaming={streaming}
-              onSuggestion={(t) => void send(t)}
+              /*
+               * النقر على اقتراح **يُعبّئ الحقل ولا يُرسل**: الموقع يكبّر
+               * الصندوق في مكانه، ولا يُنزل الشريط بفتح محادثة.
+               */
+              onSuggestion={(t) => setInput(t)}
               onAttach={(f) => void onAttach(f)}
               onAttachText={(t) => void attachText(t)}
               onPasteImage={pasteImage}

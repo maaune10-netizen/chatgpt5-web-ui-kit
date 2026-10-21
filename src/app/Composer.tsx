@@ -254,7 +254,7 @@ export function Composer({
               style={{ height: 36, color: thinking === 'off' ? C.dim : C.muted, fontSize: 16, lineHeight: '26px' }}
             >
               {/* دماغهم الحقيقيّ: sprite icons-9df9ab66 → brain-light-20 */}
-              <SiteIcon name="brain-light-20" size={16} />
+              <SiteIcon name="brain-light-20" size={20} />
               Think
             </button></Tip>
             {thinkOpen && (
