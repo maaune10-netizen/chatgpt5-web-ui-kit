@@ -4,6 +4,7 @@ import { Sidebar } from './Sidebar';
 import { Composer } from './Composer';
 import { NewChat } from './NewChat';
 import { Tip } from './ui';
+import { WorkDialog } from './WorkDialog';
 import { MessageRow } from './Message';
 import { AccountMenu } from './AccountMenu';
 import { SettingsModal } from './Settings';
@@ -51,6 +52,7 @@ export function ChatApp({
   const signedIn = state.signedIn;
 
   const [collapsed, setCollapsed] = useState(false);
+  const [workOpen, setWorkOpen] = useState(false);
   /*
    * الشاشات الضيّقة: الشريط يصير درجًا منسدلًا لا عمودًا.
    * وكان يبقى 260 مثبّتًا فيضغط المحتوى ويُظهر تمريرًا أفقيًا.
@@ -420,10 +422,9 @@ export function ChatApp({
                 type="button"
                 role="tab"
                 aria-selected={false}
-                disabled
-                title="Work is not available in this clone"
+                onClick={() => setWorkOpen(true)}
                 className="flex items-center justify-center gap-1.5 text-sm font-medium"
-                style={{ width: 112, height: 36, borderRadius: 9999, color: 'rgb(205,205,205)', cursor: 'not-allowed' }}
+                style={{ width: 112, height: 36, borderRadius: 9999, color: 'rgb(205,205,205)' }}
               >
                 <Icon name="upgradeSparkle" size={14} style={{ opacity: 0.75 }} />
                 Work
@@ -654,6 +655,7 @@ export function ChatApp({
           <GenUIPanel code={canvas} onClose={() => setCanvas(null)} />
         </Suspense>
       )}
+      {workOpen && <WorkDialog onClose={() => setWorkOpen(false)} />}
     </div>
     </GenUIContext.Provider>
   );
