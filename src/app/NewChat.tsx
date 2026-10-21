@@ -81,7 +81,7 @@ export function NewChat({
           فالثابت هو الحدّ الأعلى، والنموّ يمتدّ إلى الأسفل.
         */}
         <div
-          className="w-full"
+          className="w-full home-block"
           style={{ maxWidth: L.threadW, /*
            * معادلة من ثلاث نقاط مقيسة في الملفّ:
            *   1912×922 → العنوان 321   1738×838 → 286   1275×615 → 192
@@ -138,7 +138,7 @@ export function NewChat({
             الاقتراحات في **الحالتين** — والمقيس من capture على `/` لِحساب
             مسجَّل: الصفوف موجودة. وكانت للزائر فقط، وهذا خطأ قراءة لقطة.
           */}
-          <div className="flex flex-col" style={{ marginTop: 24 }}>  {/* مقيس عند 1912×922: الصندوق ينتهي 439.2 · أوّل صفّ 463.2 ← 24 */}
+          <div className="home-suggestions flex flex-col" style={{ marginTop: 24 }}>  {/* مقيس عند 1912×922: الصندوق ينتهي 439.2 · أوّل صفّ 463.2 ← 24 */}
             {SUGGESTIONS.map((s) => (
               <div key={s.text} className="group flex items-center" style={{ height: 52 }}>
                 <button

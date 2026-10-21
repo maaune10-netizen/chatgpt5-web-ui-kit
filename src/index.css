@@ -226,3 +226,20 @@ aside[data-collapsed='true'] .side-brand,
 aside[data-collapsed='true'] .side-section {
   display: none !important;
 }
+
+
+/*
+ * الجوال: الكتلة **في الأسفل** لا في الوسط.
+ * مقيس: 393×852 ← الصندوق عند 736 من 852، أي 116 من الأسفل.
+ * وتثبيت الحدّ الأعلى صحيح للشاشات الواسعة وحدها.
+ */
+@media (max-width: 899px) {
+  /* الجوال بلا اقتراحات — مقيس: لا صفوف عند ٣٩٣ */
+  .home-suggestions { display: none; }
+
+  .home-block {
+    margin-top: auto !important;
+    padding-bottom: 56px;
+    align-self: flex-end;
+  }
+}
