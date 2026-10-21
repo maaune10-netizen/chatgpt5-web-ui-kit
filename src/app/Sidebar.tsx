@@ -264,7 +264,7 @@ function CollapsedRail({ store, onToggle, active }: { store: Store; onToggle: ()
         الأصل: **شعار OpenAI** في الأعلى، ويتحوّل إلى أيقونة الطيّ عند التحويم.
         ومقيس: الزرّ 36×36 عند (8,8)، والشعار 24×24 داخلَه.
       */}
-      <Tip label="Toggle sidebar" side="right">
+      <Tip label="Toggle Sidebar" shortcut="Ctrl+Shift+S" side="right">
         <button
           type="button"
           onClick={onToggle}
@@ -503,7 +503,7 @@ export function Sidebar({
           </button>
           <div className="flex items-center gap-0.5">
             {/* البحث أيقونةً في الترويسة — من اللقطة، لا صفًّا في القائمة */}
-            <Tip label="Search chats"><button
+            <Tip label="Search" shortcut="Ctrl+K"><button
               type="button"
               onClick={onOpenSearch}
               title="Search chats  (Ctrl+K)"
@@ -513,7 +513,7 @@ export function Sidebar({
             >
               <Icon name="search" size={18} />
             </button></Tip>
-            <Tip label="Close sidebar"><button
+            <Tip label="Toggle Sidebar" shortcut="Ctrl+Shift+S"><button
               type="button"
               onClick={onToggleCollapsed}
               title="Close sidebar"

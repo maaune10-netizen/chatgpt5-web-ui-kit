@@ -288,11 +288,11 @@ export function Composer({
           </div>
         )}
 
-        <Tip label="Start Voice">
+        <Tip label="Dictate">
           <button
             type="button"
             title="Dictate"
-            aria-label="Start Voice"
+            aria-label="Dictate"
             /* مقيس: 36×36 — وكان 32، أي 4 أقلّ و5 أسفل */
             className="grid h-9 w-9 shrink-0 place-items-center self-center rounded-full hover:bg-white/10"
           >
@@ -313,7 +313,8 @@ export function Composer({
         ) : (
           <button
             type="button"
-            title="Use voice mode"
+            title="Start Voice"
+            aria-label="Start Voice"
             onClick={
               canSend
                 ? () => {
@@ -325,8 +326,8 @@ export function Composer({
             disabled={!canSend}
             className="grid h-9 w-9 shrink-0 place-items-center self-end rounded-full transition-colors"
             style={{
-              /* مقيس من اللقطة: #3a83f7 */
-              background: canSend ? 'var(--c-text)' : 'var(--c-blue)',
+              /* مقيس من capture: rgb(44,103,197) — غامق لا فاتح (#3a83f7) */
+              background: canSend ? 'var(--c-text)' : 'rgb(44, 103, 197)',
               color: canSend ? 'var(--c-body)' : '#ffffff',
               cursor: canSend ? 'pointer' : 'default',
             }}
