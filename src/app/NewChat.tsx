@@ -71,11 +71,19 @@ export function NewChat({
 }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 items-center justify-center px-6">
+      <div className="flex min-h-0 flex-1 items-start justify-center px-6">
         {/* إزاحة للأعلى كما في التصميم. وتختلف بين الحالتين لأن سطر
             الإخلاء في الأسفل يزيد ارتفاع الكتلة في الوضع غير المسجَّل. */}
-        <div className="w-full" /* مقيس على 1530×498: كتلة الرئيسية تبدأ عند 143 في مساحة 52..482 — أي +17 عن الوسط */
-        style={{ maxWidth: L.threadW, transform: `translateY(${signedIn ? 24 : 0}px)` }}>
+        {/*
+          **الحدّ الأعلى مثبَّت، لا الوسط.** كان التوسيط يحرّك الكتلة إلى
+          الأعلى كلّما نما الصندوق — فيبدو الشريط «نازلًا».
+          والمقيس: العنوان عند 143 في ارتفاع 498، أي 90.5 من أعلى المحتوى.
+          فالثابت هو الحدّ الأعلى، والنموّ يمتدّ إلى الأسفل.
+        */}
+        <div
+          className="w-full"
+          style={{ maxWidth: L.threadW, marginTop: 'calc(50vh - 158.5px)' }}
+        >
           {/* العنوان في التصميم: 30/600 بارتفاع سطر 36 — لا 24/31 كما خمّنت */}
           <h1
             className="text-center"
