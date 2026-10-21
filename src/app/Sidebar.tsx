@@ -325,6 +325,15 @@ export function Sidebar({
    * المثبّتة في «Pinned»، وما له مشروع داخل مشروعه، والباقي في «Chats».
    * وكانت المشاريع تظهر مرّتين لأن الشرط لم يكن يستثني.
    */
+  /*
+   * `New chat` يُعلَّم نشطًا حين نكون في محادثة فارغة — وهذا ما تفعله ChatGPT:
+   * الصفّ يأخذ #efefef (مقيس من اللقطة). وكان لا يُعلَّم أبدًا، فتبدو خلفية
+   * الصفحة من خلاله ويُقرأ «أبيض» لا «رمادي خفيف».
+   */
+  const activeConv = state.conversations.find((c) => c.id === state.activeId);
+  const newChatActive =
+    state.signedIn && state.view === 'chat' && !state.temporary && (!activeConv || activeConv.messages.length === 0);
+
   const { pinned, rest } = useMemo(() => {
     const free = state.conversations.filter((c) => !c.projectId);
     return {
@@ -421,7 +430,7 @@ export function Sidebar({
                 والبحث انتقل أيقونةً في الترويسة، والمحادثة المؤقّتة إلى قائمة
                 الحساب — فليست في الشريط في اللقطة.
               */}
-              <Row icon="create" label="New chat" trailing="Ctrl + Shift + O" compact={compact} onClick={() => void store.newChat()} />
+              <Row icon="create" label="New chat" trailing="Ctrl + Shift + O" compact={compact} active={newChatActive} onClick={() => void store.newChat()} />
               <Row icon="images" label="Images" compact={compact} onClick={() => store.go('images')} />
               <Row icon="time" label="Scheduled" compact={compact} onClick={() => store.go('scheduled')} />
               <Row icon="book" label="Library" compact={compact} onClick={() => store.go('library')} />
@@ -431,7 +440,7 @@ export function Sidebar({
             </>
           ) : (
             <>
-              <Row icon="create" label="New chat" trailing="Ctrl + Shift + O" compact={compact} onClick={() => void store.newChat()} />
+              <Row icon="create" label="New chat" trailing="Ctrl + Shift + O" compact={compact} active={newChatActive} onClick={() => void store.newChat()} />
               <Row icon="image" label="Images" onClick={() => store.go('library')} />
               <Row icon="integration" label="Plugins" onClick={() => store.go('library')} />
               <Row icon="research" label="Deep research" onClick={() => store.go('library')} />
