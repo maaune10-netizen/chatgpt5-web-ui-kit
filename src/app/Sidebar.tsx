@@ -207,15 +207,19 @@ function SectionLabel({
         style={{ fontSize: 14, lineHeight: '18px', fontWeight: 500, color: C.muted }}
         aria-expanded={collapsible ? open : undefined}
       >
+        {children}
+        {/*
+          السهم **بعد** الكلمة لا قبلها — مقيس: «Pinned» ينتهي عند 60.06
+          والسهم عند 64.06. وكان قبلها فبدت الكلمة مُزاحة.
+        */}
         {collapsible && (
           <span
             className="grid place-items-center transition-transform duration-150"
-            style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', width: 14, height: 14 }}
+            style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', width: 12, height: 12, marginInlineStart: 4 }}
           >
-            <Icon name="chevronDown" size={14} />
+            <Icon name="chevronDown" size={12} />
           </span>
         )}
-        {children}
       </button>
       {/*
         كان زرّ `＋` ظاهرًا دائمًا. والموقع يُخفيه حتى تمرّ على القسم، ويعرض
@@ -407,9 +411,10 @@ export function Sidebar({
             title="ChatGPT"
             aria-label="ChatGPT"
             className="flex items-center rounded-lg hover:bg-white/10"
-            style={{ height: 36, paddingInline: 7, fontSize: 18, lineHeight: '26px', fontWeight: 600 }}
+            style={{ height: 36, paddingInline: 8 }}
           >
-            ChatGPT
+            {/* الشعار SVG بعرض 77×18 — لا نصًّا. مقيس من الموقع. */}
+            <Icon name="cc-chatgpt" size={18} w={77} />
           </button>
           <div className="flex items-center gap-0.5">
             {/* البحث أيقونةً في الترويسة — من اللقطة، لا صفًّا في القائمة */}

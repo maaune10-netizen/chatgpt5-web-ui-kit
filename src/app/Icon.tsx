@@ -17,11 +17,14 @@ import { useIconsReady } from '../lib/icons';
 export function Icon({
   name,
   size = 20,
+  w,
   className = '',
   style,
 }: {
   name: string;
   size?: number;
+  /** عرض مستقلّ عن الارتفاع — الشعار 77×18 لا مربّع */
+  w?: number;
   className?: string;
   style?: React.CSSProperties;
 }) {
@@ -39,7 +42,7 @@ export function Icon({
 
   /* بلا أيقونة لا نرسم صندوقًا فارغًا — نحفظ المساحة ونسكت */
   if (!src || !ready) {
-    return <span aria-hidden style={{ width: size, height: size, display: 'inline-block', ...style }} />;
+    return <span aria-hidden style={{ width: w ?? size, height: size, display: 'inline-block', ...style }} />;
   }
 
   const url = `url("${src}")`;
@@ -58,7 +61,7 @@ export function Icon({
         flexGrow: 0,
         flexShrink: 0,
         flexBasis: 'auto',
-        width: size,
+        width: w ?? size,
         height: size,
         backgroundColor: 'currentColor',
         WebkitMaskImage: url,

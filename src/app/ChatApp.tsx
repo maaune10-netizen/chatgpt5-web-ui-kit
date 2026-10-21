@@ -5,7 +5,7 @@ import { Composer } from './Composer';
 import { NewChat } from './NewChat';
 import { MessageRow } from './Message';
 import { AccountMenu } from './AccountMenu';
-import { ModelMenu, SettingsModal } from './Settings';
+import { SettingsModal } from './Settings';
 import { LoginModal, SearchModal, ShareModal, UpgradeModal } from './Modals';
 import { Library, ImageViewer, FileViewer, ProjectPage } from './Library';
 import { GenUIContext, GenUIPanel, preloadGenUI } from './genui-shared';
@@ -78,7 +78,6 @@ export function ChatApp({
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [accountAt, setAccountAt] = useState<DOMRect | null>(null);
-  const [modelOpen, setModelOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [shareFor, setShareFor] = useState<string | null>(null);
@@ -385,15 +384,10 @@ export function ChatApp({
                 <Icon name="sidebar" size={20} />
               </button>
             )}
-            <button
-              type="button"
-              onClick={() => setModelOpen((v) => !v)}
-              className="flex h-9 items-center gap-1.5 rounded-lg px-2.5 hover:bg-white/[0.07]"
-            >
-              {/* التصميم يكتب «ChatGPT» هنا لا اسم النموذج */}
-              <span style={{ fontSize: 15, fontWeight: 500 }}>ChatGPT</span>
-              <Icon name="chevronDown" size={16} />
-            </button>
+            {/*
+              لا شعار ولا منتقي نموذج في ترويسة المحتوى: الموقع يضع الشعار في
+              الشريط الجانبي فقط. ومنتقي النموذج باقٍ في الإعدادات.
+            */}
           </div>
 
           {/*
@@ -445,6 +439,16 @@ export function ChatApp({
                   <Icon name="upgradeSparkleSolid" size={17} style={{ opacity: 1 }} />
                   Upgrade
                 </button>
+                <button
+                  type="button"
+                  onClick={() => void store.newChat(null, true)}
+                  title="Temporary chat"
+                  aria-label="Temporary chat"
+                  className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
+                  style={{ color: C.muted }}
+                >
+                  <Icon name="temporaryChat" size={20} />
+                </button>
                 {conv && (
                   <button
                     type="button"
@@ -487,7 +491,6 @@ export function ChatApp({
             )}
           </div>
 
-          {modelOpen && <ModelMenu config={config} onConfig={setCfg} onClose={() => setModelOpen(false)} />}
         </header>
 
         {(['images', 'scheduled', 'plugins', 'codex', 'explore'] as const).includes(state.view as never) ? (
