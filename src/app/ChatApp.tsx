@@ -377,7 +377,12 @@ export function ChatApp({
           style={{ height: L.headerH }}
         >
           <div className="flex items-center gap-1">
-            {signedIn && (collapsed || narrow) && (
+            {/*
+              زرّ الطيّ **مرّة واحدة**: في الشريط المطويّ عند (8,8). وكان
+              يظهر هنا أيضًا فيصير اثنين. ويبقى هنا للجوال وحده، لأنّ الشريط
+              يصير درجًا مخفيًّا.
+            */}
+            {signedIn && narrow && (
               <button
                 type="button"
                 onClick={() => setCollapsed(false)}

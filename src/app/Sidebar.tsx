@@ -459,7 +459,11 @@ export function Sidebar({
         width: overlay ? Math.min(width, 320) : collapsed ? 52 : width,
         background: C.sidebar,
         borderRight: !overlay && !collapsed ? `1px solid ${C.line}` : 'none',
-        overflow: 'hidden',
+        /*
+         * `visible` حين الطيّ: التلميح يخرج يمينًا من الشريط ٥٢، و`hidden`
+         * كان يقصّه فلا يظهر إطلاقًا — وهو سبب «مرّرت على البحث فلم يأتِ شيء».
+         */
+        overflow: collapsed && !overlay ? 'visible' : 'hidden',
         boxShadow: overlay ? '0 12px 40px rgba(0,0,0,0.6)' : undefined,
         transform: overlay ? `translateX(${collapsed ? '-100%' : '0'})` : undefined,
       }}
