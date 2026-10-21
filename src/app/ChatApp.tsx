@@ -3,6 +3,7 @@ import { Icon } from './Icon';
 import { Sidebar } from './Sidebar';
 import { Composer } from './Composer';
 import { NewChat } from './NewChat';
+import { Tip } from './ui';
 import { MessageRow } from './Message';
 import { AccountMenu } from './AccountMenu';
 import { SettingsModal } from './Settings';
@@ -444,16 +445,17 @@ export function ChatApp({
                   tabIndex={-1}
                   style={{ width: 104, height: 34, color: 'rgb(99, 168, 248)', fontSize: 14, lineHeight: '20px', fontWeight: 500, display: 'none' }}
                 />
+                <Tip label="Turn off temporary chat">
                 <button
                   type="button"
                   onClick={() => void store.newChat(null, true)}
-                  title="Temporary chat"
                   aria-label="Temporary chat"
                   className="grid h-9 w-9 place-items-center rounded-lg hover:bg-white/10"
                   style={{ color: C.muted }}
                 >
                   <Icon name="temporaryChat" size={20} />
                 </button>
+                </Tip>
                 {conv && (
                   <button
                     type="button"

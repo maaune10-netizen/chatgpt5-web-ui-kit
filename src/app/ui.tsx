@@ -91,3 +91,40 @@ export function Button({
     </button>
   );
 }
+
+/**
+ * `Tip` — التلميح، بمقاساته المقيسة من capture.
+ *
+ *   «Turn off temporary chat» 174×30 @ (1348,50)
+ *   bg rgb(48,48,48) · نصّ rgb(237,237,237) · 14/18 w600
+ *   حشو 5 · حدّ 0.8px أبيض 5%
+ *
+ * ويظهر بعد ~٧٠٠ مللي — وهو ما جعل التقاطه يفشل حين كان التأخير ٢٦٠.
+ * وبلا حالة React: `group-hover` وحدها، فلا يُعاد رسم شيء عند المرور.
+ */
+export function Tip({ label, children, side = 'bottom' }: { label: string; children: React.ReactNode; side?: 'bottom' | 'top' }) {
+  return (
+    <span className="group/tip relative inline-flex">
+      {children}
+      <span
+        role="tooltip"
+        className="pointer-events-none absolute left-1/2 z-50 -translate-x-1/2 whitespace-nowrap opacity-0 transition-opacity duration-100 group-hover/tip:opacity-100"
+        style={{
+          [side === 'bottom' ? 'top' : 'bottom']: 'calc(100% + 6px)',
+          transitionDelay: '700ms',
+          background: '#303030',
+          color: '#ededed',
+          fontSize: 14,
+          lineHeight: '18px',
+          fontWeight: 600,
+          padding: 5,
+          paddingInline: 8,
+          borderRadius: 8,
+          border: '0.8px solid rgba(255, 255, 255, 0.05)',
+        }}
+      >
+        {label}
+      </span>
+    </span>
+  );
+}

@@ -250,7 +250,12 @@
      * (وكان الخطأ أخذ `aria-describedby`، وهو نصّ مخفيّ 1×1 لا يُرى.)
      */
     const tip = [...document.body.children].find(
-      (n) => !n.dataset.capSeen && n.getBoundingClientRect().width > 20 && n.innerText && n.innerText.trim().length > 1,
+      (n) =>
+        n.id !== '__cap_panel' && /* ← لوحة الأداة ليست تلميحًا: كانت تُلتقط مكانه */
+        !n.dataset.capSeen &&
+        n.getBoundingClientRect().width > 20 &&
+        n.innerText &&
+        n.innerText.trim().length > 1,
     ) || document.querySelector(TIP_SEL);
     const tipRect = tip ? tip.getBoundingClientRect() : null;
     const rec = {
