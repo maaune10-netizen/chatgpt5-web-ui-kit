@@ -106,39 +106,59 @@
 
   const items = [];
   const byBox = new Set();
+  const stats = { visited: 0, pushed: 0, noBox: 0, hidden: 0, notInteresting: 0, maxDepth: 0 };
 
+  /**
+   * المشي — بلا سقف عمق ضيّق ولا استبعاد موضعيّ.
+   *
+   * أوّل نسخة أعطت **٣ عناصر** على الموقع الحقيقي: كان سقف العمق ٢٢، وشرط
+   * «خارج الشاشة» يستبعد الفروع. وشجرة ChatGPT أعمق من ذلك بكثير.
+   * فنُزع السقف الضيّق، وصار كل شيء يُحصى ليُعرف سببه.
+   */
   const walk = (el, depth) => {
-    if (items.length >= MAX || depth > 22) return;
-    if (el.tagName === 'svg' || el.closest('svg')) return; // الأيقونات لها سكربتها
+    if (items.length >= MAX) return;
+    if (depth > 60) return;
+    const tag = el.tagName;
+    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT' || tag === 'svg') return;
+    stats.visited++;
+    if (depth > stats.maxDepth) stats.maxDepth = depth;
+
     const cs = getComputedStyle(el);
-    if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return;
-    const r = el.getBoundingClientRect();
-    if (r.width < 2 || r.height < 2) return;
-    if (r.bottom < -50 || r.top > window.innerHeight + 50) {
-      /* خارج الشاشة: نتخطّى الأبناء أيضًا — إلا الحاويات الكبيرة */
-      if (r.height < window.innerHeight) return;
+    if (cs.display === 'none' || cs.visibility === 'hidden') {
+      stats.hidden++;
+      return;
     }
 
-    const text = directText(el);
-    const tag = el.tagName;
+    const r = el.getBoundingClientRect();
+    const own = directText(el);
     const interactive = ['BUTTON', 'A', 'INPUT', 'TEXTAREA', 'SELECT', 'LABEL'].includes(tag);
+    const landmark = ['ASIDE', 'HEADER', 'NAV', 'MAIN', 'FORM', 'DIALOG', 'SECTION'].includes(tag);
     const hasSurface = cs.backgroundColor !== 'rgba(0, 0, 0, 0)' || cs.borderTopWidth !== '0px';
-    const key = `${Math.round(r.x)},${Math.round(r.y)},${Math.round(r.width)},${Math.round(r.height)},${tag}`;
 
-    if ((text || interactive || hasSurface) && !byBox.has(key)) {
-      byBox.add(key);
-      items.push({
-        path: pathOf(el),
-        tag,
-        role: el.getAttribute('role') || null,
-        name: nameOf(el),
-        text: text.slice(0, 120) || null,
-        box: boxOf(el),
-        font: fontOf(cs),
-        color: colorOf(cs),
-        space: spaceOf(cs),
-        layout: { display: cs.display, position: cs.position, flexDirection: cs.flexDirection, alignItems: cs.alignItems, justifyContent: cs.justifyContent },
-      });
+    if (r.width < 2 || r.height < 2) {
+      stats.noBox++;
+    } else if (own || interactive || landmark || hasSurface) {
+      const key = `${Math.round(r.x)},${Math.round(r.y)},${Math.round(r.width)},${Math.round(r.height)},${tag}`;
+      if (!byBox.has(key)) {
+        byBox.add(key);
+        items.push({
+          path: pathOf(el),
+          tag,
+          role: el.getAttribute('role') || null,
+          name: nameOf(el),
+          text: own.slice(0, 120) || null,
+          box: boxOf(el),
+          font: fontOf(cs),
+          color: colorOf(cs),
+          space: spaceOf(cs),
+          layout: { display: cs.display, position: cs.position, flexDirection: cs.flexDirection, alignItems: cs.alignItems, justifyContent: cs.justifyContent },
+          /** هل العنصر كامل داخل الشاشة؟ — للتمييز بين المرئيّ والمخفيّ تمريرًا */
+          inView: r.top >= -2 && r.bottom <= window.innerHeight + 2,
+        });
+        stats.pushed++;
+      }
+    } else {
+      stats.notInteresting++;
     }
 
     for (const child of el.children) walk(child, depth + 1);
@@ -152,6 +172,7 @@
     viewport: { w: window.innerWidth, h: window.innerHeight, dpr: window.devicePixelRatio },
     theme: document.documentElement.getAttribute('data-theme') || document.documentElement.className || null,
     count: items.length,
+    stats,
     /** أهمّ ما نحتاجه: خطّ الصفحة نفسه وخلفيتها */
     page: {
       bodyBg: getComputedStyle(document.body).backgroundColor,
