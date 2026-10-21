@@ -74,7 +74,8 @@
   --c-line: #f2f2f2;
   --c-divider: rgba(0, 0, 0, 0.10);
   --c-hover: rgba(0, 0, 0, 0.05);
-  --c-active: rgba(0, 0, 0, 0.08);
+  /* مقيس من اللقطة عند صفّ New chat النشط: #efefef */
+  --c-active: #efefef;
 
   --c-accent: #3c6ac3;
   --c-blue: #3a83f7;

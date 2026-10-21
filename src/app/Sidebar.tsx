@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './Icon';
-import { C, ITEM } from '../lib/tokens';
+import { C, ITEM, MENU_SHADOW } from '../lib/tokens';
 import type { Store, Conversation } from './store';
 
 /**
@@ -180,13 +180,14 @@ function SectionLabel({
   onToggle,
 }: {
   children: React.ReactNode;
+  /** إجراءات القسم (＋ و⋯) — تظهر عند المرور لا دائمًا، كما في الموقع */
   action?: React.ReactNode;
   open?: boolean;
   onToggle?: () => void;
 }) {
   const collapsible = typeof open === 'boolean' && onToggle;
   return (
-    <div className="flex items-center justify-between ps-2.5 pe-1 pt-3">
+    <div className="group/sec flex items-center justify-between ps-2.5 pe-1 pt-3">
       <button
         type="button"
         onClick={collapsible ? onToggle : undefined}
@@ -205,7 +206,16 @@ function SectionLabel({
         )}
         {children}
       </button>
-      {action}
+      {/*
+        كان زرّ `＋` ظاهرًا دائمًا. والموقع يُخفيه حتى تمرّ على القسم، ويعرض
+        بجانبه `⋯`. و`focus-within` لأنّ الإخفاء بـ`display:none` يمنع الوصول
+        بلوحة المفاتيح — وهو خطأ ارتكبناه في صفوف المحادثة سابقًا.
+      */}
+      {action && (
+        <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover/sec:opacity-100 group-focus-within/sec:opacity-100">
+          {action}
+        </div>
+      )}
     </div>
   );
 }
@@ -248,6 +258,8 @@ export function Sidebar({
   const [menuFor, setMenuFor] = useState<{ id: string; at: DOMRect } | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [archiveOpen, setArchiveOpen] = useState(false);
+  /** قائمة القسم (⋯) — للمشاريع وRecents */
+  const [sectionMenu, setSectionMenu] = useState<{ kind: 'projects' | 'recents'; at: DOMRect | null } | null>(null);
   const accountRef = useRef<HTMLButtonElement>(null);
   const dragging = useRef(false);
 
@@ -447,15 +459,28 @@ export function Sidebar({
             open={isOpen('projects')}
             onToggle={() => toggle('projects')}
             action={
+              <>
               <button
                 type="button"
                 title="New project"
                 aria-label="New project"
                 onClick={() => void store.newProject('New project')}
                 className="grid h-6 w-6 place-items-center rounded-md hover:bg-white/10"
+                style={{ color: C.muted }}
               >
                 <Icon name="add" size={16} />
               </button>
+              <button
+                type="button"
+                title="Project options"
+                aria-label="Project options"
+                onClick={(e) => setSectionMenu({ kind: 'projects', at: e.currentTarget.getBoundingClientRect() })}
+                className="grid h-6 w-6 place-items-center rounded-md hover:bg-white/10"
+                style={{ color: C.muted }}
+              >
+                <Icon name="overflow" size={16} />
+              </button>
+              </>
             }
           >
             Projects
@@ -483,7 +508,22 @@ export function Sidebar({
           className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-2"
           style={{ display: state.signedIn ? undefined : 'none' }}
         >
-          <SectionLabel open={isOpen('chats')} onToggle={() => toggle('chats')}>
+          <SectionLabel
+            open={isOpen('chats')}
+            onToggle={() => toggle('chats')}
+            action={
+              <button
+                type="button"
+                title="Chat options"
+                aria-label="Chat options"
+                onClick={(e) => setSectionMenu({ kind: 'recents', at: e.currentTarget.getBoundingClientRect() })}
+                className="grid h-6 w-6 place-items-center rounded-md hover:bg-white/10"
+                style={{ color: C.muted }}
+              >
+                <Icon name="overflow" size={16} />
+              </button>
+            }
+          >
             Recents
           </SectionLabel>
           {/* ولا نصّ «لا محادثات» — ChatGPT يُظهر قسمًا فارغًا صامتًا */}
@@ -581,6 +621,51 @@ export function Sidebar({
         >
           <span className="absolute inset-y-0 right-1 w-px transition-colors group-hover/resize:bg-white/40" />
         </div>
+      )}
+
+      {/*
+        قائمة القسم (⋯). ومحتواها **من أفعالنا الحقيقية** لا من تخمين:
+        المشاريع ← «مشروع جديد» · Recents ← «محادثة جديدة» و«بحث».
+        أمّا محتوى قائمة الموقع نفسها فلم تُصوَّر بعد.
+      */}
+      {sectionMenu?.at && (
+        <>
+          <div className="fixed inset-0 z-[70]" onClick={() => setSectionMenu(null)} />
+          <div
+            className="fixed z-[71] w-48 overflow-hidden rounded-xl py-1"
+            style={{
+              top: sectionMenu.at.bottom + 4,
+              left: Math.max(8, sectionMenu.at.right - 192),
+              background: C.menu,
+              border: `1px solid ${C.line}`,
+              boxShadow: MENU_SHADOW,
+            }}
+            role="menu"
+          >
+            {(sectionMenu.kind === 'projects'
+              ? [{ icon: 'add', label: 'New project', run: () => void store.newProject('New project') }]
+              : [
+                  { icon: 'create', label: 'New chat', run: () => void store.newChat() },
+                  { icon: 'search', label: 'Search chats', run: onOpenSearch },
+                ]
+            ).map((it) => (
+              <button
+                key={it.label}
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setSectionMenu(null);
+                  it.run();
+                }}
+                className="flex w-full items-center gap-2.5 px-3 py-2 text-start transition-colors hover:bg-[var(--c-hover)]"
+                style={{ fontSize: 14, color: C.text }}
+              >
+                <Icon name={it.icon} size={16} style={{ opacity: 0.8 }} />
+                {it.label}
+              </button>
+            ))}
+          </div>
+        </>
       )}
 
       {menuFor && (
