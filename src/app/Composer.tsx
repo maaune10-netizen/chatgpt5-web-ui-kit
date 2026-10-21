@@ -220,9 +220,10 @@ export function Composer({
           style={{
             fontFamily: FONT.sans,
             fontSize: 16,
-            lineHeight: '24px',
+            /* مقيس من dump-all: 16/26 لا 16/24 */
+            lineHeight: '26px',
             color: C.text,
-            minHeight: 24,
+            minHeight: 26,
             maxHeight: 200,
             alignSelf: 'center',
           }}

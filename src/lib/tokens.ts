@@ -43,9 +43,9 @@ export const L = {
   railW: 1180, // Body
   headerH: 52, // App Header 1180x52
   threadW: 768, // Chat Thread 768x850
-  inputH: 56, // Prompt Input Field
+  inputH: 52, // مقيس من الموقع: 768×52
   inputW: 768, // Prompt Input Field 768x56
-  inputRadius: 28,
+  inputRadius: 26, // مقيس: 26 لا 28
   footerH: 138, // Chat Footer
   sidebarPad: 6, // صفوف متداخلة 6px
 } as const;

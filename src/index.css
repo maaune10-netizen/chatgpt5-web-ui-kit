@@ -13,11 +13,13 @@
  * فيتغيّر لونه تلقائيًا حين يتغيّر `data-theme` على الجذر.
  */
 :root {
-  --c-body: #212121;
-  --c-sidebar: #181818;
-  --c-input: #303030;
+  /* مقيس من dump-all (الغامق): الصفحة والشريط كلاهما #000000 */
+  --c-body: #000000;
+  --c-sidebar: #000000;
+  /* مقيس: أسطح الغامق #212121 · #1b1b1b · #131313 */
+  --c-input: #212121;
   --c-menu: #353535;
-  --c-raised: #424242;
+  --c-raised: #1b1b1b;
 
   /* مقيس من الموقع في الوضع الغامق: rgb(237,237,237) */
   --c-text: #ededed;
@@ -55,7 +57,8 @@
   --c-placeholder: #8f8f8f;
 
   --c-shadow-menu: inset 0 0 1px 1px rgba(255,255,255,0.13), 0 6px 8px 0 rgba(0,0,0,0.10), 0 0 1.5px 0 rgba(0,0,0,0.45);
-  --c-shadow-input: inset 0 1px 0 0 rgba(255,255,255,0.13), 0 8px 16px rgba(0,0,0,0.10), 0 1.5px 3px rgba(0,0,0,0.45);
+  /* مقيس من dump-all: ظلّ داخلي واحد، لا ثلاثة */
+  --c-shadow-input: inset 0 0 1px 0 rgba(255, 255, 255, 0.2);
 
   color-scheme: dark;
 }

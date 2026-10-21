@@ -1,6 +1,6 @@
 import { Icon } from './Icon';
 import { Composer } from './Composer';
-import { C, L, T } from '../lib/tokens';
+import { C, L } from '../lib/tokens';
 
 /**
  * شاشة البداية — مقاساتها من `New Chat - Logged In` و`New Chat - Logged Out`.
@@ -64,7 +64,8 @@ export function NewChat({
           {/* العنوان في التصميم: 30/600 بارتفاع سطر 36 — لا 24/31 كما خمّنت */}
           <h1
             className="text-center"
-            style={{ fontSize: T.h1.size, lineHeight: `${T.h1.lh}px`, fontWeight: 600 }}
+            /* مقيس: 24px / 28.8px / w400 — لا 30/36/600. وكان خطّنا أثقل. */
+            style={{ fontSize: 24, lineHeight: '28.8px', fontWeight: 400 }}
           >
             {/* من اللقطة: المسجَّل «What's on your mind today?» · الزائر «Where should we begin?» */}
             {/*
