@@ -27,10 +27,19 @@ import { C, L } from '../lib/tokens';
  *   y=285 «Create an image or sticker» · y=337 «Write or edit» · y=389 «Search the web»
  * ومقيس: كل صفّ 768×52، والتباعد 52، والنصّ عند 52 من اليسار.
  */
+/*
+ * الأيقونات **ملفّات الموقع نفسه**، لا مرسومة عندنا.
+ *
+ *   persistent.oaistatic.com/chatgpt/icons/use-case-icons//gray/{name}@3x.png
+ *
+ * وظهرت في سجلّ CSP عند المستخدم: كانت الصور تُرفض لأنّ `fetch` طلب
+ * `credentials: 'include'` وخادمها يرسل `ACAO: *`. والملفّات نُزّلت من هنا
+ * مباشرة، فلم تعد تحتاج التقاطًا.
+ */
 const SUGGESTIONS = [
-  { icon: 'image', text: 'Create an image or sticker' },
-  { icon: 'edit', text: 'Write or edit' },
-  { icon: 'search', text: 'Search the web' },
+  { src: '/app-icons/site/image-square-gray.png', text: 'Create an image or sticker' },
+  { src: '/app-icons/site/pencil-gray.png', text: 'Write or edit' },
+  { src: '/app-icons/site/globe-gray.png', text: 'Search the web' },
 ];
 
 export function NewChat({
@@ -123,7 +132,7 @@ export function NewChat({
                   className="flex min-w-0 flex-1 items-center gap-4 rounded-lg text-start transition-colors hover:bg-[var(--c-hover)]"
                   style={{ height: 52, paddingInlineStart: 16 }}
                 >
-                  <Icon name={s.icon} size={20} style={{ color: C.muted, flexShrink: 0 }} />
+                  <img src={s.src} alt="" width={20} height={20} style={{ flexShrink: 0, opacity: 0.95 }} />
                   <span className="truncate" style={{ fontSize: 16, lineHeight: '26px', color: C.muted }}>{s.text}</span>
                 </button>
                 <button

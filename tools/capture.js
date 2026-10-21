@@ -605,7 +605,12 @@
     for (let i = 0; i < list.length; i++) {
       const u = list[i];
       try {
-        const res = await fetch(u, { credentials: 'include' });
+        /*
+         * `omit` لا `include`: الأصول على `persistent.oaistatic.com` ترسل
+         * `Access-Control-Allow-Origin: *`، وهو **غير صالح مع credentials** —
+         * فيفشل الطلب ويضيع الأصل كله.
+         */
+        const res = await fetch(u, { credentials: 'omit' });
         if (!res.ok) { assets[u] = { error: res.status }; continue; }
         const blob = await res.blob();
         if (total + blob.size > FETCH_CAP_BYTES) { assets[u] = { error: 'cap', size: blob.size }; continue; }

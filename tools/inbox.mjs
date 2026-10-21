@@ -14,7 +14,7 @@ const INBOX = '/home/deploy/refs/chatgpt/inbox';
 const args = process.argv.slice(2);
 const files = readdirSync(INBOX)
   .filter((n) => n.endsWith('.json'))
-  .map((n) => ({ n, ...statSync(join(INBOX, n)) }))
+  .map((n) => { const st = statSync(join(INBOX, n)); return { n, size: st.size, mtime: st.mtime }; })
   .sort((a, b) => b.mtime - a.mtime);
 
 if (!files.length) {
