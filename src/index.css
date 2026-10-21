@@ -124,7 +124,14 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", var(--font-emoji);
 }
 
-html, body, #root { height: 100%; }
+/*
+ * لا تمرير أفقيّ إطلاقًا.
+ *
+ * والسبب: عنصر يتجاوز عرض الشاشة — والتلميح في الشريط المطويّ يخرج يمينًا.
+ * والأصل لا يُمرَّر أفقيًّا، بل يُقصّ ما يفيض. و`clip` أفضل من `hidden` لأنّه
+ * لا ينشئ حاوية تمرير.
+ */
+html, body, #root { height: 100%; max-width: 100%; overflow-x: clip; }
 body {
   margin: 0;
   font-family: var(--font-sans);
