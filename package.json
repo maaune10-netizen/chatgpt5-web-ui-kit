@@ -13,7 +13,8 @@
     "genui:prompt": "node tools/openui-prompt.mjs",
     "openui:inspect": "node tools/openui-inspect.mjs",
     "openui:eval": "node tools/openui-eval.mjs --effort auto --fix-rules",
-    "openui:loop": "node tools/loop-probe.mjs"
+    "openui:loop": "node tools/loop-probe.mjs",
+    "links": "node tools/links.mjs"
   },
   "dependencies": {
     "@openuidev/react-lang": "^1.0.1",

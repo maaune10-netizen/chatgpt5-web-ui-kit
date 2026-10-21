@@ -15,7 +15,7 @@ import { useResolvedMode } from '../lib/useThemeMode';
  * مسجَّل → أسطح → نوافذ)، والتخطيط الآليّ يخلطها.
  */
 
-type Status = 'live' | 'designed' | 'missing';
+type Status = 'live' | 'designed' | 'missing' | 'removed';
 
 interface PageData extends Record<string, unknown> {
   title: string;
@@ -28,6 +28,8 @@ const STATUS: Record<Status, { color: string; label: string }> = {
   live: { color: 'var(--c-ok, #1a7f37)', label: 'موصول ويعمل' },
   designed: { color: '#d9a441', label: 'مصمَّم · غير موصول' },
   missing: { color: 'var(--c-danger)', label: 'غير موجود' },
+  /* أُزيل من المنتج نفسه — فلا يُبنى ولا يُترك «ناقصًا» */
+  removed: { color: 'var(--c-dim)', label: 'أُزيل من المنتج' },
 };
 
 const W = 208;
@@ -39,16 +41,26 @@ function PageNode({ data }: NodeProps<Node<PageData>>) {
       style={{
         width: W,
         background: 'var(--c-modal)',
-        border: `1px solid ${C.line}`,
+        border: `1px ${data.status === 'removed' ? 'dashed' : 'solid'} ${C.line}`,
         borderInlineStart: `3px solid ${st.color}`,
         borderRadius: 10,
         padding: '7px 10px 8px',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.18)',
+        boxShadow: data.status === 'removed' ? 'none' : '0 1px 2px rgba(0,0,0,0.18)',
+        opacity: data.status === 'removed' ? 0.55 : 1,
       }}
     >
       {/* نقاط الاتصال مخفيّة بصريًّا — الأسهم تُرسم من الحافة */}
       <Handle type="target" position={Position.Left} style={{ opacity: 0, width: 1, height: 1, border: 0, minWidth: 0, minHeight: 0 }} />
-      <div style={{ fontSize: 12.5, fontWeight: 600, lineHeight: '17px', direction: 'ltr', textAlign: 'start' }} dir="ltr">
+      <div
+        dir="ltr"
+        style={{
+          fontSize: 12.5,
+          fontWeight: 600,
+          lineHeight: '17px',
+          textAlign: 'start',
+          textDecoration: data.status === 'removed' ? 'line-through' : undefined,
+        }}
+      >
         {data.title}
       </div>
       <div style={{ fontSize: 10.5, color: C.muted, lineHeight: '14px', marginTop: 2 }}>{data.sub}</div>
@@ -121,10 +133,10 @@ const NODES: Node[] = [
   P('img', COL.d, 1, 'Image Viewer', 'ثلاثة مصادر: محادثة · مكتبة · ويب', 'live'),
   P('proj', COL.d, 2, 'Project Page', 'محادثات المشروع وملفّاته', 'live'),
   P('pchat', COL.d, 3, 'Project Chat', 'محادثة داخل مشروع', 'live'),
-  P('gpts', COL.d, 4, 'Explore GPTs', 'التصميم جاهز · المسار غير موصول', 'designed'),
-  P('gdet', COL.d, 5, 'GPT Details', 'التصميم جاهز · المسار غير موصول', 'designed'),
-  P('gchat', COL.d, 6, 'GPT Chat', 'التصميم جاهز · المسار غير موصول', 'designed'),
-  P('builder', COL.d, 7, 'GPT Builder', 'غير موجود أصلًا', 'missing'),
+  P('gpts', COL.d, 4, 'Explore GPTs', 'كان في الـKit · أُزيل من المنتج', 'removed'),
+  P('gdet', COL.d, 5, 'GPT Details', 'كان في الـKit · أُزيل من المنتج', 'removed'),
+  P('gchat', COL.d, 6, 'GPT Chat', 'كان في الـKit · أُزيل من المنتج', 'removed'),
+  P('builder', COL.d, 7, 'GPT Builder', 'أُزيل من المنتج', 'removed'),
 
   /* النوافذ */
   P('account', COL.e, 0, 'Account Menu', 'قائمة الحساب', 'live', 'modal'),
