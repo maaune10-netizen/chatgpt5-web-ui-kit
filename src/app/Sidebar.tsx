@@ -653,13 +653,20 @@ export function Sidebar({
               onClick={onUpgrade}
               className="shrink-0 rounded-full font-medium transition-opacity hover:opacity-90"
               style={{
-                /* مقيس: 69.22×28 · 12/16 w500 · والأزرق في التذييل لا في الترويسة */
+                /*
+                  مقيس من dump-all: 69.22×28 @164.78,576
+                  خلفية rgb(33,33,33) · نصّ أبيض · حدّ rgba(255,255,255,0.15)
+                  نصف قطر 9999px · حشو 10 · 12/16 w500
+                  ولا أزرق: كان تخميني.
+                */
                 height: 28,
-                paddingInline: 12,
-                background: C.blue,
-                color: '#ffffff',
+                paddingInline: 10,
+                background: 'var(--c-input)',
+                color: 'var(--c-text)',
+                border: '1px solid var(--c-line)',
                 fontSize: 12,
                 lineHeight: '16px',
+                fontWeight: 500,
               }}
             >
               Upgrade

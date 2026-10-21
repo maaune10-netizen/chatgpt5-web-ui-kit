@@ -76,7 +76,7 @@ export function Composer({
     const el = ref.current;
     if (!el) return;
     el.style.height = 'auto';
-    el.style.height = Math.min(200, Math.max(tall ? 78 : L.inputH - 16, el.scrollHeight)) + 'px';
+    el.style.height = Math.min(200, Math.max(tall ? 78 : 26, el.scrollHeight)) + 'px';
   }, [value, tall]);
 
   /* المرفق النصّي يُرسل مع ما في الصندوق، والمرفق وحده يكفي للإرسال */
@@ -105,8 +105,12 @@ export function Composer({
            * حشو رأسيّ ٨ في الوضع العاديّ: ٨ + ٤٠ + ٨ = ٥٦، فيبقى التصميم كما هو.
            * ووجود الحشو هو ما يجعل الأزرار تلتصق بالأسفل لا بالحدّ نفسه.
            */
-          paddingTop: tall ? 12 : 8,
-          paddingBottom: tall ? 12 : 8,
+          /*
+           * مقيس: حشو ٨ · زرّ `+` 36×36 @(700.5,269.23) · ٨+٣٦+٨ = ٥٢.
+           * والنصّ عند ١٣ من الأعلى لأنّه موسَّط في الـ36 لا في الـ52.
+           */
+          paddingTop: 8,
+          paddingBottom: 8,
           boxShadow: focused ? INPUT_SHADOW + ', 0 0 0 1px var(--c-line)' : INPUT_SHADOW,
         }}
       >
@@ -216,13 +220,14 @@ export function Composer({
            * `maxHeight` هنا يطابق سقف الكبر في `useEffect` (٢٠٠) فيتحوّل
            * إلى تمرير داخلي بدل أن يدفع الصفحة.
            */
-          className="flex-1 resize-none overflow-y-auto bg-transparent py-2 outline-none placeholder:text-[var(--c-placeholder)]"
+          className="flex-1 resize-none overflow-y-auto bg-transparent py-0 outline-none placeholder:text-[var(--c-placeholder)]"
           style={{
             fontFamily: FONT.sans,
             fontSize: 16,
             /* مقيس من dump-all: 16/26 لا 16/24 */
             lineHeight: '26px',
             color: C.text,
+            /* حشو رأسيّ صفر: الحشو على الحاوية (١٣)، لا على الحقل — وإلا صار ٤٢ */
             minHeight: 26,
             maxHeight: 200,
             alignSelf: 'center',

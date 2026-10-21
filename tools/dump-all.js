@@ -29,6 +29,14 @@
   const COMPACT = true;
   const MAX = COMPACT ? 1200 : 3000;
 
+  /*
+   * `SVGS` — يضيف شيفرة كل أيقونة (`<svg>` كاملة) مع سماكة خطّها.
+   *
+   * وهذا هو الفرق بين «يبدو أثقل» و«stroke-width = 1.5 عندهم و2 عندنا»:
+   * الشكل نفسه يُقرأ من `html`، فيُنسخ لا يُقلَّد. الحجم يكبر ~١–٢ ميجا.
+   */
+  const SVGS = true;
+
   const px = (v) => (v === 'normal' ? null : v);
   const sides = (cs, p) => [cs[p + 'Top'], cs[p + 'Right'], cs[p + 'Bottom'], cs[p + 'Left']];
 
@@ -150,6 +158,37 @@
   };
   walk(document.body, 0);
 
+  /* ————— ١ب) الأيقونات: الشكل الكامل + السماكة ————— */
+  const svgs = [];
+  if (SVGS) {
+    const seen = new Map();
+    for (const node of document.querySelectorAll('svg')) {
+      const r = node.getBoundingClientRect();
+      if (r.width < 4 || r.height < 4) continue;
+      const cs = getComputedStyle(node);
+      const html = node.outerHTML.replace(/\s+/g, ' ').slice(0, 30000);
+      if (seen.has(html)) {
+        seen.get(html).count++;
+        continue;
+      }
+      const rec = {
+        count: 1,
+        box: { w: +r.width.toFixed(1), h: +r.height.toFixed(1), x: +r.x.toFixed(1), y: +r.y.toFixed(1) },
+        viewBox: node.getAttribute('viewBox'),
+        stroke: cs.stroke,
+        strokeWidth: cs.strokeWidth,
+        fill: cs.fill,
+        /* السماكة كما هي مكتوبة في الشكل، لا كما ورثها من CSS */
+        widths: [...new Set([...node.querySelectorAll('[stroke-width]')].map((n) => n.getAttribute('stroke-width')))],
+        paths: node.querySelectorAll('path').length,
+        html,
+      };
+      seen.set(html, rec);
+      svgs.push(rec);
+      if (svgs.length >= 300) break;
+    }
+  }
+
   /* ————— ٢) متغيّرات CSS من أوراق الأنماط ————— */
   const tokens = {};
   for (const sheet of document.styleSheets) {
@@ -191,7 +230,7 @@
     },
     compact: COMPACT,
     stats,
-    counts: { elements: elements.length, tokens: Object.keys(tokens).length },
+    counts: { elements: elements.length, svgs: svgs.length, tokens: Object.keys(tokens).length },
     palette: {
       text: toObj(palette.text),
       bg: toObj(palette.bg),
@@ -206,6 +245,7 @@
     },
     regions: { header: regionOf('HEADER'), aside: regionOf('ASIDE'), main: regionOf('MAIN'), nav: regionOf('NAV') },
     elements,
+    svgs,
     tokens,
   };
 
@@ -218,7 +258,7 @@
   a.remove();
 
   console.log(
-    `✓ ${a.download} — عناصر ${elements.length} · متغيّرات CSS ${Object.keys(tokens).length} · ألوان: نصّ ${palette.text.size} · خلفية ${palette.bg.size} · حدّ ${palette.border.size}`,
+    `✓ ${a.download} — عناصر ${elements.length} · أيقونات ${svgs.length} · متغيّرات CSS ${Object.keys(tokens).length} · ألوان: نصّ ${palette.text.size} · خلفية ${palette.bg.size} · حدّ ${palette.border.size}`,
   );
   console.log('  أكثر ١٠ ألوان نصًّا:', toObj(palette.text).slice(0, 10).map((c) => `${c.value}×${c.count}`).join(' · '));
 })();
