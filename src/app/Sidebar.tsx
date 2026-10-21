@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from './Icon';
-import { Tip } from './ui';
+import { Tip, SiteIcon } from './ui';
 import { C, ITEM, MENU_SHADOW } from '../lib/tokens';
 import { CHATGPT_WORDMARK } from '../lib/wordmark';
 import type { Store, Conversation } from './store';
@@ -260,19 +260,28 @@ function CollapsedRail({ store, onToggle, active }: { store: Store; onToggle: ()
   ];
   return (
     <div className="flex h-full flex-col items-center" style={{ width: 52, paddingTop: 8, gap: 0 }}>
-      <Tip label="Toggle sidebar">
+      {/*
+        الأصل: **شعار OpenAI** في الأعلى، ويتحوّل إلى أيقونة الطيّ عند التحويم.
+        ومقيس: الزرّ 36×36 عند (8,8)، والشعار 24×24 داخلَه.
+      */}
+      <Tip label="Toggle sidebar" side="right">
         <button
           type="button"
           onClick={onToggle}
           aria-label="Show sidebar"
-          className="grid place-items-center rounded-lg transition-colors hover:bg-[var(--c-hover)]"
+          className="group/logo grid place-items-center rounded-lg transition-colors hover:bg-[var(--c-hover)]"
           style={{ width: 36, height: 36, color: C.text }}
         >
-          <Icon name="sidebar" size={24} />
+          <span className="block group-hover/logo:hidden">
+            <SiteIcon name="openai-logo-regular-lg-light-16" size={24} />
+          </span>
+          <span className="hidden group-hover/logo:block">
+            <SiteIcon name="sidebar-hidden-light-20" size={20} />
+          </span>
         </button>
       </Tip>
       {items.map((it) => (
-        <Tip key={it.key} label={it.label}>
+        <Tip key={it.key} label={it.label} side="right">
           <button
             type="button"
             onClick={it.run}

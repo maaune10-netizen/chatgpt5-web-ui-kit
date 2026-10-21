@@ -424,7 +424,8 @@ export function ChatApp({
                 aria-selected={false}
                 onClick={() => setWorkOpen(true)}
                 className="flex items-center justify-center gap-1.5 text-sm font-medium"
-                style={{ width: 112, height: 36, borderRadius: 9999, color: 'rgb(205,205,205)' }}
+                /* رماديّ: يحتاج Plus — لا بلون التبويب العاديّ */
+                style={{ width: 112, height: 36, borderRadius: 9999, color: C.dim }}
               >
                 <Icon name="upgradeSparkle" size={14} style={{ opacity: 0.75 }} />
                 Work

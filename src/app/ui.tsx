@@ -103,15 +103,21 @@ export function Button({
  * ويظهر بعد ~٧٠٠ مللي — وهو ما جعل التقاطه يفشل حين كان التأخير ٢٦٠.
  * وبلا حالة React: `group-hover` وحدها، فلا يُعاد رسم شيء عند المرور.
  */
-export function Tip({ label, children, side = 'bottom' }: { label: string; children: React.ReactNode; side?: 'bottom' | 'top' }) {
+export function Tip({ label, children, side = 'bottom' }: { label: string; children: React.ReactNode; side?: 'bottom' | 'top' | 'right' }) {
   return (
     <span className="group/tip relative inline-flex">
       {children}
       <span
         role="tooltip"
-        className="pointer-events-none absolute left-1/2 z-50 -translate-x-1/2 whitespace-nowrap opacity-0 transition-opacity duration-100 group-hover/tip:opacity-100"
+        className="pointer-events-none absolute z-50 whitespace-nowrap opacity-0 transition-opacity duration-100 group-hover/tip:opacity-100"
         style={{
-          [side === 'bottom' ? 'top' : 'bottom']: 'calc(100% + 6px)',
+          /*
+           * الشريط المطويّ ضيّق ٥٢: التلميح تحته يغطّي العنصر نفسه.
+           * فيُعرض **إلى يمينه** كما في الموقع.
+           */
+          ...(side === 'right'
+            ? { left: 'calc(100% + 8px)', top: '50%', transform: 'translateY(-50%)' }
+            : { left: '50%', transform: 'translateX(-50%)', [side === 'bottom' ? 'top' : 'bottom']: 'calc(100% + 6px)' }),
           transitionDelay: '700ms',
           background: '#303030',
           color: '#ededed',
