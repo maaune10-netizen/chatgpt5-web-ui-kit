@@ -548,11 +548,15 @@ export function ChatApp({
               thinking={config.reasoningEffort}
               onThinking={(v: Config['reasoningEffort']) => setCfg({ ...config, reasoningEffort: v })}
             />
-            <div className="shrink-0 px-4 pb-3 text-center" style={{ fontSize: 12, color: C.muted, lineHeight: '16px' }}>
-              {signedIn
-                ? 'ChatGPT can make mistakes. Check important info.'
-                : 'By messaging ChatGPT, you agree to our Terms and have read our Privacy Policy.'}
-            </div>
+            {/*
+              جملة «ChatGPT can make mistakes…» **ليست في الملفّ** — بحثت في
+              ٩١ ميجا فلم أجدها. فحُذفت للمسجَّل، وبقيت جملة الشروط للزائر.
+            */}
+            {!signedIn && (
+              <div className="shrink-0 px-4 pb-3 text-center" style={{ fontSize: 12, color: C.muted, lineHeight: '16px' }}>
+                By messaging ChatGPT, you agree to our Terms and have read our Privacy Policy.
+              </div>
+            )}
           </>
         ) : (
           <>
