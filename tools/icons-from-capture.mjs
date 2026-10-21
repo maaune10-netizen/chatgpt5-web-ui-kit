@@ -18,7 +18,7 @@
  * والمكتوب في `public/app-icons/chatgpt/` — لا في `generated-icons`، لأنّ ذلك
  * يُمسَح عند كل توليد من Figma.
  */
-import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, readdirSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -85,6 +85,19 @@ const INLINE_ALIAS = {
   Recents: 'cc-recents',
 };
 
+/**
+ * تجاوزات يدويّة: أيقونات يعطيها المستخدم نصًّا (لأنّها ليست في الـsprite).
+ * اسم الملفّ هو اسمنا: `explore.svg` ← `explore`. وهي **أعلى أولوية**.
+ */
+const OVERRIDES_DIR = join(ROOT, 'tools', 'icon-overrides');
+const overrides = new Map();
+if (existsSync(OVERRIDES_DIR)) {
+  for (const f of readdirSync(OVERRIDES_DIR)) {
+    if (!f.endsWith('.svg')) continue;
+    overrides.set(f.slice(0, -4), readFileSync(join(OVERRIDES_DIR, f), 'utf8'));
+  }
+}
+
 /* ————— الـsprite ————— */
 const symbols = new Map();
 for (const f of data.spriteFiles || []) {
@@ -98,7 +111,12 @@ for (const f of data.spriteFiles || []) {
 
 /** يبني ملفّ SVG من رمز. واللون صريح لأنّ ورقة أنماط الصفحة لا ترافقنا. */
 function symbolToSvg(id, sym) {
-  const filled = /-fill|-regular/.test(id);
+  /*
+   * أيقونة الخطوط تُعلن `stroke-width` دائمًا. وكان الشرط يعتمد على `-fill`
+   * في الاسم وعلى وجود `fill="none"` — فخرجت أيقونة مساراتها بلا `fill` ولا
+   * `stroke` (لأنّ لونها من CSS) **بلا لون**. فصار الحكم من المحتوى لا من الاسم.
+   */
+  const filled = !/stroke-width/.test(sym.inner);
   const inner = sym.inner
     .replace(/fill="(?!none)[^"]*"/g, 'fill="currentColor"')
     .replace(/stroke="(?!none)[^"]*"/g, 'stroke="currentColor"');
@@ -112,7 +130,7 @@ if (existsSync(OUT_DIR)) rmSync(OUT_DIR, { recursive: true, force: true });
 mkdirSync(OUT_DIR, { recursive: true });
 
 const map = {};
-const report = { sprite: [], inline: [], missing: [] };
+const report = { override: [], sprite: [], inline: [], missing: [] };
 
 function write(name, svg) {
   const clean = svg.replace(/<symbol\b[^>]*>|<\/symbol>/g, '');
@@ -122,8 +140,15 @@ function write(name, svg) {
   map[name] = `app-icons/chatgpt/${slug}-${hash}`;
 }
 
+/* ٠) التجاوزات اليدويّة — أعلى أولوية */
+for (const [name, svg] of overrides) {
+  write(name, svg);
+  report.override.push(name);
+}
+
 /* ١) من الـsprite */
 for (const [name, id] of Object.entries(SPRITE_MAP)) {
+  if (overrides.has(name)) continue; // التجاوز أعلى أولوية
   const sym = symbols.get(id);
   if (!sym) {
     report.missing.push(`${name} ← ${id}`);
