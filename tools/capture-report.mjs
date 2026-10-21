@@ -180,6 +180,19 @@ if (j.hovers?.length) {
   }
 }
 
+/* ————— النقرات ————— */
+if (j.clicks?.length) {
+  const withMsg = j.clicks.filter((c) => c.appeared?.length);
+  console.log(`\n══ النقرات (${j.clicks.length} · ${withMsg.length} أظهرت شيئًا) ══`);
+  for (const c of withMsg.slice(0, 14)) {
+    console.log(`  «${c.key.slice(0, 30)}» →`);
+    for (const a of c.appeared.slice(0, 2)) {
+      const st = j.styles[a.s];
+      console.log(`      «${a.text.slice(0, 60)}» ${a.box.w}x${a.box.h} ${st?.['background-color'] || ''} ${st?.color || ''} r=${st?.['border-radius'] || ''}`);
+    }
+  }
+}
+
 /* ————— CSS ————— */
 const hover = (j.css || []).filter((r) => /:hover|:focus|:active/.test(r.css));
 console.log(`\n══ CSS التفاعل (${hover.length} من ${j.css.length}) ══`);

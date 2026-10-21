@@ -205,7 +205,27 @@
    * answer، وإطاره يتغيّر إلى كذا».
    */
   const hovers = [];
-  const TIP_SEL = '[role="tooltip"],[data-radix-popper-content-wrapper],.tooltip,[class*="tooltip"]';
+  /*
+   * ليس كلّ تلميح `[role=tooltip]`. بعضها في portal، وبعضها مربوط
+   * بـ`aria-describedby`، وبعضها `popover` أصليّ. فنبحث في كلّها.
+   */
+  const TIP_SEL = [
+    '[role="tooltip"]',
+    '[role="status"]',
+    '[aria-live]',
+    '[popover]:popover-open',
+    '[data-radix-popper-content-wrapper]',
+    '[data-state="open"][data-side]',
+    '[id*="tooltip" i]',
+    '[class*="tooltip" i]',
+  ].join(',');
+
+  /* التلميح الخفيّ: aria-describedby → نصّ العنصر المشار إليه */
+  const describedBy = (el) => {
+    const ids = (el.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+    const txt = ids.map((id) => document.getElementById(id)?.innerText || '').join(' ').replace(/\s+/g, ' ').trim();
+    return txt ? txt.slice(0, 200) : null;
+  };
 
   const recordHover = (x, y) => {
     const el = document.elementFromPoint(x, y);
@@ -230,7 +250,7 @@
       at: new Date().toISOString(),
       x, y,
       key: chain[0].label || chain[0].title || chain[0].text || chain[0].tag,
-      tip: tip ? tip.innerText.replace(/\s+/g, ' ').trim().slice(0, 200) : null,
+      tip: (tip ? tip.innerText.replace(/\s+/g, ' ').trim().slice(0, 200) : null) || describedBy(el),
       tipBox: tipRect ? { x: +tipRect.x.toFixed(0), y: +tipRect.y.toFixed(0), w: +tipRect.width.toFixed(0), h: +tipRect.height.toFixed(0) } : null,
       tipS: tip ? styleIdOf(getComputedStyle(tip)) : null,
       chain,
@@ -248,6 +268,55 @@
     hoverTimer = setTimeout(() => recordHover(x, y), 260);
   };
   window.addEventListener('mousemove', onMove, { passive: true });
+
+  /* ————————————————— النقر: ماذا ظهر بعده —————————————————
+   *
+   * «أضغط Work فيظهر لي إشعار» — هذا لا يظهر بالتحويم. فنسجّل كل نقرة،
+   * ونقارن الأسطح الطافية قبلها وبعدها بـ٧٠٠ مللي: فما ظهر هو الجواب.
+   */
+  const clicks = [];
+  const FLOAT_SEL = '[role="alert"],[role="status"],[role="dialog"],[role="tooltip"],[aria-live],[popover]:popover-open,[data-radix-popper-content-wrapper],[class*="toast" i],[class*="Toast"]';
+
+  const surfacesNow = () => {
+    const out = new Map();
+    for (const n of document.querySelectorAll(FLOAT_SEL)) {
+      if (n.closest('#__cap_panel')) continue;
+      const r = n.getBoundingClientRect();
+      if (r.width < 8 || r.height < 8) continue;
+      const text = n.innerText.replace(/\s+/g, ' ').trim().slice(0, 220);
+      if (!text) continue;
+      out.set(text, {
+        text,
+        tag: n.tagName,
+        role: n.getAttribute('role') || null,
+        box: { x: +r.x.toFixed(0), y: +r.y.toFixed(0), w: +r.width.toFixed(0), h: +r.height.toFixed(0) },
+        s: styleIdOf(getComputedStyle(n)),
+      });
+    }
+    return out;
+  };
+
+  const onClick = (e) => {
+    const el = e.target instanceof Element ? e.target.closest('button,[role="button"],[role="tab"],a,[role="menuitem"],summary') : null;
+    if (!el || el.closest('#__cap_panel')) return;
+    const before = surfacesNow();
+    const r = el.getBoundingClientRect();
+    const key = (el.getAttribute('aria-label') || el.innerText || el.textContent || el.tagName).replace(/\s+/g, ' ').trim().slice(0, 90);
+    const rec = {
+      at: new Date().toISOString(),
+      key,
+      box: { x: +r.x.toFixed(0), y: +r.y.toFixed(0), w: +r.width.toFixed(0), h: +r.height.toFixed(0) },
+      s: styleIdOf(getComputedStyle(el)),
+      appeared: [],
+      stateAfter: null,
+    };
+    clicks.push(rec);
+    setTimeout(() => {
+      rec.appeared = [...surfacesNow()].filter(([t]) => !before.has(t)).map(([, v]) => v);
+      rec.stateAfter = el.getAttribute('aria-expanded');
+    }, 700);
+  };
+  document.addEventListener('click', onClick, true);
 
   /* ————————————————— لقطة حالة ————————————————— */
   const SURFACES = '[role="dialog"],[aria-expanded="true"],[data-state="open"],[popover],dialog[open]';
@@ -459,7 +528,7 @@
     const secs = ((Date.now() - t0) / 1000).toFixed(0);
     panel.innerHTML = `
       <span>🔴 <b>${states.length}</b> حالة</span>
-      <span style="color:#7a7a7a">${secs}s · ${siteMap.size} صفحة · <b id="__cap_h">${hovers.length}</b> تحويمًا · ~${estimate()}</span>
+      <span style="color:#7a7a7a">${secs}s · ${siteMap.size} صفحة · <b id="__cap_h">${hovers.length}</b> تحويمًا · <b id="__cap_c">${clicks.length}</b> نقرة · ~${estimate()}</span>
       <button id="__cap_s" style="all:unset;cursor:pointer;background:${running ? '#2f2f2f' : '#1f6f3f'};padding:5px 9px;border-radius:6px">${running ? '⏸ إيقاف' : '▶ متابعة'}</button>
       <button id="__cap_d" style="all:unset;cursor:pointer;background:#3a83f7;color:#fff;padding:5px 9px;border-radius:6px">⬇ تنزيل</button>`;
     hoverCount = panel.querySelector('#__cap_h');
@@ -520,11 +589,13 @@
         assetCount: Object.keys(assets).length,
         assetBytes: total,
         hovers: hovers.length,
+        clicks: clicks.length,
         styleTableSize: styleTable.size,
       },
       styles: Object.fromEntries([...styleTable].map(([h, v]) => [h, v.props])),
       css: cssRules,
       hovers,
+      clicks,
       states,
       appearance: [...appearance].map(([key, widths]) => ({
         key,
