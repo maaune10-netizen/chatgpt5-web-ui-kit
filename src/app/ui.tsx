@@ -103,9 +103,9 @@ export function Button({
  * ويظهر بعد ~٧٠٠ مللي — وهو ما جعل التقاطه يفشل حين كان التأخير ٢٦٠.
  * وبلا حالة React: `group-hover` وحدها، فلا يُعاد رسم شيء عند المرور.
  */
-export function Tip({ label, shortcut, children, side = 'bottom' }: { label: string; shortcut?: string; children: React.ReactNode; side?: 'bottom' | 'top' | 'right' }) {
+export function Tip({ label, shortcut, wrapperClassName, children, side = 'bottom' }: { label: string; shortcut?: string; wrapperClassName?: string; children: React.ReactNode; side?: 'bottom' | 'top' | 'right' }) {
   return (
-    <span className="group/tip relative inline-flex">
+    <span className={`group/tip relative inline-flex ${wrapperClassName || ''}`}>
       {children}
       <span
         role="tooltip"

@@ -288,7 +288,7 @@ export function Composer({
           </div>
         )}
 
-        <Tip label="Dictate">
+        <Tip label="Dictate" wrapperClassName="composer-voice">
           <button
             type="button"
             title="Dictate"

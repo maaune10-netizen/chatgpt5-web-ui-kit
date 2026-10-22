@@ -253,12 +253,15 @@ aside[data-collapsed='true'] .side-section {
     order: -1;
   }
   /* `+` يسارًا، وصوتيّاتهم يمينًا — مقيس: 24 · 289 · 333 */
-  .composer-mic {
+  .composer-voice {
     margin-inline-start: auto;
+  }
+  .composer-mic {
+    margin-inline-start: 0;
   }
 
   /* حشو المحتوى ١٦ على الجوال — مقيس: زرّ `+` عند 24 (16 + 8) */
-  .home-pad { padding-inline: 16px !important; }
+  .home-pad { padding-inline: 12px !important; }
 
   /* الجوال بلا اقتراحات — مقيس: لا صفوف عند ٣٩٣ */
   .home-suggestions { display: none; }
