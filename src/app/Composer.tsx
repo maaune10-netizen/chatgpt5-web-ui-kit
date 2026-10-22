@@ -294,7 +294,7 @@ export function Composer({
             title="Dictate"
             aria-label="Dictate"
             /* مقيس: 36×36 — وكان 32، أي 4 أقلّ و5 أسفل */
-            className="grid h-9 w-9 shrink-0 place-items-center self-center rounded-full hover:bg-white/10"
+            className="composer-mic grid h-9 w-9 shrink-0 place-items-center self-center rounded-full hover:bg-white/10"
           >
             <SiteIcon name="microphone-light-20" size={20} />
           </button>
@@ -326,9 +326,12 @@ export function Composer({
             disabled={!canSend}
             className="grid h-9 w-9 shrink-0 place-items-center self-end rounded-full"
             style={{
-              /* مقيس من capture: rgb(44,103,197) — غامق لا فاتح (#3a83f7) */
-              background: canSend ? 'var(--c-text)' : 'rgb(44, 103, 197)',
-              color: canSend ? 'var(--c-body)' : '#ffffff',
+              /*
+               * الأزرق نفسه في الحالتين — `Start Voice` و`الإرسال` لون واحد.
+               * وكان أبيض عند وجود نصّ، والأصل أزرق دائمًا.
+               */
+              background: 'rgb(44, 103, 197)',
+              color: '#ffffff',
               cursor: canSend ? 'pointer' : 'default',
             }}
           >
