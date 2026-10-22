@@ -159,7 +159,7 @@ export function Composer({
           </div>
         )}
 
-        <div className="flex items-end gap-2">
+        <div className="composer-row flex items-end gap-2">
         <button
           type="button"
           title="Add photos & files"
@@ -241,7 +241,7 @@ export function Composer({
           ومقيس من اللقطة: أيقونة + كلمة، بلا خلفية حتى يُفتح.
         */}
         {onThinking && (
-          <div className="relative shrink-0 self-end">
+          <div className="think-btn relative shrink-0 self-end">
             <Tip label="Get a smarter answer">
             <button
               type="button"

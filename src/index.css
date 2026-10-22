@@ -234,12 +234,38 @@ aside[data-collapsed='true'] .side-section {
  * وتثبيت الحدّ الأعلى صحيح للشاشات الواسعة وحدها.
  */
 @media (max-width: 899px) {
+  /*
+   * الجوال: `Think` غير موجود إطلاقًا — مقيس عند ٣٩٣: أزرار الصندوق ثلاثة
+   * فقط (`+` · `Dictate` · `Start Voice`). ووجوده كان يخنق الحقل إلى ٩٢.
+   */
+  .think-btn { display: none !important; }
+
+  /*
+   * الجوال: الصندوق **صفّان** — النصّ فوق، والأزرار تحت.
+   * مقيس عند ٣٩٣: النصّ 736..762، والأزرار 768..804 (+ · Dictate · Start Voice).
+   */
+  .composer-row {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .composer-row > textarea {
+    flex: 1 0 100%;
+    order: -1;
+  }
+  /* `+` يسارًا، وصوتيّاتهم يمينًا — مقيس: 24 · 289 · 333 */
+  .composer-mic {
+    margin-inline-start: auto;
+  }
+
+  /* حشو المحتوى ١٦ على الجوال — مقيس: زرّ `+` عند 24 (16 + 8) */
+  .home-pad { padding-inline: 16px !important; }
+
   /* الجوال بلا اقتراحات — مقيس: لا صفوف عند ٣٩٣ */
   .home-suggestions { display: none; }
 
   .home-block {
     margin-top: auto !important;
-    padding-bottom: 56px;
+    padding-bottom: 40px;
     align-self: flex-end;
   }
 }

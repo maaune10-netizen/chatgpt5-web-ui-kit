@@ -71,7 +71,7 @@ export function NewChat({
 }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex min-h-0 flex-1 items-start justify-center px-6">
+      <div className="home-pad flex min-h-0 flex-1 items-start justify-center px-6">
         {/* إزاحة للأعلى كما في التصميم. وتختلف بين الحالتين لأن سطر
             الإخلاء في الأسفل يزيد ارتفاع الكتلة في الوضع غير المسجَّل. */}
         {/*
