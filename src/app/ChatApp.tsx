@@ -370,7 +370,7 @@ export function ChatApp({
         <div className="fixed inset-0 z-[80] bg-black/50" onClick={() => setCollapsed(true)} aria-hidden />
       )}
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="app-header flex min-w-0 flex-1 flex-col">
         {/* الترويسة — 52px، App Header */}
         <header
           className="relative flex shrink-0 items-center justify-between px-3"
@@ -405,7 +405,7 @@ export function ChatApp({
           */}
           {signedIn && (
             <div
-              className="absolute left-1/2 hidden -translate-x-1/2 items-center sm:flex"
+              className="composer-mode absolute left-1/2 flex -translate-x-1/2 items-center"
               style={{ background: C.segment, height: 36, borderRadius: 9999, padding: 0 }}
               role="tablist"
               aria-label="Chat mode"

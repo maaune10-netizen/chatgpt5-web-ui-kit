@@ -241,6 +241,21 @@ aside[data-collapsed='true'] .side-section {
   .think-btn { display: none !important; }
 
   /*
+   * الجوال: **لا عنوان** — مقيس عند ٣٩٣: لا `H1` في الصفحة إطلاقًا.
+   * و`Chat | Work` **موجود** عند x=85 (بعد زرّ الشريط 8..44)، لا موسَّطًا.
+   */
+  .home-title { display: none !important; }
+  /*
+   * المفتاح **موسَّط** (`85 = (393−224)/2`) — لا مُزاح. والملفّ يضع
+   * `Temporary chat` عند 349 أي على الطرف الآخر من نفس الصفّ.
+   */
+  /* حشو الترويسة ٨: الزرّ عند 8 (مقيس) */
+  .app-header {
+    padding-inline: 0 !important;
+    margin-inline: -4px;
+  }
+
+  /*
    * الجوال: الصندوق **صفّان** — النصّ فوق، والأزرار تحت.
    * مقيس عند ٣٩٣: النصّ 736..762، والأزرار 768..804 (+ · Dictate · Start Voice).
    */

@@ -93,7 +93,7 @@ export function NewChat({
         >
           {/* العنوان في التصميم: 30/600 بارتفاع سطر 36 — لا 24/31 كما خمّنت */}
           <h1
-            className="text-center"
+            className="home-title text-center"
             /* مقيس: 24px / 28.8px / w400 — لا 30/36/600. وكان خطّنا أثقل. */
             style={{ fontSize: 24, lineHeight: '28.8px', fontWeight: 400 }}
           >
