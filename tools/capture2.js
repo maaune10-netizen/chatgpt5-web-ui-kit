@@ -75,6 +75,11 @@
   };
 
   /* الشكل المقروء — ما يتغيّر فعلًا حين يتحرّك شيء */
+  const urlFromCss2 = (v) => {
+    const m = /url\(["']?([^"')]+)["']?\)/.exec(v || '');
+    return m ? m[1].slice(0, 80) : null;
+  };
+
   const readShape = (el, cs) => {
     const r = el.getBoundingClientRect();
     return {
@@ -116,8 +121,13 @@
 
   /* ————————————————— المرحلة ١: التعرّف ————————————————— */
 
+  /* لوحة ألوان الصفحة: تُبنى أثناء التعرّف — فتُعرف الألوان قبل الحركة */
+  let palette = { text: new Map(), bg: new Map(), border: new Map(), icon: new Map() };
+  const addColor = (m, k) => { if (k && k !== 'rgba(0, 0, 0, 0)' && k !== 'none') m.set(k, (m.get(k) || 0) + 1); };
+
   const discover = () => {
     objects.clear();
+    palette = { text: new Map(), bg: new Map(), border: new Map(), icon: new Map() };
     seq = 0;
 
     const walk = (el, depth) => {
@@ -147,6 +157,12 @@
       if (objects.has(key)) { for (const c of el.children) walk(c, depth + 1); return; }
 
       const shape = readShape(el, cs);
+      /* الألوان تُحصى هنا، لا عند تغيّرها */
+      addColor(palette.bg, cs.backgroundColor);
+      if (cs.borderTopWidth !== '0px') addColor(palette.border, cs.borderTopColor);
+      if (own || hasIcon) addColor(palette.text, cs.color);
+      const fi = urlFromCss2(cs.maskImage !== 'none' ? cs.maskImage : cs.webkitMaskImage);
+      if (fi) addColor(palette.icon, fi);
       objects.set(key, {
         id: seq++,
         key,
@@ -294,6 +310,12 @@
         dir: document.documentElement.dir || 'ltr',
       },
       aside: (() => { const a = document.querySelector('aside'); if (!a) return null; const r = a.getBoundingClientRect(); return { x: Math.round(r.x), w: Math.round(r.width) }; })(),
+      palette: {
+        text: [...palette.text].sort((a, b) => b[1] - a[1]),
+        bg: [...palette.bg].sort((a, b) => b[1] - a[1]),
+        border: [...palette.border].sort((a, b) => b[1] - a[1]),
+        icon: [...palette.icon].sort((a, b) => b[1] - a[1]),
+      },
       objects: objects.size,
       byRegion: [...objects.values()].reduce((a, o) => ((a[o.region] = (a[o.region] || 0) + 1), a), {}),
       svgs,
@@ -333,7 +355,13 @@
         startedAt: new Date(t0).toISOString(),
         durationMs: Date.now() - t0,
         url: location.href,
-        objects: objects.size,
+        palette: {
+        text: [...palette.text].sort((a, b) => b[1] - a[1]),
+        bg: [...palette.bg].sort((a, b) => b[1] - a[1]),
+        border: [...palette.border].sort((a, b) => b[1] - a[1]),
+        icon: [...palette.icon].sort((a, b) => b[1] - a[1]),
+      },
+      objects: objects.size,
       byRegion: [...objects.values()].reduce((a, o) => ((a[o.region] = (a[o.region] || 0) + 1), a), {}),
         states: states.length,
         hovers: hovers.length,
@@ -365,7 +393,7 @@
   const onClick = (e) => {
     const el = e.target instanceof Element ? e.target.closest('button,[role="button"],[role="tab"],a,[role="menuitem"]') : null;
     if (!el || el.closest('#__cap2_panel')) return;
-    burstUntil = Date.now() + BURST_FOR; /* ٦٠ مللي الآن */
+    burstUntil = Date.now() + BURST_FOR;
     const before = surfacesNow();
     const rec = { at: Date.now() - t0, key: nameOf(el), appeared: [] };
     clicks.push(rec);
@@ -379,6 +407,17 @@
     let t = null;
     return () => { clearTimeout(t); t = setTimeout(() => { if (running) { discover(); snapshot('resize'); } }, 350); };
   })();
+
+  /*
+   * **أيّ إدخال يُشعل الانفجار** — لا النقر وحده.
+   * والحركة التي ننتظرها تأتي من المرور والكتابة والتمرير، فربطها بالنقر
+   * وحده يُبقي الأداة صمّاء في معظم الوقت.
+   */
+  const wake = () => { burstUntil = Date.now() + BURST_FOR; };
+  for (const ev of ['keydown', 'wheel', 'scroll', 'pointerdown', 'focusin']) {
+    window.addEventListener(ev, wake, { passive: true, capture: true });
+  }
+  window.addEventListener('mousemove', wake, { passive: true });
 
   window.addEventListener('mousemove', onMove, { passive: true });
   document.addEventListener('click', onClick, true);
