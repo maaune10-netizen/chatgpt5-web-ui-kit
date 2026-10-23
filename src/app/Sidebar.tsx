@@ -387,7 +387,11 @@ export function Sidebar({
          * السحب إلى ما دون `MIN_W` **يطوي الشريط** تلقائيًّا — لا يتوقّف عند
          * ٢٠٠. وهذا سلوك الأصل: السحب البعيد زرُّ طيّ.
          */
-        if (ev.clientX < MIN_W - 24) {
+        /*
+         * **نقطة واحدة تحت الحدّ الأدنى تكفي** — لا ٢٤ بكسل تسامحًا.
+         * في الأصل: ينقص بكسل واحد فيُقفل الشريط فورًا.
+         */
+        if (ev.clientX < MIN_W) {
           dragging.current = false;
           document.body.style.cursor = '';
           document.body.style.userSelect = '';
