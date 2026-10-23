@@ -518,7 +518,8 @@ export function Sidebar({
               dangerouslySetInnerHTML={{ __html: CHATGPT_WORDMARK }}
             />
           </button>
-          <div className="flex items-center gap-0.5">
+          <div
+ className="flex items-center gap-0.5">
             {/* البحث أيقونةً في الترويسة — من اللقطة، لا صفًّا في القائمة */}
             <Tip label="Search" shortcut="Ctrl+K"><button
               type="button"

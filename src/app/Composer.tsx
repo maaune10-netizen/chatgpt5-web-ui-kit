@@ -165,14 +165,16 @@ export function Composer({
           والملفّ لم يلتقطها (تطلب إذن الميكروفون)، فهذه **من وصف المستخدم**
           لا من قياس — ويُقال ذلك صراحةً.
         */}
+        {/*
+          الإملاء — من cap2 لا من وصف:
+            • الزرّ يصير «Cancel dictation»  (نقرة مسجَّلة)
+            • الحركة دوران `spin` بمدّة 2000ms linear  (motion مسجَّل)
+          ولم تُسجَّل «موجة أعمدة» — فالتي بنيتها من الوصف كانت اختراعًا.
+        */}
         {dictating && (
           <div className="composer-dictation flex items-center gap-3" style={{ height: 36, paddingInline: 4 }}>
+            <span className="dictation-spin" aria-hidden="true" />
             <span style={{ fontSize: 16, lineHeight: '26px', color: 'rgb(99, 168, 248)' }}>Listening…</span>
-            <span className="dictation-wave" aria-hidden="true">
-              {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-                <i key={i} style={{ animationDelay: `${i * 90}ms` }} />
-              ))}
-            </span>
           </div>
         )}
 
@@ -313,10 +315,10 @@ export function Composer({
           </div>
         )}
 
-        <Tip label={dictating ? 'Stop dictation' : 'Dictate'} wrapperClassName="composer-voice">
+        <Tip label={dictating ? 'Cancel dictation' : 'Dictate'} wrapperClassName="composer-voice">
           <button
             type="button"
-            title={dictating ? 'Stop dictation' : 'Dictate'}
+            title={dictating ? 'Cancel dictation' : 'Dictate'}
             onClick={() => setDictating((v) => !v)}
             aria-label="Dictate"
             /* مقيس: 36×36 — وكان 32، أي 4 أقلّ و5 أسفل */

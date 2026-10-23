@@ -289,21 +289,15 @@ aside[data-collapsed='true'] .side-section {
 }
 
 
-/* موجة الإملاء — أعمدة تعلو وتنزل */
-.dictation-wave {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  height: 22px;
+/* الإملاء: دوران ٢٠٠٠ مللي linear — من `motion` في cap2 */
+.dictation-spin {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(99, 168, 248, 0.25);
+  border-top-color: rgb(99, 168, 248);
+  animation: dictation-spin 2000ms linear infinite;
 }
-.dictation-wave i {
-  display: block;
-  width: 3px;
-  border-radius: 2px;
-  background: rgb(99, 168, 248);
-  animation: dictation-pulse 900ms ease-in-out infinite alternate;
-}
-@keyframes dictation-pulse {
-  from { height: 4px; opacity: 0.6; }
-  to { height: 20px; opacity: 1; }
+@keyframes dictation-spin {
+  to { transform: rotate(360deg); }
 }
