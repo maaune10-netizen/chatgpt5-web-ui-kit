@@ -103,7 +103,7 @@ export function Button({
  * ويظهر بعد ~٧٠٠ مللي — وهو ما جعل التقاطه يفشل حين كان التأخير ٢٦٠.
  * وبلا حالة React: `group-hover` وحدها، فلا يُعاد رسم شيء عند المرور.
  */
-export function Tip({ label, shortcut, wrapperClassName, children, side = 'bottom' }: { label: string; shortcut?: string; wrapperClassName?: string; children: React.ReactNode; side?: 'bottom' | 'top' | 'right' }) {
+export function Tip({ label, shortcut, wrapperClassName, children, side = 'bottom', align = 'center' }: { label: string; shortcut?: string; wrapperClassName?: string; children: React.ReactNode; side?: 'bottom' | 'top' | 'right'; align?: 'center' | 'end' }) {
   return (
     <span className={`group/tip relative inline-flex ${wrapperClassName || ''}`}>
       {children}
@@ -117,7 +117,10 @@ export function Tip({ label, shortcut, wrapperClassName, children, side = 'botto
            */
           ...(side === 'right'
             ? { left: 'calc(100% + 8px)', top: '50%', transform: 'translateY(-50%)' }
-            : { left: '50%', transform: 'translateX(-50%)', [side === 'bottom' ? 'top' : 'bottom']: 'calc(100% + 6px)' }),
+            : align === 'end'
+              /* عند حدّ الشاشة: يُثبَّت بيمين الزرّ فيخرج كاملًا لا مقطوعًا */
+              ? { right: 0, [side === 'bottom' ? 'top' : 'bottom']: 'calc(100% + 6px)' }
+              : { left: '50%', transform: 'translateX(-50%)', [side === 'bottom' ? 'top' : 'bottom']: 'calc(100% + 6px)' }),
           transitionDelay: '700ms',
           background: '#303030',
           color: '#ededed',

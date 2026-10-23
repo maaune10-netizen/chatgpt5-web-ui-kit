@@ -270,8 +270,11 @@
   };
 
   const recordHover = (x, y) => {
-    const el = document.elementFromPoint(x, y);
+    let el = document.elementFromPoint(x, y);
     if (!el || el.closest('#__cap_panel')) return;
+    /* المؤشّر يصيب `span` أو `svg` داخل الزرّ — والمقصود **الزرّ**،
+       وإلا نُسب التلميح إلى عنصر لا مالك له. */
+    el = el.closest('button,a,[role="button"],[role="tab"],[role="menuitem"]') || el;
     const chain = [];
     let n = el;
     for (let i = 0; i < 4 && n && n !== document.body; i++) {
@@ -307,6 +310,29 @@
       tip: (tip ? tip.innerText.replace(/\s+/g, ' ').trim().slice(0, 200) : null) || describedBy(el),
       tipBox: tipRect ? { x: +tipRect.x.toFixed(0), y: +tipRect.y.toFixed(0), w: +tipRect.width.toFixed(0), h: +tipRect.height.toFixed(0) } : null,
       tipS: tip ? styleIdOf(getComputedStyle(tip)) : null,
+      /*
+       * **الموضع** نسبةً إلى الزرّ: فوقه أم تحته أم يمينه، وهل خرج عن الشاشة.
+       * وهذا ما يسأل عنه «التلميح يظهر على اليمين لا تحت» — بلا تخمين.
+       */
+      placement: tipRect
+        ? (() => {
+            const t = chain[0].box;
+            const cx = t.x + t.w / 2;
+            const cy = t.y + t.h / 2;
+            const tx = tipRect.x + tipRect.width / 2;
+            const ty = tipRect.y + tipRect.height / 2;
+            const dx = tx - cx;
+            const dy = ty - cy;
+            return {
+              side: Math.abs(dy) > Math.abs(dx) ? (dy > 0 ? 'bottom' : 'top') : dx > 0 ? 'right' : 'left',
+              dx: Math.round(dx),
+              dy: Math.round(dy),
+              gap: Math.round(Math.abs(dy) - (t.h / 2 + tipRect.height / 2)),
+              clamped: tipRect.x < 0 || tipRect.right > innerWidth,
+              offscreen: { left: Math.round(tipRect.x), right: Math.round(innerWidth - tipRect.right) },
+            };
+          })()
+        : null,
       chain,
     };
     /* التمريرات المكرّرة على الشيء نفسه لا تُضيف معلومة */

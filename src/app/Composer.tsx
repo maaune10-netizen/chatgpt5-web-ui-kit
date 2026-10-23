@@ -276,7 +276,8 @@ export function Composer({
                         setThinkOpen(false);
                       }}
                       className="flex w-full items-center justify-between px-3 py-1.5 text-start capitalize transition-colors hover:bg-[var(--c-hover)]"
-                      style={{ fontSize: 13, color: C.text }}
+                      /* المختار **أزرق** — لا علامة صحّ وحدها */
+                      style={{ fontSize: 13, color: thinking === v ? 'rgb(99, 168, 248)' : C.text }}
                     >
                       {v}
                       {thinking === v && <Icon name="check" size={14} style={{ opacity: 0.8 }} />}
