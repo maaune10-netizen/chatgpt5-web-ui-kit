@@ -1,6 +1,14 @@
 import { Icon } from './Icon';
 import { Composer } from './Composer';
+import { useState } from 'react';
 import { C, L } from '../lib/tokens';
+
+/*
+ * العناوين **عدّة، وتُختار عشوائيًّا** عندهم — لا عنوان واحد.
+ * ومقيسان بالملفّ: عرض 298.7 و261.4، والارتفاع 32 لكليهما (24/28.8).
+ */
+const TITLES = ['Where should we begin?', 'What’s on your mind today?'];
+const pickTitle = () => TITLES[Math.floor(Math.random() * TITLES.length)];
 
 /**
  * شاشة البداية — مقاساتها من `New Chat - Logged In` و`New Chat - Logged Out`.
@@ -69,6 +77,7 @@ export function NewChat({
   thinking?: 'auto' | 'off' | 'low' | 'high' | 'max';
   onThinking?: (v: 'auto' | 'off' | 'low' | 'high' | 'max') => void;
 }) {
+  const [title] = useState(pickTitle);
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="home-pad flex min-h-0 flex-1 items-start justify-center px-6">
@@ -95,7 +104,8 @@ export function NewChat({
           <h1
             className="home-title text-center"
             /* مقيس: 24px / 28.8px / w400 — لا 30/36/600. وكان خطّنا أثقل. */
-            style={{ fontSize: 24, lineHeight: '28.8px', fontWeight: 400 }}
+            /* مقيس: 24/28.8 · وارتفاع العنوان 32 لا 29 — من علوّ السطر في عنصرهم */
+            style={{ fontSize: 24, lineHeight: '28.8px', fontWeight: 400, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             {/* من اللقطة: المسجَّل «What's on your mind today?» · الزائر «Where should we begin?» */}
             {/*
@@ -103,7 +113,7 @@ export function NewChat({
               ولقطة سابقة أظهرت «What's on your mind today?» — فقد يكون اختبارًا
               متغيّرًا عندهم. اتّبعنا ما يراه الآن، والقياس القادم يحسم.
             */}
-            Where should we begin?
+            {title}
           </h1>
 
           {/*
