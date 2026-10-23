@@ -7,15 +7,19 @@ import { C, MENU_SHADOW } from '../lib/tokens';
  * 260 عرضًا · عناصر 248x36 · نصف قطر 10 · خلفية #353535 · الظل الثلاثي.
  */
 export function AccountMenu({
+  menuWidth,
+
   anchor,
   onClose,
   onSettings,
   onLibrary,
   onLogout,
   onUpgrade,
-  onTemporary,
+
   email,
 }: {
+  /** عرض الشريط — والقائمة تأخذه كما هو */
+  menuWidth?: number;
   anchor: DOMRect;
   onClose: () => void;
   onSettings: () => void;
@@ -46,7 +50,8 @@ export function AccountMenu({
     position: 'fixed',
     left: Math.max(8, anchor.left),
     bottom: Math.max(8, window.innerHeight - anchor.top + 8),
-    width: 260,
+    /* العرض = عرض الشريط نفسه، لا رقم ثابت */
+    width: menuWidth ?? 240,
     background: C.menu,
     borderRadius: 16,
     boxShadow: MENU_SHADOW,
@@ -54,46 +59,51 @@ export function AccountMenu({
     zIndex: 200,
   };
 
+  /* لم تبقَ في التصميم بعد الحذف — تُثبَّت كمراجع لاستخدامها لاحقًا */
+  void onLibrary;
+  void email;
+  void Org;
+
   return (
     <div ref={ref} style={style} role="menu">
-      <button
-        type="button"
-        onClick={() => {
-          void navigator.clipboard.writeText(email);
-        }}
-        className="flex w-full items-center gap-2 rounded-[10px] px-2.5 text-start hover:bg-white/[0.07]"
-        style={{ height: 36 }}
-        title="Copy email"
-      >
-        <span className="flex-1 truncate" style={{ fontSize: 14, color: C.muted }}>
-          {email}
-        </span>
-        <Icon name="copy" size={20} />
-      </button>
-
+      {/*
+        **لا شيء فوق القائمة.** المقيس من الالتقاط الكامل:
+          الحرّ (Free) ثمّ البنود مباشرة.
+        فحُذف: زرّ النسخ بالبريد، ومنتقي المساحات (Interaction Faction /
+        Personal account)، و«Manage workspace». لم تكن في الأصل.
+      */}
+      {/*
+        رأس القائمة **مقيس**: الاسم ثمّ «Free» تحته.
+          Free @ (53,581) 12/14 w400 rgb(175,175,175)
+        أي أنّه سطر الحساب، لا زرّ نسخ بريد.
+      */}
+      <div style={{ paddingInlineStart: 39, paddingBlock: 8 }}>
+        <div style={{ fontSize: 14, lineHeight: '20px', color: C.text }}>عبدالرحمن نبيل</div>
+        <div style={{ fontSize: 12, lineHeight: '14px', color: C.muted, marginTop: 2 }}>Free</div>
+      </div>
       <Divider />
-
-      <Org initials="IF" color="#3d47ff" label="Interaction Faction" />
-      <Org initials="JO" color="#287fb8" label="Personal account" check />
-
-      <Divider />
-
-      <Item icon="group" label="Manage workspace" onClick={() => onLibrary()} />
       {/*
         «My GPTs» أُزيل من المنتج — فحذفه ليس نقصًا بل تصحيح.
         وحلّ محلّه «Temporary chat»، التي كانت صفًّا في الشريط وليست فيه
         في اللقطة. فبقي الوصول إليها بلا مخالفة التصميم.
       */}
-      <Item icon="temporaryChat" label="Temporary chat" onClick={onTemporary} />
-      <Item icon="personalization" label="Customize ChatGPT" onClick={onSettings} />
+      {/*
+        الترتيب **مقيس** من الالتقاط الكامل:
+          Upgrade plan · Personalization · Profile · Settings
+          ← فجوة ٥٣ ←
+          Help · Log out
+        والتباعد بين البنود ٣٦، ونصّها 14/20 w400.
+      */}
+      <Item icon="upgradeSparkle" label="Upgrade plan" onClick={onUpgrade} />
+      <Item icon="personalization" label="Personalization" onClick={onSettings} />
+      <Item icon="user" label="Profile" onClick={() => {}} />
       <Item icon="settings" label="Settings" onClick={onSettings} />
 
+      {/* فاصل **خطّ** لا فراغ — كالذي بين «Manage workspace» و«Personal Account»،
+          ومقيس: Settings ينتهي 754 وHelp يبدأ 787 ← 53 تحتوي الخطّ. */}
       <Divider />
 
-      <Item icon="upgradeSparkle" label="Upgrade plan" onClick={onUpgrade} />
-
-      <Divider />
-
+      <Item icon="help" label="Help" onClick={() => {}} />
       <Item icon="logout" label="Log out" onClick={onLogout} />
     </div>
   );
@@ -136,9 +146,13 @@ function Org({ initials, color, label, check }: { initials: string; color: strin
   );
 }
 
-function Divider() {
+/*
+ * الفاصل خطّ بارتفاع سطر: مقيس ٥٣ بين نهاية آخر بند وبداية التالي،
+ * والخطّ في وسطها. و٨ كانت ضيّقة جدًّا.
+ */
+function Divider({ tall }: { tall?: boolean }) {
   return (
-    <div style={{ height: 8, display: 'flex', alignItems: 'center' }}>
+    <div style={{ height: tall ? 53 : 8, display: 'flex', alignItems: 'center' }}>
       <div style={{ height: 1, width: '100%', background: C.divider }} />
     </div>
   );
