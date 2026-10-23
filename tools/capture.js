@@ -333,6 +333,49 @@
       tipBox: tipRect ? { x: +tipRect.x.toFixed(0), y: +tipRect.y.toFixed(0), w: +tipRect.width.toFixed(0), h: +tipRect.height.toFixed(0) } : null,
       tipS: tip ? styleIdOf(getComputedStyle(tip)) : null,
       /*
+       * **سطح يُفتح بالتحويم** — لا تلميحًا فقط.
+       * `Help` فيه سهم يفتح ثمانية خيارات، و`Explore` يفتح «Map»،
+       * واسم الحساب يفتح مدرجًا. وكلها **أكبر** من تلميح، فلم تكن تُلتقط.
+       */
+      surface: (() => {
+        /*
+         * السطح **متداخل** لا ابنًا لـ`body` مباشرة: قائمة الحساب تقع خلف
+         * ثلاثة أغلفة بعرض الشاشة. فمسح أبناء body لا يراها إطلاقًا.
+         * والبحث بالأدوار يجدها حيث كانت.
+         */
+        const cand = [...document.querySelectorAll('[role="menu"],[role="dialog"],[role="listbox"],[role="tooltip"]')]
+          .filter((n) => {
+            if (n.closest && n.closest('#__cap_panel')) return false;
+            const r = n.getBoundingClientRect();
+            const cs = getComputedStyle(n);
+            if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return false;
+            return r.width > 80 && r.width < 620 && r.height > 20 && r.height < 700;
+          })
+          .pop();
+        if (!cand || cand === tip) return null;
+        const r = cand.getBoundingClientRect();
+        return {
+          box: { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) },
+          text: cand.innerText.replace(/\s+/g, ' ').trim().slice(0, 600),
+          items: [...cand.querySelectorAll('[role="menuitem"],[role="menuitemradio"],button,li')]
+            .map((b) => {
+              const br = b.getBoundingClientRect();
+              if (br.width < 20 || br.height < 8) return null;
+              const ic = b.querySelector('svg');
+              return {
+                text: b.innerText.replace(/\s+/g, ' ').trim().slice(0, 120),
+                box: { x: Math.round(br.x), y: Math.round(br.y), w: Math.round(br.width), h: Math.round(br.height) },
+                hasIcon: !!ic,
+                /* سهم في النهاية؟ */
+                chevron: /chevron|caret|arrow/i.test(ic ? ic.outerHTML.slice(0, 300) : '') || /arrow|chevron/i.test(b.getAttribute('class') || ''),
+              };
+            })
+            .filter(Boolean)
+            .slice(0, 20),
+          s: styleIdOf(getComputedStyle(cand)),
+        };
+      })(),
+      /*
        * **الموضع** نسبةً إلى الزرّ: فوقه أم تحته أم يمينه، وهل خرج عن الشاشة.
        * وهذا ما يسأل عنه «التلميح يظهر على اليمين لا تحت» — بلا تخمين.
        */
