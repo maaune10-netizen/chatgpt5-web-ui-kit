@@ -287,3 +287,23 @@ aside[data-collapsed='true'] .side-section {
     align-self: flex-end;
   }
 }
+
+
+/* موجة الإملاء — أعمدة تعلو وتنزل */
+.dictation-wave {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+}
+.dictation-wave i {
+  display: block;
+  width: 3px;
+  border-radius: 2px;
+  background: rgb(99, 168, 248);
+  animation: dictation-pulse 900ms ease-in-out infinite alternate;
+}
+@keyframes dictation-pulse {
+  from { height: 4px; opacity: 0.6; }
+  to { height: 20px; opacity: 1; }
+}

@@ -57,6 +57,7 @@ export function Composer({
   const fileRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
   const [thinkOpen, setThinkOpen] = useState(false);
+  const [dictating, setDictating] = useState(false);
   /*
    * النصّ الطويل الملصوق لا يدخل الصندوق بل يصير «مرفقًا» فوقه.
    *
@@ -159,7 +160,23 @@ export function Composer({
           </div>
         )}
 
-        <div className="composer-row flex items-end gap-2">
+        {/*
+          الإملاء: موجة حيّة مكان النصّ — "صوت يعلو وينزل" كما في الموقع.
+          والملفّ لم يلتقطها (تطلب إذن الميكروفون)، فهذه **من وصف المستخدم**
+          لا من قياس — ويُقال ذلك صراحةً.
+        */}
+        {dictating && (
+          <div className="composer-dictation flex items-center gap-3" style={{ height: 36, paddingInline: 4 }}>
+            <span style={{ fontSize: 16, lineHeight: '26px', color: 'rgb(99, 168, 248)' }}>Listening…</span>
+            <span className="dictation-wave" aria-hidden="true">
+              {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+                <i key={i} style={{ animationDelay: `${i * 90}ms` }} />
+              ))}
+            </span>
+          </div>
+        )}
+
+        <div className="composer-row flex items-end gap-2" style={{ display: dictating ? 'none' : undefined }}>
         <button
           type="button"
           title="Add photos & files"
@@ -296,10 +313,11 @@ export function Composer({
           </div>
         )}
 
-        <Tip label="Dictate" wrapperClassName="composer-voice">
+        <Tip label={dictating ? 'Stop dictation' : 'Dictate'} wrapperClassName="composer-voice">
           <button
             type="button"
-            title="Dictate"
+            title={dictating ? 'Stop dictation' : 'Dictate'}
+            onClick={() => setDictating((v) => !v)}
             aria-label="Dictate"
             /* مقيس: 36×36 — وكان 32، أي 4 أقلّ و5 أسفل */
             className="composer-mic grid h-9 w-9 shrink-0 place-items-center self-center rounded-full hover:bg-white/10"
