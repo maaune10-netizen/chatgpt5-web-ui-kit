@@ -7,9 +7,9 @@
 | 1 | `Hide sidebar` — تلميح زرّ الطيّ | ✅ `196,8 36×36` مطابق |
 | 2 | `Chat history` — دور `nav` | ⚠️ الاسم موجود، لكن عندنا `0,453 240×405` وعندهم `0,52 240×870` — يحتاج غلافًا للعمود كلّه | |
 | 3 | `Open profile menu` — صفّ الحساب | ✅ `6,866 151×48` · `Upgrade 165,876 69×28` مطابق | |
-| 4 | `Composer mode` — دور `tablist` | ← أعمل عليه | |
-| 5 | `Requires upgrade` — نصّ مخفيّ تحت Work | |
-| 6 | `Chat sidebar options` — زرّ ⋯ لخيارات القائمة | |
+| 4 | `Composer mode` | ✅ `role=group` · `964,8 224×36` مطابق | |
+| 5 | `Requires upgrade` | ✅ `1×1` عند `1102,26` مطابق | |
+| 6 | `Chat sidebar options` | ← أعمل عليه (الاسم ✓، الموضع يُقاس) | |
 | 7 | `Project sidebar options` | |
 | 8 | `Add new project` | |
 | 9 | `Filter chats and work` — حقل تصفية | |

@@ -407,8 +407,9 @@ export function ChatApp({
             <div
               className="composer-mode absolute left-1/2 flex -translate-x-1/2 items-center"
               style={{ background: C.segment, height: 36, borderRadius: 9999, padding: 0 }}
-              role="tablist"
-              aria-label="Chat mode"
+              /* مقيس: DIV role=group «Composer mode» 224×36 */
+              role="group"
+              aria-label="Composer mode"
             >
               {/*
                 مقيس من capture على `/`: الحاوية 224×36 @ (773,8)، والنصفان
@@ -430,10 +431,17 @@ export function ChatApp({
                 onClick={() => setWorkOpen(true)}
                 className="flex items-center justify-center gap-1.5 text-sm font-medium"
                 /* رماديّ: يحتاج Plus — لا بلون التبويب العاديّ */
-                style={{ width: 112, height: 36, borderRadius: 9999, color: C.dim }}
+                style={{ position: 'relative', width: 112, height: 36, borderRadius: 9999, color: C.dim }}
               >
                 <Icon name="upgradeSparkle" size={14} style={{ opacity: 0.75 }} />
                 Work
+                {/* مقيس: SPAN 1×1 — نصّ لقارئ الشاشة، لا مرئيّ */}
+                <span
+                  /* مقيس: 1×1 عند x=1102 داخل نصف يبدأ 1076 ← 26 من بدايته */
+                  style={{ position: 'absolute', insetInlineStart: 26, top: 18, width: 1, height: 1, overflow: 'hidden', clipPath: 'inset(50%)', whiteSpace: 'nowrap' }}
+                >
+                  Requires upgrade
+                </span>
               </button>
             </div>
           )}

@@ -652,8 +652,8 @@ export function Sidebar({
             action={
               <button
                 type="button"
-                title="Chat options"
-                aria-label="Chat options"
+                title="Chat sidebar options"
+                aria-label="Chat sidebar options"
                 onClick={(e) => setSectionMenu({ kind: 'recents', at: e.currentTarget.getBoundingClientRect() })}
                 className="grid h-6 w-6 place-items-center rounded-md hover:bg-white/10"
                 style={{ color: C.muted }}
