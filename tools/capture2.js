@@ -387,7 +387,7 @@
 
   const panel = document.createElement('div');
   panel.id = '__cap2_panel';
-  panel.style.cssText = `position:fixed;z-index:2147483647;inset-inline-start:12px;bottom:12px;background:#0b0b0b;color:#ededed;
+  panel.style.cssText = `position:fixed;z-index:2147483647;inset-inline-end:12px;bottom:12px;background:#0b0b0b;color:#ededed;
     font:12px/1.6 ui-monospace,monospace;padding:10px 12px;border-radius:10px;border:1px solid #2a2a2a;
     display:flex;gap:9px;align-items:center;flex-wrap:wrap;max-width:94vw`;
   document.body.appendChild(panel);
