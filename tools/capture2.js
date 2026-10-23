@@ -92,6 +92,21 @@
 
   const DIFF_KEYS = ['x', 'y', 'w', 'h', 'color', 'bg', 'op', 'fs', 'fw', 'r', 'tr', 'sh'];
 
+  /*
+   * **المناطق الثلاث** — لأنّ كل عطل يسكن في واحدة:
+   *   sidebar  — الشريط وعناصره
+   *   top      — الترويسة (الشعار، المفتاح، Temporary، Upgrade)
+   *   middle   — الصندوق والاقتراحات والنصّ
+   * وتُحسب من الصندوق لا من الاسم: الشريط بعرضه، والترويسة بارتفاعها.
+   */
+  const regionOf = (r) => {
+    const aside = document.querySelector('aside');
+    const aw = aside ? aside.getBoundingClientRect().width : 0;
+    if (aw > 0 && r.x + r.width / 2 <= aw) return 'sidebar';
+    if (r.y + r.height / 2 < 52) return 'top';
+    return 'middle';
+  };
+
   /* الفرق بين شكلين — يُسجَّل الفرق فقط، لا الشكل كلّه */
   const diff = (a, b) => {
     const d = {};
@@ -138,6 +153,7 @@
         name: nameOf(el),
         tag,
         role: el.getAttribute('role') || null,
+        region: regionOf(r),
         depth,
         first: { t: 0, ...shape },
         changes: [],
@@ -279,6 +295,7 @@
       },
       aside: (() => { const a = document.querySelector('aside'); if (!a) return null; const r = a.getBoundingClientRect(); return { x: Math.round(r.x), w: Math.round(r.width) }; })(),
       objects: objects.size,
+      byRegion: [...objects.values()].reduce((a, o) => ((a[o.region] = (a[o.region] || 0) + 1), a), {}),
       svgs,
     };
     const sig = hash(st.url + st.viewport.w + st.objects + svgs.map((s) => s.viewBox + s.box.w).join(''));
@@ -317,6 +334,7 @@
         durationMs: Date.now() - t0,
         url: location.href,
         objects: objects.size,
+      byRegion: [...objects.values()].reduce((a, o) => ((a[o.region] = (a[o.region] || 0) + 1), a), {}),
         states: states.length,
         hovers: hovers.length,
         clicks: clicks.length,

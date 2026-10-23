@@ -3,7 +3,7 @@ import { Icon } from './Icon';
 import { Sidebar } from './Sidebar';
 import { Composer } from './Composer';
 import { NewChat } from './NewChat';
-import { Tip } from './ui';
+import { SiteIcon, Tip } from './ui';
 import { WorkDialog } from './WorkDialog';
 import { MessageRow } from './Message';
 import { AccountMenu } from './AccountMenu';
@@ -433,7 +433,7 @@ export function ChatApp({
                 /* رماديّ: يحتاج Plus — لا بلون التبويب العاديّ */
                 style={{ position: 'relative', width: 112, height: 36, borderRadius: 9999, color: C.dim }}
               >
-                <Icon name="upgradeSparkle" size={14} style={{ opacity: 0.75 }} />
+                <SiteIcon name="diamond-sparkle-light-20" size={20} />
                 Work
                 {/* مقيس: SPAN 1×1 — نصّ لقارئ الشاشة، لا مرئيّ */}
                 <span
