@@ -415,22 +415,23 @@ export function ChatApp({
                 مقيس من capture على `/`: الحاوية 224×36 @ (773,8)، والنصفان
                 112×36 — لا 32 مع حشو. والنشط أبيض صافٍ، والخامل rgb(205,205,205).
               */}
+              <Tip label="Ask questions">
               <button
                 type="button"
                 role="tab"
                 aria-selected
-                title="Ask questions"
                 className="text-sm font-medium"
                 style={{ width: 112, height: 36, borderRadius: 9999, background: 'var(--c-modal)', color: '#ffffff' }}
               >
                 Chat
               </button>
+              </Tip>
+              <Tip label="Get tasks done with your files and apps">
               <button
                 type="button"
                 role="tab"
                 aria-selected={false}
                 onClick={() => setWorkOpen(true)}
-                title="Get tasks done with your files and apps"
                 className="flex items-center justify-center gap-1.5 text-sm font-medium"
                 /* رماديّ: يحتاج Plus — لا بلون التبويب العاديّ */
                 style={{ position: 'relative', width: 112, height: 36, borderRadius: 9999, color: C.dim }}
@@ -445,6 +446,7 @@ export function ChatApp({
                   Requires upgrade
                 </span>
               </button>
+              </Tip>
             </div>
           )}
 
