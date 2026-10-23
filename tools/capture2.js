@@ -23,7 +23,15 @@
     document.getElementById('__cap2_panel')?.remove();
   }
 
-  const SAMPLE_MS = 250; // إيقاع المراقبة
+  const SAMPLE_MS = 250; // الإيقاع الهادئ
+  /*
+   * **انفجار بعد كل نقرة**: ٦٠ مللي لثلاث ثوان.
+   * والسبب: حركة داخل صندوق الكتابة (الإملاء) تُبدأ وتُعاد في أقلّ من ٢٥٠
+   * مللي، فتقع بين عينتين ولا تُرى. والإيقاع الثابت يخفي ما مدّته أقصر منه.
+   */
+  const BURST_MS = 60;
+  const BURST_FOR = 3000;
+  let burstUntil = 0;
   const MAX_OBJECTS = 900;
   const MAX_CHANGES = 120; // لكل كائن
   const MAX_MS = 10 * 60 * 1000;
@@ -339,6 +347,7 @@
   const onClick = (e) => {
     const el = e.target instanceof Element ? e.target.closest('button,[role="button"],[role="tab"],a,[role="menuitem"]') : null;
     if (!el || el.closest('#__cap2_panel')) return;
+    burstUntil = Date.now() + BURST_FOR; /* ٦٠ مللي الآن */
     const before = surfacesNow();
     const rec = { at: Date.now() - t0, key: nameOf(el), appeared: [] };
     clicks.push(rec);
@@ -371,13 +380,18 @@
   snapshot('start');
   render();
 
+  /* حلقة واحدة بإيقاع متغيّر: ٦٠ مللي داخل الانفجار، ٢٥٠ خارجه */
+  let lastTick = 0;
   const sampleLoop = setInterval(() => {
     if (!running) return;
     if (Date.now() - t0 > MAX_MS) { running = false; render(); return; }
+    const every = Date.now() < burstUntil ? BURST_MS : SAMPLE_MS;
+    if (Date.now() - lastTick < every) return;
+    lastTick = Date.now();
     sample();
     sampleMotion();
     render();
-  }, SAMPLE_MS);
+  }, 30);
 
   window.__cap2 = {
     objects, states, hovers, clicks, motion, discover, out,
