@@ -1,5 +1,13 @@
 /**
- * capture2.js — أداة القياس، مكتوبة من جديد على مرحلتين.
+ * capture2.js — أداة القياس.  **الإصدار ٣.٠**
+ *
+ * سجلّ الإصدارات:
+ *   ١ — لقطات كاملة لحظيّة (شكلٌ في لحظة).
+ *   ٢ — تتبّع كائن بكائن: تعرّف ثمّ راقب الفرق.
+ *   ٣ — خمس مراحل: كائنات · ألوان · حركة · **علاقات** · **سبب وأثر**،
+ *       ومناطق ثلاث، وانفجار ٦٠ مللي عند أيّ إدخال، وتلميح الموقع بالموقع.
+ *
+ * وقاعدة: كل تعديل يرفع الرقم ويُكتب في السجلّ أعلاه.
  *
  *   المرحلة ١ — **التعرّف**: تُعدّ كل كائن مرئيّ في الصفحة، وتُسمّيه، وتقرأ
  *   شكله الأوّل (صندوقه، خطّه، ألوانه، حشوه، نصف قطره).
@@ -23,6 +31,7 @@
     document.getElementById('__cap2_panel')?.remove();
   }
 
+  const VERSION = '3.0';
   const SAMPLE_MS = 250; // الإيقاع الهادئ
   /*
    * **انفجار بعد كل نقرة**: ٦٠ مللي لثلاث ثوان.
@@ -408,6 +417,7 @@
     const data = {
       meta: {
         tool: 'capture2',
+        version: VERSION,
         startedAt: new Date(t0).toISOString(),
         durationMs: Date.now() - t0,
         url: location.href,
@@ -457,7 +467,7 @@
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `cap2-${objects.size}o-${(blob.size / 1048576).toFixed(1)}mb.json`;
+    a.download = `cap2-v${VERSION}-${objects.size}o-${(blob.size / 1048576).toFixed(1)}mb.json`;
     a.click();
     console.log(`✓ ${objects.size} كائنًا · ${states.length} حالة · ${(blob.size / 1048576).toFixed(1)} ميجا`);
   };
@@ -544,5 +554,5 @@
     },
   };
 
-  console.log(`🎯 capture2 — تعرّف على ${discovered} كائنًا. يتتبّع الآن كل تغيّر في الشكل واللون والحجم والموضع.`);
+  console.log(`🎯 capture2 v${VERSION} — تعرّف على ${discovered} كائنًا. يتتبّع الآن كل تغيّر في الشكل واللون والحجم والموضع.`);
 })();
