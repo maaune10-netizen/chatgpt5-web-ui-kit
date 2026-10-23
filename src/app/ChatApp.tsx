@@ -419,6 +419,7 @@ export function ChatApp({
                 type="button"
                 role="tab"
                 aria-selected
+                title="Ask questions"
                 className="text-sm font-medium"
                 style={{ width: 112, height: 36, borderRadius: 9999, background: 'var(--c-modal)', color: '#ffffff' }}
               >
@@ -429,6 +430,7 @@ export function ChatApp({
                 role="tab"
                 aria-selected={false}
                 onClick={() => setWorkOpen(true)}
+                title="Get tasks done with your files and apps"
                 className="flex items-center justify-center gap-1.5 text-sm font-medium"
                 /* رماديّ: يحتاج Plus — لا بلون التبويب العاديّ */
                 style={{ position: 'relative', width: 112, height: 36, borderRadius: 9999, color: C.dim }}
