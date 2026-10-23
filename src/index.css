@@ -301,3 +301,16 @@ aside[data-collapsed='true'] .side-section {
 @keyframes dictation-spin {
   to { transform: rotate(360deg); }
 }
+
+
+/*
+ * `fade-in` ٧٠٠ مللي — مقيس من cap2: `fade-in-HYTrVJ` بمدّة 700، تُستخدم ٣١
+ * مرّة في صفحة واحدة. أي أنّ **كل ظهور** عندهم يتلاشى في ٧٠٠، لا يظهر فجأة.
+ */
+.fade-in {
+  animation: fade-in 700ms cubic-bezier(0.2, 0, 0.2, 1) both;
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

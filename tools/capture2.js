@@ -240,8 +240,27 @@
     if (!el || el.closest('#__cap2_panel')) return;
     el = el.closest('button,a,[role="button"],[role="tab"],[role="menuitem"]') || el;
     const r = el.getBoundingClientRect();
-    const tip = [...document.querySelectorAll('[role="tooltip"],[role="status"],[aria-live]')]
-      .find((n) => getComputedStyle(n).opacity === '1' && n.getBoundingClientRect().width > 20);
+    /*
+     * التلميح يُضاف إلى `<body>` كآخر ابن، في portal، بلا محدّد نعرفه.
+     * فالبحث بالمحدّد يلتقط عنصرًا آخر (gap=845 في ملفّ سابق).
+     * والطريقة التي لا تُخطئ: آخر أبناء body الصغيرة، من الأحدث إلى الأقدم.
+     */
+    const tip =
+      [...document.body.children]
+        .reverse()
+        .find((n) => {
+          if (n.id === '__cap2_panel' || n.closest('#__cap2_panel')) return false;
+          const r = n.getBoundingClientRect();
+          if (r.width < 40 || r.width > 420 || r.height < 16 || r.height > 120) return false;
+          const cs = getComputedStyle(n);
+          if (cs.position !== 'fixed' && cs.position !== 'absolute') return false;
+          const t = (n.innerText || '').trim();
+          return t.length > 1 && t.length < 220;
+        }) ||
+      [...document.querySelectorAll('[role="tooltip"],[role="status"]')].find((n) => {
+        const r = n.getBoundingClientRect();
+        return getComputedStyle(n).opacity === '1' && r.width > 40 && r.height > 16;
+      });
     const tb = tip ? tip.getBoundingClientRect() : null;
     const key = nameOf(el);
     const text = tip ? tip.innerText.replace(/\s+/g, ' ').trim().slice(0, 200) : null;

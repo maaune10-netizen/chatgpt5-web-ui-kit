@@ -90,7 +90,7 @@ export function NewChat({
           فالثابت هو الحدّ الأعلى، والنموّ يمتدّ إلى الأسفل.
         */}
         <div
-          className="w-full home-block"
+          className="home-block fade-in w-full"
           style={{ maxWidth: L.threadW, /*
            * معادلة من ثلاث نقاط مقيسة في الملفّ:
            *   1912×922 → العنوان 321   1738×838 → 286   1275×615 → 192

@@ -22,7 +22,7 @@ export function WorkDialog({ onClose }: { onClose: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-label="Meet ChatGPT Work"
-        className="fixed left-1/2 top-1/2 z-[71] flex -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden"
+        className="fade-in fixed left-1/2 top-1/2 z-[71] flex -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden"
         style={{
           width: 520,
           height: 440,
