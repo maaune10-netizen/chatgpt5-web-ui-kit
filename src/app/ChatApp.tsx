@@ -460,7 +460,9 @@ export function ChatApp({
                   tabIndex={-1}
                   style={{ width: 104, height: 34, color: 'rgb(99, 168, 248)', fontSize: 14, lineHeight: '20px', fontWeight: 500, display: 'none' }}
                 />
-                <Tip label="Turn off temporary chat" align="end">
+                /* مقيس: التلميح نفسه «Temporary chat» — 14/600 على rgb(48,48,48).
+           و«Turn off temporary chat» هي **بند القائمة** بعد النقر، لا التلميح. */
+                <Tip label="Temporary chat" align="end">
                 <button
                   type="button"
                   onClick={() => void store.newChat(null, true)}
