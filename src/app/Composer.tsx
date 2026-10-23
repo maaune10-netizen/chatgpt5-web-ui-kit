@@ -250,8 +250,15 @@ export function Composer({
               aria-haspopup="menu"
               aria-expanded={thinkOpen}
               /* مقيس: الزرّ 90×36 · النصّ 16/26 — وكان 13، وهو سبب «عندهم كبيرة» */
-              className="flex items-center gap-2 rounded-full px-3 transition-colors hover:bg-white/10"
-              style={{ height: 36, color: thinking === 'off' ? C.dim : C.muted, fontSize: 16, lineHeight: '26px' }}
+              /* المُفعَّل أزرق — والخلفية زرقاء خفيفة، لا بيضاء */
+              className="think-btn-ctl flex items-center gap-2 rounded-full px-3 transition-colors"
+              style={{
+                height: 36,
+                fontSize: 16,
+                lineHeight: '26px',
+                color: thinking && thinking !== 'auto' && thinking !== 'off' ? 'rgb(99, 168, 248)' : thinking === 'off' ? C.dim : C.muted,
+                background: thinking && thinking !== 'auto' && thinking !== 'off' ? 'rgba(99, 168, 248, 0.15)' : undefined,
+              }}
             >
               {/* دماغهم الحقيقيّ: sprite icons-9df9ab66 → brain-light-20 */}
               <SiteIcon name="brain-light-20" size={20} />

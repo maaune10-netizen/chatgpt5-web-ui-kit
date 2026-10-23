@@ -370,6 +370,7 @@ export function Sidebar({
     (e: React.PointerEvent) => {
       e.preventDefault();
       dragging.current = true;
+      /* السحب تحت الحدّ الأدنى **يطوي** الشريط تلقائيًّا — كما في الأصل */
       document.body.style.cursor = 'col-resize';
       document.body.style.userSelect = 'none';
 
@@ -382,6 +383,17 @@ export function Sidebar({
 
       const move = (ev: PointerEvent) => {
         if (!dragging.current) return;
+        /*
+         * السحب إلى ما دون `MIN_W` **يطوي الشريط** تلقائيًّا — لا يتوقّف عند
+         * ٢٠٠. وهذا سلوك الأصل: السحب البعيد زرُّ طيّ.
+         */
+        if (ev.clientX < MIN_W - 24) {
+          dragging.current = false;
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+          onToggleCollapsed();
+          return;
+        }
         latest = Math.min(MAX_W, Math.max(MIN_W, ev.clientX));
         onWidth(latest);
       };
