@@ -303,14 +303,27 @@
      * فبدل البحث بمحدّد نجهله: نقارن أبناء `<body>` قبل وبعد.
      * (وكان الخطأ أخذ `aria-describedby`، وهو نصّ مخفيّ 1×1 لا يُرى.)
      */
-    const tip = [...document.body.children].find(
-      (n) =>
-        n.id !== '__cap_panel' && /* ← لوحة الأداة ليست تلميحًا: كانت تُلتقط مكانه */
-        !n.dataset.capSeen &&
-        n.getBoundingClientRect().width > 20 &&
-        n.innerText &&
-        n.innerText.trim().length > 1,
-    ) || document.querySelector(TIP_SEL);
+    /*
+     * التلميح يُضاف إلى `<body>` في portal، بلا محدّد نعرفه.
+     * فالمحدِّد يلتقط عنصرًا آخر؛ والأوثق: آخر أبناء body الصغيرة.
+     * (وهذا ما كشف تلميح «Explore» على أيقونة النقاط الثلاث.)
+     */
+    const tip =
+      [...document.body.children]
+        .reverse()
+        .find((n) => {
+          if (n.id === '__cap_panel' || (n.closest && n.closest('#__cap_panel'))) return false;
+          const r = n.getBoundingClientRect();
+          if (r.width < 40 || r.width > 420 || r.height < 16 || r.height > 120) return false;
+          const cs = getComputedStyle(n);
+          if (cs.position !== 'fixed' && cs.position !== 'absolute') return false;
+          const t = (n.innerText || '').trim();
+          return t.length > 1 && t.length < 220;
+        }) ||
+      [...document.querySelectorAll('[role="tooltip"],[role="status"]')].find((n) => {
+        const r = n.getBoundingClientRect();
+        return getComputedStyle(n).opacity === '1' && r.width > 40 && r.height > 16;
+      });
     const tipRect = tip ? tip.getBoundingClientRect() : null;
     const rec = {
       at: new Date().toISOString(),
@@ -727,7 +740,7 @@
   let hoverCount = null;
   const panel = document.createElement('div');
   panel.id = '__cap_panel';
-  panel.style.cssText = `position:fixed;z-index:2147483647;inset-inline-start:12px;bottom:12px;background:#0b0b0b;color:#ededed;
+  panel.style.cssText = `position:fixed;z-index:2147483647;inset-inline-end:12px;bottom:12px;background:#0b0b0b;color:#ededed;
     font:12px/1.6 ui-monospace,SFMono-Regular,monospace;padding:10px 12px;border-radius:10px;border:1px solid #2a2a2a;
     box-shadow:0 10px 30px rgba(0,0,0,.6);display:flex;gap:9px;align-items:center;flex-wrap:wrap;max-width:94vw`;
   document.body.appendChild(panel);
