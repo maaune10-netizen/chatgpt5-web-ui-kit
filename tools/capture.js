@@ -278,7 +278,9 @@
     return txt ? txt.slice(0, 200) : null;
   };
 
+  let hoversSurfaces = [];
   const recordHover = (x, y) => {
+    hoversSurfaces = [];
     let el = document.elementFromPoint(x, y);
     if (!el || el.closest('#__cap_panel')) return;
     /* المؤشّر يصيب `span` أو `svg` داخل الزرّ — والمقصود **الزرّ**،
@@ -343,15 +345,30 @@
          * ثلاثة أغلفة بعرض الشاشة. فمسح أبناء body لا يراها إطلاقًا.
          * والبحث بالأدوار يجدها حيث كانت.
          */
-        const cand = [...document.querySelectorAll('[role="menu"],[role="dialog"],[role="listbox"],[role="tooltip"]')]
+        /*
+         * **كل** الأسطح الظاهرة، والأقرب إلى المؤشّر هو المقصود.
+         * القائمة الفرعية التي يفتحها `Help` تظهر **فوق** القائمة الأمّ،
+         * فأخذُ آخر واحد في الشجرة قد يُخطئ. والقرب مسافةٌ تُقاس.
+         */
+        const all = [...document.querySelectorAll('[role="menu"],[role="dialog"],[role="listbox"],[role="tooltip"]')]
           .filter((n) => {
             if (n.closest && n.closest('#__cap_panel')) return false;
             const r = n.getBoundingClientRect();
             const cs = getComputedStyle(n);
             if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return false;
-            return r.width > 80 && r.width < 620 && r.height > 20 && r.height < 700;
-          })
-          .pop();
+            return r.width > 60 && r.width < 620 && r.height > 18 && r.height < 700;
+          });
+        const dist = (n) => {
+          const r = n.getBoundingClientRect();
+          const dx = Math.max(r.x - x, 0, x - r.right);
+          const dy = Math.max(r.y - y, 0, y - r.bottom);
+          return Math.round(Math.hypot(dx, dy));
+        };
+        const cand = all.slice().sort((a, b) => dist(a) - dist(b))[0];
+        hoversSurfaces = all.map((n) => {
+          const r = n.getBoundingClientRect();
+          return { role: n.getAttribute('role'), box: { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) }, dist: dist(n), text: (n.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 300) };
+        });
         if (!cand || cand === tip) return null;
         const r = cand.getBoundingClientRect();
         return {
@@ -375,6 +392,7 @@
           s: styleIdOf(getComputedStyle(cand)),
         };
       })(),
+      surfaces: hoversSurfaces, /* تُقرأ بعد حساب surface — وإلا كانت فارغة */
       /*
        * **الموضع** نسبةً إلى الزرّ: فوقه أم تحته أم يمينه، وهل خرج عن الشاشة.
        * وهذا ما يسأل عنه «التلميح يظهر على اليمين لا تحت» — بلا تخمين.
