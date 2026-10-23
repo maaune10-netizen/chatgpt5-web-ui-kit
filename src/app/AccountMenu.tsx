@@ -51,7 +51,8 @@ export function AccountMenu({
     left: Math.max(8, anchor.left),
     bottom: Math.max(8, window.innerHeight - anchor.top + 8),
     /* العرض = عرض الشريط نفسه، لا رقم ثابت */
-    width: menuWidth ?? 240,
+    /* مقيس من الالتقاط: 224×280 — وهو **أضيق من الشريط (240)** بـ16 */
+    width: Math.min(menuWidth ?? 224, 224),
     background: C.menu,
     borderRadius: 16,
     boxShadow: MENU_SHADOW,

@@ -315,7 +315,8 @@ export function Composer({
           </div>
         )}
 
-        <Tip label={dictating ? 'Cancel dictation' : 'Dictate'} wrapperClassName="composer-voice">
+        <Tip label={dictating ? 'Cancel dictation' : 'Dictate'}
+            shortcut={dictating ? 'Esc' : undefined} wrapperClassName="composer-voice">
           <button
             type="button"
             title={dictating ? 'Cancel dictation' : 'Dictate'}
