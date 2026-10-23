@@ -130,7 +130,7 @@
     palette = { text: new Map(), bg: new Map(), border: new Map(), icon: new Map() };
     seq = 0;
 
-    const walk = (el, depth) => {
+    const walk = (el, depth, parentKey, prevRect, parentEl, childIndex) => {
       if (objects.size >= MAX_OBJECTS || depth > 60) return;
       const tag = el.tagName;
       if (/^(SCRIPT|STYLE|NOSCRIPT|META|LINK|HEAD|TITLE|PATH|USE|G|DEFS|SYMBOL)$/.test(tag)) return;
@@ -148,13 +148,40 @@
 
       /* الحاويات الفارغة لا تُمثّل شيئًا يُرى */
       if (!own && !hasSurface && !hasIcon && !named) {
-        for (const c of el.children) walk(c, depth + 1);
+        let pv = prevRect;
+        for (const c of el.children) { walk(c, depth + 1, parentKey, pv); const cr = c.getBoundingClientRect(); if (cr.width || cr.height) pv = cr; }
         return;
       }
-      if (r.width < 2 || r.height < 2) { for (const c of el.children) walk(c, depth + 1); return; }
+      if (r.width < 2 || r.height < 2) { for (const c of el.children) walk(c, depth + 1, parentKey, prevRect); return; }
 
       const key = keyOf(el, depth);
-      if (objects.has(key)) { for (const c of el.children) walk(c, depth + 1); return; }
+      if (objects.has(key)) {
+        let pv = prevRect;
+        for (const c of el.children) { walk(c, depth + 1, key, pv); const cr = c.getBoundingClientRect(); if (cr.width || cr.height) pv = cr; }
+        return;
+      }
+
+      /*
+       * ——— المرحلة ٤: **العلاقة لا الإحداثيّ** ———
+       * الإحداثيّ المطلق ينهار حين يتغيّر المحتوى. والعلاقة تبقى:
+       * الأب، والترتيب، والفراغ عن الشقيق السابق، والمحاذاة، والحشو النسبيّ.
+       */
+      const pCS = parentEl ? getComputedStyle(parentEl) : null;
+      const pRect = parentEl ? parentEl.getBoundingClientRect() : null;
+      const relation = {
+        parent: parentKey || null,
+        index: childIndex,
+        gap: prevRect
+          ? { x: round(r.x - (prevRect.x + prevRect.width)), y: round(r.y - (prevRect.y + prevRect.height)) }
+          : null,
+        inset: pRect ? { top: round(r.y - pRect.y), right: round(pRect.right - r.right), bottom: round(pRect.bottom - r.bottom), left: round(r.x - pRect.x) } : null,
+        parentLayout: pCS ? { display: pCS.display, dir: pCS.flexDirection, gap: pCS.gap, align: pCS.alignItems, justify: pCS.justifyContent, wrap: pCS.flexWrap } : null,
+        align: pRect
+          ? Math.abs(r.x - pRect.x - (pRect.right - r.right)) < 2
+            ? 'center'
+            : r.x - pRect.x < pRect.right - r.right ? 'start' : 'end'
+          : null,
+      };
 
       const shape = readShape(el, cs);
       /* الألوان تُحصى هنا، لا عند تغيّرها */
@@ -170,6 +197,7 @@
         tag,
         role: el.getAttribute('role') || null,
         region: regionOf(r),
+        relation,
         depth,
         first: { t: 0, ...shape },
         changes: [],
@@ -177,9 +205,18 @@
         el, // مرجع حيّ للمرحلة ٢ (لا يُخرَج)
       });
 
-      for (const c of el.children) walk(c, depth + 1);
+      let ci = 0;
+      let pv = null;
+      for (const c of el.children) {
+        if (c.tagName !== 'SCRIPT' && c.tagName !== 'STYLE') {
+          walk(c, depth + 1, key, pv, el, ci);
+          ci++;
+        }
+        const cr = c.getBoundingClientRect();
+        if (cr.width || cr.height) pv = cr;
+      }
     };
-    walk(document.body, 0);
+    walk(document.body, 0, null, null, null, 0);
     return objects.size;
   };
 
@@ -389,9 +426,32 @@
       },
       objects: [...objects.values()].map((o) => ({
         id: o.id, name: o.name, tag: o.tag, role: o.role, key: o.key,
+        region: o.region, relation: o.relation,
         first: o.first, changes: o.changes,
       })),
-      states, hovers, clicks,
+      states, hovers,
+      /*
+       * ——— المرحلة ٥: **السبب والأثر** ———
+       * كل نقرة، وما تغيّر بعدها داخل نافذة الانفجار، بفارق زمنيّ.
+       * فيُقال «الضغط على X غيّر Y بعد ٨٣ مللي» — سلوكًا لا سجلًّا.
+       */
+      clicks: clicks.map((c) => {
+        const win = [c.at, c.at + BURST_FOR];
+        const effects = [];
+        for (const o of objects.values()) {
+          for (const ch of o.changes || []) {
+            if (!ch.d || ch.t < win[0] || ch.t > win[1]) continue;
+            effects.push({
+              name: o.name,
+              region: o.region,
+              lag: ch.t - c.at,
+              props: Object.fromEntries(Object.entries(ch.d).map(([k, v]) => [k, { from: v[0], to: v[1] }])),
+            });
+            if (effects.length >= 40) break;
+          }
+        }
+        return { ...c, effects };
+      }),
       motion: [...motion.values()],
     };
     const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
