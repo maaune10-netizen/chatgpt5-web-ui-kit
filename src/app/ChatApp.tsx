@@ -466,6 +466,18 @@ export function ChatApp({
                 />
                 {/* مقيس: التلميح نفسه «Temporary chat» — 14/600 على rgb(48,48,48).
                     و«Turn off temporary chat» هي بند القائمة بعد النقر، لا التلميح. */}
+                {/*
+                  مقيس: 1756,9 · 104×34 · 14/20 w500 · rgb(99,168,248).
+                  وجوده مؤكَّد في الالتقاط الكامل — فأُعيد.
+                */}
+                <button
+                  type="button"
+                  onClick={() => setUpgradeOpen(true)}
+                  className="flex items-center justify-center transition-opacity hover:opacity-90"
+                  style={{ width: 104, height: 34, color: 'rgb(99, 168, 248)', fontSize: 14, lineHeight: '20px', fontWeight: 500 }}
+                >
+                  Upgrade
+                </button>
                 <Tip label="Temporary chat" align="end">
                 <button
                   type="button"
