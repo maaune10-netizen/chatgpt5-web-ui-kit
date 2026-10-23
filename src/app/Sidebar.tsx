@@ -790,7 +790,7 @@ export function Sidebar({
           title="Drag to resize"
           role="separator"
           aria-orientation="vertical"
-          className="group/resize absolute inset-y-0 -right-1 z-20 w-2 cursor-col-resize"
+          className="group/resize absolute inset-y-0 right-0 z-30 w-2 cursor-col-resize"
         >
           <span className="absolute inset-y-0 right-1 w-px transition-colors group-hover/resize:bg-white/40" />
         </div>
