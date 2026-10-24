@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { C } from '../lib/tokens';
+import { Composer } from './Composer';
+import { Icon } from './Icon';
 
 /*
  * صفحة `/scheduled` — **كل رقم من `capture-23s-53.2mb.json` (حالة #11)**:
@@ -48,6 +51,10 @@ function Row({ item }: { item: Item }) {
           gap: 12,
         }}
       >
+        {/* أيقونة الصف: plus-lg 20×20 بلون ثانوي — كما في الملفّ */}
+        <span style={{ flex: '0 0 auto', marginTop: 4, opacity: 0.7, display: 'inline-flex' }}>
+          <Icon name="plus" size={20} />
+        </span>
         <div style={{ width: 628 }}>
           <div style={{ height: 24, fontSize: 14, lineHeight: '20px', color: C.text }}>{item.title}</div>
           <div style={{ height: 24, fontSize: 14, lineHeight: '20px', color: C.muted, marginTop: 2 }}>{item.body}</div>
@@ -74,6 +81,7 @@ function Row({ item }: { item: Item }) {
 }
 
 export function Scheduled() {
+  const [text, setText] = useState('');
   return (
     /*
      * الترتيب **مقيس**: H1 → +32.8 الوصف → +92.8 الكومبوزر → +24 القسم.
@@ -96,30 +104,20 @@ export function Scheduled() {
             Active
           </button>
         </div>
-        {/* الكومبوزر: 728×52 · زرّ + 36 عند +8 · الحقل 580 عند +52 · وأزرار 80 و36 يمينًا */}
-        <div
-          style={{
-            width: 728,
-            height: 52,
-            marginTop: 36, /* 92.8 − (28.8 + 4 + 24) = 36 */
-            borderRadius: 26,
-            background: C.input,
-            boxShadow: 'inset 0 0 1px 0 rgba(255,255,255,0.2)',
-            display: 'flex',
-            alignItems: 'center',
-            paddingInline: 8,
-            gap: 8,
-          }}
-        >
-          <div style={{ width: 36, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.1)' }} />
-          <input
+        {/*
+         * **الكومبوزر الحقيقي** — لا صناديق فارغة.
+         * مقيس: 728×52، وزرّ + 36×36 عند +8، وأزرار يمينًا 80 و36.
+         */}
+        <div style={{ width: 728, marginTop: 36 }}>
+          <Composer
+            value={text}
+            onChange={setText}
+            onSend={() => setText('')}
+            onStop={() => {}}
+            streaming={false}
             placeholder="Ask ChatGPT to schedule tasks, set reminders…"
-            style={{ width: 580, height: 36, background: 'transparent', fontSize: 16, lineHeight: '26px', color: C.text, outline: 'none' }}
+            showDisclaimer={false}
           />
-          <div style={{ marginInlineStart: 'auto', display: 'flex', gap: 4 }}>
-            <div style={{ width: 80, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.1)' }} />
-            <div style={{ width: 36, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.1)' }} />
-          </div>
         </div>
       </div>
       {/* 24 من أسفل الكومبوزر إلى «Recommended» */}
