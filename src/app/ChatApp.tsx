@@ -1,5 +1,6 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Images } from './Images';
+import { Scheduled } from './Scheduled';
 import { Icon } from './Icon';
 import { Sidebar } from './Sidebar';
 import { Composer } from './Composer';
@@ -536,7 +537,9 @@ export function ChatApp({
 
         {state.view === 'images' ? (
           <Images />
-        ) : (['scheduled', 'plugins', 'codex', 'explore'] as const).includes(state.view as never) ? (
+        ) : state.view === 'scheduled' ? (
+          <Scheduled />
+        ) : (['plugins', 'codex', 'explore'] as const).includes(state.view as never) ? (
           <NotBuilt
             title={
               {
