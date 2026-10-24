@@ -535,10 +535,18 @@ export function ChatApp({
 
         </header>
 
+        {/*
+         * **المحتوى وحده ينزلق.** بلا هذه الحاوية ينمو المستند فينزلق الشريط
+         * الجانبي معه — وهو ثابت في الموقع.
+         */}
         {state.view === 'images' ? (
-          <Images />
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <Images />
+          </div>
         ) : state.view === 'scheduled' ? (
-          <Scheduled />
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <Scheduled />
+          </div>
         ) : (['plugins', 'codex', 'explore'] as const).includes(state.view as never) ? (
           <NotBuilt
             title={
