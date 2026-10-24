@@ -79,6 +79,11 @@ export function ChatApp({
     const v = typeof localStorage !== 'undefined' ? Number(localStorage.getItem('gpt5.sidebar.width')) : 0;
     return v >= 200 && v <= 460 ? v : 240; // ٢٤٠ = مقيس من الموقع
   });
+  /* عرض الشريط في متغيّر — تقرأه العناصر الثابتة كي تتوسّط المحتوى لا الشاشة */
+  useEffect(() => {
+    document.documentElement.style.setProperty('--gpt5-sidebar-w', `${collapsed ? 52 : sidebarW}px`);
+  }, [sidebarW, collapsed]);
+
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [accountAt, setAccountAt] = useState<DOMRect | null>(null);

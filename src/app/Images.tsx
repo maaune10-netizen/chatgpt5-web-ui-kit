@@ -81,6 +81,47 @@ function CardView({ card }: { card: Card }) {
 
 const CARD_INK = 'rgba(255,255,255,0.06)';
 
+/*
+ * الشريط الثابت أسفل الصفحة — **مقيس** (حالة #11):
+ *   الحاوية  692.5, 846   768 × 52   ← نفس مقاس كومبوزر الشات بحرفه
+ *   الحقل    744.5, 854   529.7 × 36 ← أي +52 أفقيًّا و+8 رأسيًّا
+ * وبقيّة العرض (186.3) على يمين الحقل أزرارٌ لم تُسمَّ في الملفّ.
+ */
+function PromptBar() {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        /*
+         * **وسط المحتوى لا وسط الشاشة.** المقيس 692.5 = 240 + (1672−768)/2،
+         * والتوسيط على الشاشة يعطي 572 — أي فارق 120.5 هو نصف الشريط.
+         * ولأنّ الشريط يُسحب، الموضع يُقرأ من متغيّر لا من رقم ثابت.
+         */
+        left: 'calc(50% + (var(--gpt5-sidebar-w, 240px) / 2))',
+        transform: 'translateX(-50%)',
+        bottom: 24, /* 922 − 846 − 52 */
+        width: 768,
+        height: 52,
+        borderRadius: 26,
+        background: C.input,
+        boxShadow: 'inset 0 0 1px 0 rgba(255,255,255,0.2)',
+        display: 'flex',
+        alignItems: 'center',
+        paddingInline: 8,
+        zIndex: 40,
+      }}
+    >
+      {/* 44 + 8 = 52 — موضع الحقل كما قِيس */}
+      <div style={{ width: 44 }} />
+      <input
+        placeholder="Describe an image"
+        style={{ width: 529.7, height: 36, background: 'transparent', fontSize: 16, lineHeight: '26px', color: C.text, outline: 'none' }}
+      />
+      <div style={{ flex: 1 }} />
+    </div>
+  );
+}
+
 export function Images() {
   const [tab, setTab] = React.useState<'trending' | 'templates'>('trending');
   const cards = tab === 'trending' ? TRENDING : TEMPLATES;
@@ -98,6 +139,7 @@ export function Images() {
           ))}
         </div>
       </div>
+      <PromptBar />
     </div>
   );
 }
