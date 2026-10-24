@@ -55,7 +55,7 @@ function Tab({ label, active, onClick, width }: { label: string; active: boolean
         borderRadius: 18,
         fontSize: 14,
         lineHeight: '20px',
-        fontWeight: active ? 500 : 400,
+        fontWeight: 500,
         background: active ? 'rgba(255,255,255,0.1)' : 'transparent',
         color: active ? C.text : C.muted,
       }}
@@ -69,7 +69,7 @@ function CardView({ card }: { card: Card }) {
   return (
     <button
       type="button"
-      style={{ width: CARD_W, height: CARD_H, borderRadius: 12, overflow: 'hidden', background: CARD_INK, textAlign: 'start' }}
+      style={{ width: CARD_W, height: CARD_H, borderRadius: 16, overflow: 'hidden', background: CARD_INK, textAlign: 'start' }}
     >
       {/* مساحة الصورة: 111 = 174 − 63 */}
       <div style={{ height: CARD_H, position: 'relative', background: `linear-gradient(150deg, ${card.tone}, #1b1b1b)` }}>
@@ -80,11 +80,11 @@ function CardView({ card }: { card: Card }) {
         <span
           style={{
             position: 'absolute',
-            left: 10,
-            bottom: 8,
-            fontSize: 13,
-            lineHeight: '17px',
-            fontWeight: 600,
+            left: 12,
+            bottom: 12,
+            fontSize: 14,
+            lineHeight: '19px',
+            fontWeight: 500,
             color: '#fff',
             textShadow: '0 1px 2px rgba(0,0,0,0.45)',
             maxWidth: CARD_W - 20,
@@ -104,9 +104,9 @@ export function Images() {
   const cards = tab === 'trending' ? TRENDING : TEMPLATES;
 
   return (
-    <div style={{ paddingTop: 26 }}>
+    <div style={{ paddingTop: 24 /* مقيس: h1 y=24 */ }}>
       <div style={{ width: GRID_W, marginInline: 'auto' }}>
-        <h1 style={{ margin: 0, marginBottom: 30, fontSize: 20, lineHeight: '28px', fontWeight: 600, color: C.text }}>Images</h1>
+        <h1 style={{ margin: 0, marginBottom: 38, fontSize: 24, lineHeight: '29px', fontWeight: 500, color: C.text }}>Images</h1>
       </div>
       <div style={{ width: GRID_W, marginInline: 'auto' }}>
         <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>

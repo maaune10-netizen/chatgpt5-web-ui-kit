@@ -379,9 +379,16 @@ export function ChatApp({
 
       <div className="app-header flex min-w-0 flex-1 flex-col">
         {/* الترويسة — 52px، App Header */}
+        {/*
+         * صفحات `/images` و`/scheduled` **بلا ترويسة 52**: البلوبرنت يقول
+         * إن `h1` عند `y=24` — أي لا شيء فوقه. وإبقاء الترويسة يدفعها إلى 78.
+         */}
         <header
           className="relative flex shrink-0 items-center justify-between px-3"
-          style={{ height: L.headerH }}
+          style={{
+            height: state.view === 'images' || state.view === 'scheduled' ? 0 : L.headerH,
+            overflow: 'hidden',
+          }}
         >
           <div className="flex items-center gap-1">
             {/*
