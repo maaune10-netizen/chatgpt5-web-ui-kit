@@ -1,5 +1,4 @@
 import { C } from '../lib/tokens';
-import { PageComposer } from './PageComposer';
 
 /*
  * صفحة `/scheduled` — **كل رقم من `capture-23s-53.2mb.json` (حالة #11)**:
@@ -76,8 +75,55 @@ function Row({ item }: { item: Item }) {
 
 export function Scheduled() {
   return (
-    <div style={{ paddingTop: 82 /* تحت الرأس 52 + 30 */ }}>
-      <div style={{ width: 728, marginInline: 'auto', paddingBottom: 140 }}>
+    /*
+     * الترتيب **مقيس**: H1 → +32.8 الوصف → +92.8 الكومبوزر → +24 القسم.
+     * والكومبوزر **فوق** هنا، لا أسفل الصفحة كما في /images.
+     */
+    <div style={{ paddingTop: 82 }}>
+      <div style={{ width: 728, marginInline: 'auto' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div style={{ width: 488.2 }}>
+            <h1 style={{ fontSize: 24, lineHeight: '28.8px', fontWeight: 400, color: C.text, margin: 0 }}>Scheduled</h1>
+            <div style={{ height: 24, marginTop: 4, fontSize: 14, lineHeight: '20px', color: C.muted }}>
+              Ask ChatGPT to schedule tasks, set reminders…
+            </div>
+          </div>
+          {/* 85.7 × 28 على حدّ الشبكة الأيمن (1349.8 + 85.7 = 1435.5) */}
+          <button
+            type="button"
+            style={{ width: 85.7, height: 28, borderRadius: 14, fontSize: 14, lineHeight: '20px', color: C.text, background: 'rgba(255,255,255,0.1)' }}
+          >
+            Active
+          </button>
+        </div>
+        {/* الكومبوزر: 728×52 · زرّ + 36 عند +8 · الحقل 580 عند +52 · وأزرار 80 و36 يمينًا */}
+        <div
+          style={{
+            width: 728,
+            height: 52,
+            marginTop: 36, /* 92.8 − (28.8 + 4 + 24) = 36 */
+            borderRadius: 26,
+            background: C.input,
+            boxShadow: 'inset 0 0 1px 0 rgba(255,255,255,0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            paddingInline: 8,
+            gap: 8,
+          }}
+        >
+          <div style={{ width: 36, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.1)' }} />
+          <input
+            placeholder="Ask ChatGPT to schedule tasks, set reminders…"
+            style={{ width: 580, height: 36, background: 'transparent', fontSize: 16, lineHeight: '26px', color: C.text, outline: 'none' }}
+          />
+          <div style={{ marginInlineStart: 'auto', display: 'flex', gap: 4 }}>
+            <div style={{ width: 80, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.1)' }} />
+            <div style={{ width: 36, height: 36, borderRadius: 18, background: 'rgba(255,255,255,0.1)' }} />
+          </div>
+        </div>
+      </div>
+      {/* 24 من أسفل الكومبوزر إلى «Recommended» */}
+      <div style={{ width: 728, marginInline: 'auto', marginTop: 24, paddingBottom: 140 }}>
         <button
           type="button"
           style={{
@@ -88,7 +134,6 @@ export function Scheduled() {
             color: C.text,
             fontSize: 14,
             lineHeight: '20px',
-            marginBottom: 6,
           }}
         >
           Recommended
@@ -97,7 +142,6 @@ export function Scheduled() {
           <Row key={it.title} item={it} />
         ))}
       </div>
-      <PageComposer placeholder="Ask ChatGPT to schedule tasks, set reminders…" />
     </div>
   );
 }
