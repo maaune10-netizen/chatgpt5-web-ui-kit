@@ -87,20 +87,20 @@ const CARD_INK = 'rgba(255,255,255,0.06)';
  *   الحقل    744.5, 854   529.7 × 36 ← أي +52 أفقيًّا و+8 رأسيًّا
  * وبقيّة العرض (186.3) على يمين الحقل أزرارٌ لم تُسمَّ في الملفّ.
  */
-function PromptBar({ fixed }: { fixed?: boolean }) {
+function PromptBar() {
   return (
     <div
       style={{
-        position: fixed ? 'fixed' : 'static',
+        position: 'fixed',
         /*
          * **وسط المحتوى لا وسط الشاشة.** المقيس 692.5 = 240 + (1672−768)/2،
          * والتوسيط على الشاشة يعطي 572 — أي فارق 120.5 هو نصف الشريط.
          * ولأنّ الشريط يُسحب، الموضع يُقرأ من متغيّر لا من رقم ثابت.
          */
-        ...(fixed
-          ? { left: 'calc(50% + (var(--gpt5-sidebar-w, 240px) / 2))', transform: 'translateX(-50%)', bottom: 24 }
-          : { marginTop: 32 }), /* 1622.8 − 1590.8 = 32 */
-        width: fixed ? 768 : 728, /* داخل الشبكة 728 = عرض الأعمدة الخمسة */
+        left: 'calc(50% + (var(--gpt5-sidebar-w, 240px) / 2))',
+        transform: 'translateX(-50%)',
+        bottom: 24, /* 922 − 846 − 52 */
+        width: 768,
         height: 52,
         borderRadius: 26,
         background: C.input,
@@ -138,13 +138,8 @@ export function Images() {
             <CardView key={c.title} card={c} />
           ))}
         </div>
-        {/*
-         * الكومبوزر داخل الشبكة **تابع للأعمدة لا للحاوية الكبرى**:
-         * عرضه 728 = ٥ أعمدة + ٤ فجوات، وموضعه موضعها.
-         */}
-        <PromptBar fixed={false} />
       </div>
-      <PromptBar fixed />
+      <PromptBar />
     </div>
   );
 }
