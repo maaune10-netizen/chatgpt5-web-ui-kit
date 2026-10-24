@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { C } from '../lib/tokens';
-import { Composer } from './Composer';
+import { PageComposer } from './PageComposer';
 
 /*
  * صفحة `/images` — كل رقم فيها **مقيس** من `capture-13s-18.2mb.json` (حالة #9):
@@ -82,49 +82,6 @@ function CardView({ card }: { card: Card }) {
 
 const CARD_INK = 'rgba(255,255,255,0.06)';
 
-/*
- * **الكومبوزر نفسه، لا نسخة مشابهة.**
- * حقول الصور تُكتب في كومبوزر الشات بحرفه: Think · Dictate · Start Voice،
- * ويتصرّف مع العرض كما يتصرّف هناك — يصغر داخل الإطار ولا يدخل على الشريط.
- */
-function PromptBar() {
-  const [text, setText] = React.useState('');
-  const [effort, setEffort] = React.useState<'auto' | 'off' | 'low' | 'high' | 'max'>('auto');
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: 24,
-        /*
-         * **داخل الإطار لا فوقه:** يبدأ حيث ينتهي الشريط، فيتوسّط المحتوى
-         * (692 = 240 + (1672−768)/2) ولا يدخل على الشريط حين تضيق الشاشة.
-         */
-        left: 'var(--gpt5-sidebar-w, 240px)',
-        right: 0,
-        display: 'flex',
-        justifyContent: 'center',
-        paddingInline: 16,
-        zIndex: 40,
-        pointerEvents: 'none',
-      }}
-    >
-      <div style={{ pointerEvents: 'auto', width: '100%', maxWidth: 768 }}>
-        <Composer
-          value={text}
-          onChange={setText}
-          onSend={() => setText('')}
-          onStop={() => {}}
-          streaming={false}
-          placeholder="Describe an image"
-          thinking={effort}
-          onThinking={setEffort}
-          showDisclaimer={false}
-        />
-      </div>
-    </div>
-  );
-}
-
 export function Images() {
   const [tab, setTab] = React.useState<'trending' | 'templates'>('trending');
   const cards = tab === 'trending' ? TRENDING : TEMPLATES;
@@ -142,7 +99,8 @@ export function Images() {
           ))}
         </div>
       </div>
-      <PromptBar />
+      {/* الكومبوزر **ثابت في الصفحات** — مصدره واحد في `PageComposer` */}
+      <PageComposer placeholder="Describe an image" />
     </div>
   );
 }
