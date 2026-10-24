@@ -51,14 +51,14 @@ function Row({ item }: { item: Item }) {
           gap: 12,
         }}
       >
-        {/* أيقونة الصف: plus-lg 20×20 بلون ثانوي — كما في الملفّ */}
-        <span style={{ flex: '0 0 auto', marginTop: 4, opacity: 0.7, display: 'inline-flex' }}>
-          <Icon name="plus" size={20} />
-        </span>
+        {/* الإيموجي على اليسار (مقيس: العنوان يبدأ +40) — و«+» على اليمين */}
         <div style={{ width: 628 }}>
           <div style={{ height: 24, fontSize: 14, lineHeight: '20px', color: C.text }}>{item.title}</div>
           <div style={{ height: 24, fontSize: 14, lineHeight: '20px', color: C.muted, marginTop: 2 }}>{item.body}</div>
         </div>
+        <span style={{ flex: '0 0 auto', marginTop: 4, opacity: 0.7, display: 'inline-flex' }}>
+          <Icon name="plus" size={20} />
+        </span>
         {item.active && (
           <span
             style={{

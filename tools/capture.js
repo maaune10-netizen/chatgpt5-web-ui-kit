@@ -472,6 +472,31 @@
             box: { x: +br.x.toFixed(0), y: +br.y.toFixed(0), w: +br.width.toFixed(0), h: +br.height.toFixed(0) },
             s: styleIdOf(getComputedStyle(b)),
             icon: icon ? icon.outerHTML.replace(/\s+/g, ' ').slice(0, 20000) : null,
+            /*
+             * **كل** الأيقونات في العنصر، لا الأولى فقط.
+             * الصفّ فيه إيموجي يسارًا و«+» يمينًا — وأخذُ أول `<svg>` جعل
+             * الاثنين يبدوان واحدًا، وموضعه يبدو خطأً.
+             */
+            icons: [...el.querySelectorAll('svg,img')].slice(0, 8).map((n) => {
+              const r = n.getBoundingClientRect();
+              const u = n.querySelector ? n.querySelector('use') : null;
+              return {
+                kind: n.tagName.toLowerCase(),
+                box: { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) },
+                ref: u ? (u.getAttribute('href') || u.getAttribute('xlink:href')) : n.getAttribute('src'),
+                text: (n.textContent || '').trim().slice(0, 8),
+                bg: getComputedStyle(n).backgroundImage.slice(0, 120),
+              };
+            }).filter((i) => i.box.w > 0 && i.box.h > 0),
+            /* الإيموجي: نصّ قصير فيه رمز — أو محتوى عنصر زائف */
+            emoji: (() => {
+              const t = (el.textContent || '').trim();
+              if (/\p{Extended_Pictographic}/u.test(t) && t.length <= 4) return t;
+              const ps = ['::before', '::after'].map((q) => getComputedStyle(el, q).content).join(' ');
+              const e = ps.match(/\p{Extended_Pictographic}/gu);
+              return e ? e.join('') : null;
+            })(),
+            bgImage: getComputedStyle(el).backgroundImage.slice(0, 160),
           };
         })
         .filter(Boolean);
