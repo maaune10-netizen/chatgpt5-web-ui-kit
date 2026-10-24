@@ -145,7 +145,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar { width: 10px; height: 10px; }
+/*
+ * **٩ لا ١٠.** مقيس: مركز محتواهم 1071.5 = 240 + (1912−240−9)/2،
+ * وبدون شريط تمرير يصبح 1076 — أي فرق 4.5 في كل شبكة موسَّطة.
+ */
+::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: #4d4d4d; }
