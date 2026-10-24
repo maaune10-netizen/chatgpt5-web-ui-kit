@@ -1,261 +1,235 @@
-/**
- * Blueprint — مخطط كامل لأي جزء من الصفحة.
+/*
+ * blueprint.js — v4
  *
- *   الصق في Console على chatgpt.com، ثم:
- *     • تلقائيًّا: يلتقط **الشريط الجانبي** ويُنزّل `blueprint.json`.
- *     • أو لعنصر تختاره:  `__blueprint($0)`  — بعد تحديده في Inspector.
+ * الغرض: **بلوبرنت الصفحة كاملة**، لا صورة عنها.
  *
- * ويُخرج **أربع طرق للنظر إلى الشيء نفسه**، لأنّ كلًّا منها يكشف ما لا يكشفه الآخر:
+ *  1. كل عنصر: صندوقه، نصّه، دوره، أيقوناته، إيموجيه، صوره، مؤشّره، حالته.
+ *  2. كل تفاعليّ: يُمرَّر عليه تلقائيًّا، ويُسجَّل ما يفتحه (سطح/قائمة/تلميح).
+ *  3. كل موسِّع (aria-expanded / سهم / «More»): يُنقر تلقائيًّا، ويُسجَّل ما يفتحه، ثم Escape.
+ *  4. مخرَجَان: JSON كامل، وMarkdown مقروء بالهيكل والمقاسات.
  *
- *   ١) `tree`  — الشجرة كما هي: كل عنصر وأبناؤه، بترتيبهم وأعماقهم.
- *   ٢) `texts` — كل نصّ ظاهر: كلمته، خطّه، لونه، وصندوقه. (‏Pinned · Projects · Recents)
- *   ٣) `icons` — كل أيقونة: صندوقها، و`viewBox`، ونصّها (أو مرجع الـsprite).
- *   ٤) `rows`  — العناصر المتكرّرة: مجموعات إخوة لها نفس المقاس — أي «الصفوف».
- *
- * ولكل عنصر في الأربعة: الصندوق (نسبيًّا للجذر ومطلقًا) · الخطّ · الألوان ·
- * المسافات **لكل جهة** · والتخطيط (flex/grid/position).
- *
- * ولا يحتاج مكتبة، ولا يرسل شيئًا: يُنزّل ملفًّا عندك فقط.
+ * التشغيل: الصق الملفّ كاملًا في الكونسول. يعمل وحده ولا يحتاج ضغط زرّ.
  */
-(async () => {
-  const MAX_NODES = 2500;
+(() => {
+  const PANEL = '__bp_panel';
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const box = (n) => {
+    const r = n.getBoundingClientRect();
+    return { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) };
+  };
+  const visible = (n) => {
+    const r = n.getBoundingClientRect();
+    const s = getComputedStyle(n);
+    return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && +s.opacity > 0.05;
+  };
+  const own = (n) => {
+    let t = '';
+    for (const c of n.childNodes) if (c.nodeType === 3) t += c.textContent;
+    return t.replace(/\s+/g, ' ').trim();
+  };
+  const emojiOf = (n) => {
+    const t = (n.textContent || '').trim();
+    if (/\p{Extended_Pictographic}/u.test(t) && t.length <= 4) return t;
+    const p = ['::before', '::after'].map((q) => getComputedStyle(n, q).content).join(' ');
+    const m = p.match(/\p{Extended_Pictographic}/gu);
+    return m ? m.join('') : null;
+  };
+  const iconsOf = (n) =>
+    [...n.querySelectorAll('svg,img')]
+      .filter(visible)
+      .slice(0, 10)
+      .map((i) => {
+        const u = i.querySelector ? i.querySelector('use') : null;
+        return {
+          kind: i.tagName.toLowerCase(),
+          box: box(i),
+          ref: u ? u.getAttribute('href') || u.getAttribute('xlink:href') : i.getAttribute('src'),
+          bg: getComputedStyle(i).backgroundImage.slice(0, 100),
+        };
+      });
 
-  const px = (v) => (v === 'normal' ? null : v);
-  const sides = (cs, p) => [cs[p + 'Top'], cs[p + 'Right'], cs[p + 'Bottom'], cs[p + 'Left']];
+  /* ---------- الأسطح الظاهرة ---------- */
+  const surfaceRoots = () =>
+    [...document.querySelectorAll('[role="menu"],[role="dialog"],[role="listbox"],[role="tooltip"],[data-state="open"]')].filter(
+      (n) => !n.closest('#' + PANEL) && visible(n) && box(n).w > 40 && box(n).w < 900,
+    );
 
-  const styleOf = (cs) => ({
-    font: {
-      family: cs.fontFamily.split(',')[0].replace(/["']/g, ''),
-      size: cs.fontSize,
-      weight: cs.fontWeight,
-      style: cs.fontStyle,
-      lineHeight: cs.lineHeight,
-      letterSpacing: px(cs.letterSpacing),
-      align: cs.textAlign,
-      transform: cs.textTransform,
-      whiteSpace: cs.whiteSpace,
-      overflow: cs.textOverflow,
-    },
-    color: {
-      text: cs.color,
-      bg: cs.backgroundColor,
-      bgImage: cs.backgroundImage === 'none' ? null : cs.backgroundImage,
-      border: cs.borderTopColor,
-      opacity: cs.opacity,
-    },
-    space: {
-      pad: sides(cs, 'padding'),
-      margin: sides(cs, 'margin'),
-      gap: px(cs.gap),
-      rowGap: px(cs.rowGap),
-      radius: cs.borderRadius,
-      borderWidth: sides(cs, 'border').map((v) => v),
-      borderStyle: cs.borderTopStyle,
-      shadow: cs.boxShadow === 'none' ? null : cs.boxShadow,
-    },
-    layout: {
-      display: cs.display,
-      position: cs.position,
-      flexDirection: cs.flexDirection,
-      flexWrap: cs.flexWrap,
-      alignItems: cs.alignItems,
-      justifyContent: cs.justifyContent,
-      gridTemplateColumns: cs.gridTemplateColumns === 'none' ? null : cs.gridTemplateColumns,
-      overflowX: cs.overflowX,
-      overflowY: cs.overflowY,
-      zIndex: cs.zIndex === 'auto' ? null : cs.zIndex,
-    },
+  const surfaceOf = (root) => ({
+    role: root.getAttribute('role') || root.tagName.toLowerCase(),
+    box: box(root),
+    text: (root.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 400),
+    items: [...root.querySelectorAll('[role="menuitem"],[role="menuitemradio"],[role="option"],button,a')]
+      .filter(visible)
+      .slice(0, 30)
+      .map((b) => ({
+        text: (b.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 120),
+        box: box(b),
+        icons: iconsOf(b),
+        emoji: emojiOf(b),
+        expanded: b.getAttribute('aria-expanded'),
+        checked: b.getAttribute('aria-checked'),
+      })),
   });
 
-  const boxOf = (el, root) => {
-    const r = el.getBoundingClientRect();
-    const b = root.getBoundingClientRect();
+  /* ---------- المسح ---------- */
+  const all = [...document.querySelectorAll('body *')].filter((n) => !n.closest('#' + PANEL) && visible(n));
+
+  const nodes = all.map((n) => {
+    const s = getComputedStyle(n);
     return {
-      abs: { x: +r.x.toFixed(2), y: +r.y.toFixed(2), w: +r.width.toFixed(2), h: +r.height.toFixed(2) },
-      /** نسبيًّا إلى جذر المخطط — هذه هي التي تُبنى منها المسافات */
-      rel: { x: +(r.x - b.x).toFixed(2), y: +(r.y - b.y).toFixed(2), w: +r.width.toFixed(2), h: +r.height.toFixed(2) },
+      tag: n.tagName.toLowerCase(),
+      role: n.getAttribute('role'),
+      text: own(n).slice(0, 200) || null,
+      box: box(n),
+      font: { size: s.fontSize, weight: s.fontWeight, line: s.lineHeight, family: s.fontFamily.split(',')[0] },
+      color: s.color,
+      bg: s.backgroundColor,
+      radius: s.borderRadius,
+      padding: s.padding,
+      gap: s.gap,
+      display: s.display,
+      cursor: s.cursor,
+      overflow: s.overflow,
+      icons: iconsOf(n),
+      emoji: emojiOf(n),
+      img: n.tagName === 'IMG' ? n.src : null,
+      bgImage: s.backgroundImage !== 'none' ? s.backgroundImage.slice(0, 140) : null,
+      disabled: n.disabled || n.getAttribute('aria-disabled') === 'true' || null,
+      expanded: n.getAttribute('aria-expanded'),
+      label: n.getAttribute('aria-label') || n.title || null,
+      href: n.getAttribute('href') || null,
     };
-  };
+  });
 
-  const ownText = (el) =>
-    [...el.childNodes]
-      .filter((n) => n.nodeType === 3)
-      .map((n) => n.textContent.replace(/\s+/g, ' ').trim())
-      .filter(Boolean)
-      .join(' ');
+  /* ---------- المرشّحون للتحويم والنقر ---------- */
+  const hovCandidates = all
+    .filter((n) => {
+      const s = getComputedStyle(n);
+      const r = n.getBoundingClientRect();
+      return r.width > 12 && r.height > 12 && (n.tagName === 'BUTTON' || n.tagName === 'A' || n.getAttribute('role') === 'menuitem' || s.cursor === 'pointer');
+    })
+    .slice(0, 28);
 
-  const pathOf = (el, root) => {
-    const parts = [];
-    let n = el;
-    while (n && n !== root.parentElement) {
-      let s = n.tagName.toLowerCase();
-      if (n.id) s += '#' + n.id;
-      const cls = (typeof n.className === 'string' ? n.className : '').split(/\s+/).filter((c) => c && !c.includes(':')).slice(0, 2);
-      if (cls.length) s += '.' + cls.join('.');
-      parts.unshift(s);
-      if (n === root) break;
-      n = n.parentElement;
-    }
-    return parts.join(' > ');
-  };
+  const expandCandidates = hovCandidates.filter(
+    (n) => n.getAttribute('aria-expanded') === 'false' || /chevron|caret|arrow/i.test(n.innerHTML.slice(0, 800)),
+  );
 
-  const iconOf = (el) => {
-    const svg = el.tagName === 'svg' ? el : el.querySelector('svg');
-    if (!svg) {
-      /*
-       * ليست كل الأيقونات `<svg>`: بعضها `<span>` بقناع CSS
-       * (`mask-image: url(…)`) أو `background-image`. وهي التي نستعملها نحن.
-       */
-      const cs = getComputedStyle(el);
-      const mask = cs.maskImage !== 'none' ? cs.maskImage : cs.webkitMaskImage !== 'none' ? cs.webkitMaskImage : null;
-      const bg = cs.backgroundImage !== 'none' ? cs.backgroundImage : null;
-      const src = mask || bg;
-      if (!src) return null;
-      const m = /url\("?([^")]+)"?\)/.exec(src);
-      if (!m) return null;
-      const r = el.getBoundingClientRect();
-      return { kind: mask ? 'mask' : 'background', src: m[1], size: { w: +r.width.toFixed(1), h: +r.height.toFixed(1) } };
-    }
-    const use = svg.querySelector('use');
-    const href = use ? use.getAttribute('href') || use.getAttribute('xlink:href') : null;
-    const html = svg.outerHTML;
-    return {
-      viewBox: svg.getAttribute('viewBox'),
-      size: { w: +svg.getBoundingClientRect().width.toFixed(1), h: +svg.getBoundingClientRect().height.toFixed(1) },
-      spriteRef: href,
-      /* النصّ الكامل للأيقونة إن كانت مسارات — وإلا يكفي مرجع الـsprite */
-      html: href ? null : html.length < 4000 ? html : null,
-      htmlLength: html.length,
-    };
-  };
+  const run = async () => {
+    const result = { url: location.href, at: new Date().toISOString(), viewport: { w: innerWidth, h: innerHeight }, nodes, hovers: [], clicks: [] };
 
-  const texts = [];
-  const icons = [];
-  let count = 0;
-
-  const toNode = (el, root, depth) => {
-    if (count >= MAX_NODES) return null;
-    const tag = el.tagName;
-    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') return null;
-    const cs = getComputedStyle(el);
-    if (cs.display === 'none' || cs.visibility === 'hidden') return null;
-    const r = el.getBoundingClientRect();
-
-    count++;
-    const label = (el.getAttribute('aria-label') || el.getAttribute('title') || '').trim() || null;
-    const own = ownText(el);
-    const icon = iconOf(el);
-    const box = boxOf(el, root);
-    const style = styleOf(cs);
-
-    if (own) texts.push({ depth, tag, text: own.slice(0, 160), box: box.rel, font: style.font, color: style.color, path: pathOf(el, root) });
-    if (icon && el.tagName !== 'svg') icons.push({ depth, box: box.rel, ...icon, path: pathOf(el, root) });
-
-    const node = {
-      depth,
-      path: pathOf(el, root),
-      tag,
-      role: el.getAttribute('role') || null,
-      label,
-      text: own || null,
-      box,
-      style,
-      icon,
-      children: [],
-    };
-
-    for (const child of el.children) {
-      const n = toNode(child, root, depth + 1);
-      if (n) node.children.push(n);
-    }
-    return node;
-  };
-
-  /** الصفوف: إخوة متطابقون في الوسم والارتفاع — أي «عناصر القائمة» */
-  const rows = [];
-  const collectRows = (node) => {
-    const groups = new Map();
-    for (const c of node.children || []) {
-      if (c.box.rel.h < 8 || c.box.rel.h > 300) continue;
-      const k = `${c.tag}|${Math.round(c.box.rel.h)}`;
-      if (!groups.has(k)) groups.set(k, []);
-      groups.get(k).push(c);
-    }
-    for (const [, list] of groups) {
-      if (list.length < 2) continue;
-      const sorted = [...list].sort((a, b) => a.box.rel.y - b.box.rel.y);
-      /* الفراغ = المسافة بين نهاية صفّ وبداية التالي. والسالب ضجيج حاويات. */
-      const gaps = [];
-      for (let i = 1; i < sorted.length; i++) {
-        const g = +(sorted[i].box.rel.y - (sorted[i - 1].box.rel.y + sorted[i - 1].box.rel.h)).toFixed(2);
-        if (g >= 0) gaps.push(g);
+    /* 1) تحويم على كل مرشّح */
+    for (const n of hovCandidates) {
+      try {
+        const r = n.getBoundingClientRect();
+        const cx = Math.round(r.x + r.width / 2);
+        const cy = Math.round(r.y + r.height / 2);
+        n.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, clientX: cx, clientY: cy }));
+        n.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, clientX: cx, clientY: cy }));
+        n.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, clientX: cx, clientY: cy }));
+        n.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true, clientX: cx, clientY: cy }));
+        n.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: cx, clientY: cy }));
+        await sleep(300);
+        const surf = surfaceRoots().map(surfaceOf);
+        const cur = getComputedStyle(n);
+        result.hovers.push({
+          target: { text: own(n).slice(0, 60), label: n.getAttribute('aria-label'), box: box(n), tag: n.tagName.toLowerCase() },
+          cursor: cur.cursor,
+          cursorAfter: cur.cursor,
+          surfaces: surf,
+        });
+      } catch (e) {
+        /* عنصر اختفى أثناء المسح */
       }
-      if (!gaps.length) continue;
-      const f = sorted[0];
-      rows.push({
-        count: sorted.length,
-        tag: f.tag,
-        h: f.box.rel.h,
-        w: f.box.rel.w,
-        gapBetween: Math.max(...gaps) === Math.min(...gaps) ? gaps[0] : gaps,
-        sample: (f.label || f.text || '').slice(0, 50),
-        font: f.style.font,
-        pad: f.style.space.pad,
-        radius: f.style.space.radius,
-        bg: f.style.color.bg,
-        parentPath: (f.path || '').split(' > ').slice(0, -1).join(' > '),
-      });
     }
-    for (const c of node.children || []) collectRows(c);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+    /* 2) نقر على كل موسِّع */
+    for (const n of expandCandidates.slice(0, 8)) {
+      try {
+        const before = surfaceRoots().length;
+        n.click();
+        await sleep(480);
+        const surf = surfaceRoots().map(surfaceOf);
+        result.clicks.push({
+          target: { text: own(n).slice(0, 60), label: n.getAttribute('aria-label'), box: box(n) },
+          before,
+          after: surf.length,
+          surfaces: surf,
+        });
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+        await sleep(240);
+      } catch (e) {
+        /* تجاهل */
+      }
+    }
+
+    return result;
   };
 
-  const run = (root, label) => {
-    count = 0;
-    texts.length = 0;
-    icons.length = 0;
-    rows.length = 0;
-    const tree = toNode(root, root, 0);
-    collectRows(tree);
-    const out = {
-      what: label,
-      url: location.href,
-      at: new Date().toISOString(),
-      viewport: { w: window.innerWidth, h: window.innerHeight, dpr: window.devicePixelRatio },
-      theme: document.documentElement.getAttribute('data-theme') || document.documentElement.dataset?.theme || null,
-      root: { tag: root.tagName, box: boxOf(root, root), style: styleOf(getComputedStyle(root)) },
-      counts: { nodes: count, texts: texts.length, icons: icons.length, rowGroups: rows.length },
-      tree,
-      texts,
-      icons,
-      rows,
-    };
-    const blob = new Blob([JSON.stringify(out, null, 1)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `blueprint-${label.replace(/[^a-z0-9-]/gi, '')}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    console.log(
-      `✓ ${a.download} — عناصر ${count} · نصوص ${texts.length} · أيقونات ${icons.length} · مجموعات صفوف ${rows.length}`,
-    );
-    return out;
-  };
-
-  /* كشف الشريط الجانبي: aside، ثم أول عمود طويل ضيّق */
-  const detect = () => {
-    const aside = document.querySelector('aside');
-    if (aside) return [aside, 'sidebar'];
-    const nav = document.querySelector('nav');
-    if (nav) return [nav, 'nav'];
-    const cand = [...document.querySelectorAll('div')].find((d) => {
-      const r = d.getBoundingClientRect();
-      return r.height > window.innerHeight * 0.8 && r.width > 180 && r.width < 420 && r.x < 40;
+  /* ---------- Markdown مقروء ---------- */
+  const md = (r) => {
+    const L = [];
+    L.push('# ' + r.url);
+    L.push(`viewport ${r.viewport.w}×${r.viewport.h} · ${r.nodes.length} nodes`);
+    L.push('\n## الهيكل والمقاسات');
+    for (const n of r.nodes) {
+      if (n.box.w < 8 || n.box.h < 8) continue;
+      const bits = [`\`${n.tag}\``, `${n.box.x},${n.box.y} ${n.box.w}×${n.box.h}`];
+      if (n.text) bits.push(`"${n.text.slice(0, 50)}"`);
+      if (n.emoji) bits.push(`emoji ${n.emoji}`);
+      if (n.icons.length) bits.push(`icons ${n.icons.length}(${n.icons.map((i) => (i.ref || '').split('/').pop()).join(',')})`);
+      if (n.font.size !== '16px') bits.push(`${n.font.size}/${n.font.line} ${n.font.weight}`);
+      if (n.radius !== '0px') bits.push(`r ${n.radius}`);
+      L.push('- ' + bits.join(' · '));
+    }
+    L.push('\n## التحويم');
+    r.hovers.forEach((h, i) => {
+      if (!h.surfaces.length) return;
+      L.push(`\n### ${i}. "${h.target.text || h.target.label}" @${h.target.box.x},${h.target.box.y}`);
+      for (const s of h.surfaces) {
+        L.push(`- ${s.role} ${s.box.w}×${s.box.h}: ${s.text.slice(0, 120)}`);
+        for (const it of s.items) L.push(`  - ${it.emoji || ''} ${it.text || '(icon)'} ${it.box.w}×${it.box.h}${it.expanded ? ' ▸' : ''}`);
+      }
     });
-    return cand ? [cand, 'sidebar'] : [document.body, 'body'];
+    L.push('\n## النقر');
+    r.clicks.forEach((c, i) => {
+      L.push(`\n### ${i}. "${c.target.text || c.target.label}" — surfaces ${c.before} → ${c.after}`);
+      for (const s of c.surfaces) {
+        L.push(`- ${s.role} ${s.box.w}×${s.box.h}: ${s.text.slice(0, 120)}`);
+        for (const it of s.items) L.push(`  - ${it.emoji || ''} ${it.text || '(icon)'}`);
+      }
+    });
+    return L.join('\n');
   };
 
-  window.__blueprint = (el) => run(el || document.body, 'custom');
-  const [root, label] = detect();
-  run(root, label);
+  /* ---------- اللوحة ---------- */
+  const panel = document.createElement('div');
+  panel.id = PANEL;
+  panel.style.cssText =
+    'position:fixed;right:12px;bottom:12px;z-index:2147483647;background:#111;color:#eee;font:12px/1.5 ui-monospace,monospace;padding:10px 12px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.6);max-width:320px';
+  panel.innerHTML = '<b>blueprint</b><div id="__bp_s">جارٍ الفحص…</div>';
+  document.body.appendChild(panel);
+  const say = (t) => (document.getElementById('__bp_s').textContent = t);
+
+  const save = (name, data, type) => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([data], { type }));
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  };
+
+  (async () => {
+    const r = await run();
+    window.__bp = r;
+    say(`${r.nodes.length} عنصر · ${r.hovers.filter((h) => h.surfaces.length).length} تحويم بسطح · ${r.clicks.filter((c) => c.after > c.before).length} نقرة بسطح`);
+    panel.insertAdjacentHTML(
+      'beforeend',
+      '<div style="display:flex;gap:6px;margin-top:8px">' +
+        '<button id="__bp_j" style="flex:1;padding:6px;border-radius:6px;background:#2a2a2a;color:#eee">JSON</button>' +
+        '<button id="__bp_m" style="flex:1;padding:6px;border-radius:6px;background:#2a2a2a;color:#eee">Markdown</button></div>',
+    );
+    document.getElementById('__bp_j').onclick = () => save('blueprint.json', JSON.stringify(r, null, 2), 'application/json');
+    document.getElementById('__bp_m').onclick = () => save('blueprint.md', md(r), 'text/markdown');
+  })();
 })();
