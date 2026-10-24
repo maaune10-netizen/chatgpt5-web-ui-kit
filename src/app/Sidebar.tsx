@@ -578,7 +578,8 @@ export function Sidebar({
                 <Row icon="codexAgentUpgraded" label="Codex" compact={compact} onClick={() => store.go('codex')} />
               </div>
               <div style={{ marginTop: 1 }}>
-                <Row icon="explore" label="Explore" compact={compact} onClick={() => store.go('explore')} />
+                {/* «Explore» يفتح **قائمة** لا صفحة — مقيس: role=menu 172×56 ببند واحد «Maps» */}
+                <ExploreMenu compact={compact} />
               </div>
             </>
           ) : (
@@ -1017,3 +1018,63 @@ function Divider() {
   return <div className="my-1 h-px" style={{ background: C.line }} />;
 }
 
+
+
+/*
+ * قائمة Explore — **مقيسة من الالتقاط**:
+ *   role=menu · 172×56 · بند واحد «Maps»
+ * أي سطح بخيار، لا صفحة ولا تلميح.
+ */
+function ExploreMenu({ compact }: { compact?: boolean }) {
+  const [open, setOpen] = useState(false);
+  const anchor = useRef<HTMLDivElement | null>(null);
+  const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const r = anchor.current?.getBoundingClientRect();
+    if (r) setPos({ left: Math.round(r.left) + 12, top: Math.round(r.top) + Math.round(r.height) + 4 });
+    const onDoc = (e: MouseEvent) => {
+      if (!anchor.current?.contains(e.target as Node)) setOpen(false);
+    };
+    window.addEventListener('mousedown', onDoc);
+    return () => window.removeEventListener('mousedown', onDoc);
+  }, [open]);
+
+  return (
+    <div ref={anchor} className="relative">
+      <Row icon="explore" label="Explore" compact={compact} onClick={() => setOpen((v) => !v)} />
+      {open && pos && (
+        <div
+          role="menu"
+          style={{
+            position: 'fixed',
+            left: pos.left,
+            top: pos.top,
+            width: 172,
+            height: 56,
+            background: C.menu,
+            borderRadius: 12,
+            boxShadow: MENU_SHADOW,
+            padding: 6,
+            zIndex: 200,
+          }}
+        >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setOpen(false);
+              window.location.hash = 'flow';
+            }}
+            className="flex w-full items-center gap-2 rounded-[8px] px-2 text-start hover:bg-white/[0.07]"
+            style={{ height: 44, fontSize: 14, color: C.text }}
+          >
+            <Icon name="globe" size={18} />
+            Maps
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
