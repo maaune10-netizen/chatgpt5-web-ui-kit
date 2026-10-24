@@ -72,9 +72,26 @@ function CardView({ card }: { card: Card }) {
       style={{ width: CARD_W, height: CARD_H, borderRadius: 12, overflow: 'hidden', background: CARD_INK, textAlign: 'start' }}
     >
       {/* مساحة الصورة: 111 = 174 − 63 */}
-      <div style={{ height: CARD_H - 63, background: `linear-gradient(150deg, ${card.tone}, #1b1b1b)` }} />
-      <div style={{ height: 63, padding: '32px 12px 12px' }}>
-        <span style={{ fontSize: 12, lineHeight: '19px', color: C.text, display: 'block' }}>{card.title}</span>
+      <div style={{ height: CARD_H, position: 'relative', background: `linear-gradient(150deg, ${card.tone}, #1b1b1b)` }}>
+        {/*
+         * **العنوان فوق الصورة**، أسفلها يسارًا، أبيض عريض.
+         * كان تحتها في صندوق 63 — والصورة تقول إنّه مطبوع عليها.
+         */}
+        <span
+          style={{
+            position: 'absolute',
+            left: 10,
+            bottom: 8,
+            fontSize: 13,
+            lineHeight: '17px',
+            fontWeight: 600,
+            color: '#fff',
+            textShadow: '0 1px 2px rgba(0,0,0,0.45)',
+            maxWidth: CARD_W - 20,
+          }}
+        >
+          {card.title}
+        </span>
       </div>
     </button>
   );
@@ -87,7 +104,10 @@ export function Images() {
   const cards = tab === 'trending' ? TRENDING : TEMPLATES;
 
   return (
-    <div style={{ paddingTop: 90.8 - 52 /* رأس الصفحة 52 */ }}>
+    <div style={{ paddingTop: 26 }}>
+      <div style={{ width: GRID_W, marginInline: 'auto' }}>
+        <h1 style={{ margin: 0, marginBottom: 30, fontSize: 20, lineHeight: '28px', fontWeight: 600, color: C.text }}>Images</h1>
+      </div>
       <div style={{ width: GRID_W, marginInline: 'auto' }}>
         <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
           <Tab label="Trending" active={tab === 'trending'} onClick={() => setTab('trending')} width={90} />
@@ -100,7 +120,7 @@ export function Images() {
         </div>
       </div>
       {/* الكومبوزر **ثابت في الصفحات** — مصدره واحد في `PageComposer` */}
-      <PageComposer placeholder="Describe an image" />
+      <PageComposer placeholder="Describe a new image" />
     </div>
   );
 }
